@@ -35,22 +35,22 @@ class MainApplication(tk.Frame):
         self.columnconfigure(0, weight=1, minsize=200)
 
         #holds nx1 grid of instances
-        instancesPanel = tk.Frame(self, bg="black")
+        instancesPanel = tk.Frame(self)
         instancesPanel.grid(column=0, row=0, sticky="nsew")
-        self.rowconfigure(0, weight=0, minsize=100)
+        self.rowconfigure(0, weight=1, minsize=100)
 
         instancesPanel.columnconfigure(0, weight=3, minsize=200) #setting only one column, the others are all hidden
 
         #frame that occupies empty space between instancesPanel and extraPanel
-        blankFrame = tk.Frame(self, bg ="blue", height=300)
-        blankFrame.grid(column=0, row=1, sticky="nsew")
-        self.rowconfigure(1, weight=3, minsize=50)
+        #blankFrame = tk.Frame(self, bg ="blue", height=300)
+        #blankFrame.grid(column=0, row=1, sticky="nsew")
+        #self.rowconfigure(1, weight=3)
 
 
         #holds ADD button, for now
         extraPanel = tk.Frame(self, bg="white")
-        extraPanel.grid(column=0, row=2, sticky="nsew")
-        self.rowconfigure(2, weight=1, minsize=25)
+        extraPanel.grid(column=0, row=1, sticky="nsew")
+        self.rowconfigure(1, weight=0, minsize=25)
 
         extraPanel.columnconfigure(0, weight=1, minsize=200) #setting up extraPanel
         extraPanel.rowconfigure(0, weight=1, minsize=20) #setting up extraPanel
