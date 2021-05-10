@@ -8,7 +8,7 @@ class TickFrame(tk.Frame):
             
 
             # TORESTORE: name_lbl = tk.Label(master=self, text=name, width=25)
-            name_lbl = tk.Label(master=self, text=name, width=50, height=3)
+            name_lbl = tk.Label(master=self, text=name, width=25, height=3)
             decrease_btn = tk.Button(master=self, text="-")
             count_lbl = tk.Label(master=self, text=" ")
             increase_btn = tk.Button(master=self, text="+")
@@ -37,14 +37,14 @@ class MainApplication(tk.Frame):
         #holds nx1 grid of instances
         instancesPanel = tk.Frame(self, bg="black")
         instancesPanel.grid(column=0, row=0, sticky="nsew")
-        self.rowconfigure(0, weight=5, minsize=100)
+        self.rowconfigure(0, weight=0, minsize=100)
 
-        instancesPanel.columnconfigure(0, weight=1, minsize=200) #setting only one column, the others are all hidden
+        instancesPanel.columnconfigure(0, weight=3, minsize=200) #setting only one column, the others are all hidden
 
         #frame that occupies empty space between instancesPanel and extraPanel
-        blankFrame = tk.Frame(self, bg ="blue")
+        blankFrame = tk.Frame(self, bg ="blue", height=300)
         blankFrame.grid(column=0, row=1, sticky="nsew")
-        self.rowconfigure(1, weight=3, minsize=25)
+        self.rowconfigure(1, weight=3, minsize=50)
 
 
         #holds ADD button, for now
