@@ -62,7 +62,7 @@ class MainApplication(tk.Frame):
 
         #Create a frame for the canvas and scrollbar
         frame0 = tk.Frame(self)
-        frame0.grid(row=0, column=0)
+        frame0.grid(row=0, column=0, sticky = "nsew")
         #Create a Canvas
         my_canvas = tk.Canvas(self)
         my_canvas.grid(column=0, row=0)
