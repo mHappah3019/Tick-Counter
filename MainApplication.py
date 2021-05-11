@@ -35,11 +35,11 @@ class MainApplication(tk.Frame):
         self.columnconfigure(0, weight=1, minsize=200)
 
         #holds nx1 grid of instances
-        instancesPanel = tk.Frame(self)
-        instancesPanel.grid(column=0, row=0, sticky="nsew")
+        #TORESTORE: instancesPanel = tk.Frame(self)
+        #TORESTORE: instancesPanel.grid(column=0, row=0, sticky="nsew")
         self.rowconfigure(0, weight=1, minsize=100)
 
-        instancesPanel.columnconfigure(0, weight=3, minsize=200) #setting only one column, the others are all hidden
+        #TORESTORE: instancesPanel.columnconfigure(0, weight=3, minsize=200) #setting only one column, the others are all hidden
 
         #frame that occupies empty space between instancesPanel and extraPanel
         #blankFrame = tk.Frame(self, bg ="blue", height=300)
@@ -63,14 +63,21 @@ class MainApplication(tk.Frame):
         #Create a frame for the canvas and scrollbar
         frame0 = tk.Frame(self)
         frame0.grid(row=0, column=0, sticky = "nsew")
-        #Create a Canvas
-        my_canvas = tk.Canvas(self)
-        my_canvas.grid(column=0, row=0)
+        #Add a canvas in that frame
+        canvas = tk.Canvas(frame0, bg="yellow")
+        canvas.grid(column=0, row=0)
 
 
-        #Add a Scrollbar to the Canvas
-        my_scrollbar = tk.Scrollbar()
-        #Configure the Canvas
+        #Create a vertical scrollbar linked to the canvas
+
+        vsbar = tk.Scrollbar(frame0, orient=tk.VERTICAL, command=canvas.yview)
+        vsbar.grid(row=0, column=1, sticky="ns")
+        canvas.configure(yscrollcommand=vsbar.set)
+        
+        #Create a frame on the canvas to contain TickFrames
+
+        instancesPanel = tk.Frame(self, bg="red", bd=2)
+        instancesPanel.columnconfigure(0, weight=3, minsize=200)
 
 
         for count, name in enumerate(instances_names_array):
