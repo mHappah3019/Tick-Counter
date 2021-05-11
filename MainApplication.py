@@ -60,6 +60,19 @@ class MainApplication(tk.Frame):
         ADD_btn.grid(row=0, column=0, sticky="nsew")
 
 
+        #Create a frame for the canvas and scrollbar
+        frame0 = tk.Frame(self)
+        frame0.grid(row=0, column=0)
+        #Create a Canvas
+        my_canvas = tk.Canvas(self)
+        my_canvas.grid(column=0, row=0)
+
+
+        #Add a Scrollbar to the Canvas
+        my_scrollbar = tk.Scrollbar()
+        #Configure the Canvas
+
+
         for count, name in enumerate(instances_names_array):
             instancesPanel.rowconfigure(count, weight=1)
             # TODO: capire come si può passare come argomenti relief e borderwidth
