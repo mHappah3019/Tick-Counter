@@ -28,15 +28,14 @@ class TickFrame(tk.Frame):
 
 class MainApplication(tk.Frame):
     def __init__(self, parent, *args, **kwargs):
-        tk.Frame.__init__(self, parent, *args, **kwargs)
+        tk.Frame.__init__(self, parent, *args, **kwargs) #bg="black" to check how sticky="nsew" works for the Frames (instancesPanel etc)
         self.parent = parent #"parent" shall be "root"
-
         #needed for "hiding" all the empty columns
         self.columnconfigure(0, weight=1, minsize=200)
 
         #holds nx1 grid of instances
         instancesPanel = tk.Frame(self, bg="black")
-        instancesPanel.grid(column=0, row=0, sticky="nsew")
+        instancesPanel.grid(column=0, row=0, sticky="nsew") #nsew serve anche qua in quanto altrimenti il Frame viene fatto grande quanto basta e il resto viene lasciato "blank" (grey)
         self.rowconfigure(0, weight=5, minsize=100)
 
         instancesPanel.columnconfigure(0, weight=1, minsize=200) #setting only one column, the others are all hidden
