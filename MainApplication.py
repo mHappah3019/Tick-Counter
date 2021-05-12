@@ -1,6 +1,7 @@
 import tkinter as tk
 
-instances_names_array = ["Tick1", "Tick2", "Tick3"]
+instances_names_array = ["Tick1", "Tick2", "Tick3", "Tick3", "Tick3", "Tick3", "Tick3", "Tick3", "Tick3", "Tick3", "Tick3"]
+
 
 class TickFrame(tk.Frame):
         def __init__(self, parent, name):
@@ -63,21 +64,29 @@ class MainApplication(tk.Frame):
         #Create a frame for the canvas and scrollbar
         frame0 = tk.Frame(self)
         frame0.grid(row=0, column=0, sticky = "nsew")
+        frame0.columnconfigure(0, weight=1)
+        frame0.rowconfigure(0, weight=1)
+
+
+        def onCanvasConfigure(e):
+            canvas.itemconfig('frame', height=canvas.winfo_height(), width=canvas.winfo_width())
         #Add a canvas in that frame
         canvas = tk.Canvas(frame0, bg="yellow")
-        canvas.grid(column=0, row=0)
+        canvas.grid(column=0, row=0, sticky="nsew")
 
 
         #Create a vertical scrollbar linked to the canvas
-
         vsbar = tk.Scrollbar(frame0, orient=tk.VERTICAL, command=canvas.yview)
-        vsbar.grid(row=0, column=1, sticky="ns")
+        vsbar.grid(row=0, column=1, sticky="nsew")
         canvas.configure(yscrollcommand=vsbar.set)
         
         #Create a frame on the canvas to contain TickFrames
-
-        instancesPanel = tk.Frame(self, bg="red", bd=2)
+        instancesPanel = tk.Frame(canvas, bg="red", bd=2)
         instancesPanel.columnconfigure(0, weight=3, minsize=200)
+
+        canvas.create_window((0,0), window=instancesPanel, anchor="nw", tags="frame")
+
+        canvas.bind("<Configure>", onCanvasConfigure)
 
 
         for count, name in enumerate(instances_names_array):
