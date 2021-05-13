@@ -1,4 +1,5 @@
 import tkinter as tk
+import time
 
 instances_names_array = ["Tick1", "Tick2", "Tick3", "Tick3", "Tick3", "Tick3", "Tick3", "Tick3", "Tick3", "Tick3", "Tick3"]
 
@@ -9,7 +10,7 @@ class TickFrame(tk.Frame):
             
 
             # TORESTORE: name_lbl = tk.Label(master=self, text=name, width=25)
-            name_lbl = tk.Label(master=self, text=name, width=25, height=3)
+            name_lbl = tk.Label(master=self, text=name, width=25, height=2)
             decrease_btn = tk.Button(master=self, text="-")
             count_lbl = tk.Label(master=self, text=" ")
             increase_btn = tk.Button(master=self, text="+")
@@ -72,6 +73,9 @@ class MainApplication(tk.Frame):
 
         def onCanvasConfigure(e):
             canvas.itemconfig('frame', height=canvas.winfo_height(), width=canvas.winfo_width())
+        def onFrameConfigure(e):
+            '''Reset the scroll region to encompass the inner frame'''
+            canvas.configure(scrollregion=canvas.bbox("all"))
 
         #Add a canvas in that frame
         canvas = tk.Canvas(frame0, bg="yellow")
@@ -80,7 +84,7 @@ class MainApplication(tk.Frame):
 
         #Create a vertical scrollbar linked to the canvas
         vsbar = tk.Scrollbar(frame0, orient=tk.VERTICAL, command=canvas.yview)
-        vsbar.grid(row=0, column=1, sticky="nsew")
+        vsbar.grid(row=0, column=1, sticky="ns")
         canvas.configure(yscrollcommand=vsbar.set)
         
         #Create a frame on the canvas to contain TickFrames
@@ -89,8 +93,11 @@ class MainApplication(tk.Frame):
 
         canvas.create_window((0,0), window=instancesPanel, anchor="nw", tags="frame")
 
-        canvas.bind("<Configure>", onCanvasConfigure)
+        #TODO: i due qua sotto si sovrascrivono
+        canvas.bind("<Configure>", onFrameConfigure)
+        #canvas.bind("<Configure>", onCanvasConfigure)
 
+    
         #TODO: make the scrollbar work when TickFrames have weight = 0
 
         for count, name in enumerate(instances_names_array):
@@ -109,6 +116,8 @@ class MainApplication(tk.Frame):
 
 if __name__ == "__main__":
     root = tk.Tk()
+    root.geometry("400x600")
+    
     MainApplication(root).pack(side="top", fill="both", expand=True)
-
+    
     root.mainloop()
