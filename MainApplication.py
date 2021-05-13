@@ -18,6 +18,7 @@ class TickFrame(tk.Frame):
 
             self.columnconfigure([0,1,2,3,4], weight=1)
             self.rowconfigure(0, weight=1)
+            
     
             name_lbl.grid(row=0, column=0, sticky="nsew")
 
@@ -64,15 +65,17 @@ class MainApplication(tk.Frame):
         #Create a frame for the canvas and scrollbar
         frame0 = tk.Frame(self)
         frame0.grid(row=0, column=0, sticky = "nsew")
+    
         frame0.columnconfigure(0, weight=1)
         frame0.rowconfigure(0, weight=1)
 
 
         def onCanvasConfigure(e):
             canvas.itemconfig('frame', height=canvas.winfo_height(), width=canvas.winfo_width())
+
         #Add a canvas in that frame
         canvas = tk.Canvas(frame0, bg="yellow")
-        canvas.grid(column=0, row=0, sticky="nsew")
+        canvas.grid(column=0, row=0, sticky = "nsew")
 
 
         #Create a vertical scrollbar linked to the canvas
@@ -88,9 +91,11 @@ class MainApplication(tk.Frame):
 
         canvas.bind("<Configure>", onCanvasConfigure)
 
+        #TODO: make the scrollbar work when TickFrames have weight = 0
 
         for count, name in enumerate(instances_names_array):
-            instancesPanel.rowconfigure(count, weight=1)
+            #TORESTORE: instancesPanel.rowconfigure(count, weight=1)
+            instancesPanel.rowconfigure(count, weight=0)
             # TODO: capire come si può passare come argomenti relief e borderwidth
             #instance = TickFrame(instancesPanel, name, relief=tk.SUNKEN, borderwidth=2)
             instance = TickFrame(instancesPanel, name)
