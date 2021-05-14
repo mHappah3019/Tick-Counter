@@ -3,6 +3,40 @@ import time
 
 instances_names_array = ["Tick1", "Tick2", "Tick3", "Tick3", "Tick3", "Tick3", "Tick3", "Tick3", "Tick3", "Tick3", "Tick3"]
 
+class ScrollableFrame(tk.Frame):
+    def __init__(self, parent):
+
+            tk.Frame.__init__(self,parent) #"parent" shall be MainApplication
+            self.canvas = tk.Canvas(self, borderwidth=3, bg="black")
+            self.frame = tk.Frame(self.canvas, bd=2, bg="yellow")
+            self.vsb = tk.Scrollbar(self, orient=tk.VERTICAL, command=self.canvas.yview)
+            self.canvas.configure(yscrollcommand=self.vsb.set)
+
+           
+            self.vsb.pack(side="right", fill="y")
+            self.canvas.pack(side="left", fill="both", expand=True)
+
+            self.canvas.create_window((0,0), window=self.frame, anchor="nw",
+                                  tags="self.frame")
+
+            self.frame.bind("<Configure>", self.onFrameConfigure)
+
+            self.populate()
+    
+    def populate(self):
+        for count, name in enumerate(instances_names_array):
+            
+            self.frame.rowconfigure(count, weight=1)
+            # TODO: capire come si può passare come argomenti relief e borderwidth
+            #instance = TickFrame(instancesPanel, name, relief=tk.SUNKEN, borderwidth=2)
+            instance = TickFrame(self.frame, name)
+            instance.grid(row=count, column=0, sticky = "nsew")
+
+    def onFrameConfigure(self, event):
+        '''Reset the scroll region to encompass the inner frame'''
+        self.canvas.configure(scrollregion=self.canvas.bbox("all"))
+
+
 
 class TickFrame(tk.Frame):
         def __init__(self, parent, name):
@@ -38,11 +72,11 @@ class MainApplication(tk.Frame):
         self.columnconfigure(0, weight=1, minsize=200)
 
         #holds nx1 grid of instances
-        #TORESTORE: instancesPanel = tk.Frame(self)
-        #TORESTORE: instancesPanel.grid(column=0, row=0, sticky="nsew")
+        instancesPanel = tk.Frame(self)
+        instancesPanel.grid(column=0, row=0, sticky="nsew")
         self.rowconfigure(0, weight=1, minsize=100)
 
-        #TORESTORE: instancesPanel.columnconfigure(0, weight=3, minsize=200) #setting only one column, the others are all hidden
+        instancesPanel.columnconfigure(0, weight=3, minsize=200) #setting only one column, the others are all hidden
 
         #frame that occupies empty space between instancesPanel and extraPanel
         #blankFrame = tk.Frame(self, bg ="blue", height=300)
@@ -61,55 +95,6 @@ class MainApplication(tk.Frame):
         #implementation of the ADD button
         ADD_btn = tk.Button(extraPanel, text="ADD",)
         ADD_btn.grid(row=0, column=0, sticky="nsew")
-
-
-        #Create a frame for the canvas and scrollbar
-        frame0 = tk.Frame(self)
-        frame0.grid(row=0, column=0, sticky = "nsew")
-    
-        frame0.columnconfigure(0, weight=1)
-        frame0.rowconfigure(0, weight=1)
-
-
-        def onCanvasConfigure(e):
-            canvas.itemconfig('frame', height=canvas.winfo_height(), width=canvas.winfo_width())
-        def onFrameConfigure(e):
-            '''Reset the scroll region to encompass the inner frame'''
-            canvas.configure(scrollregion=canvas.bbox("all"))
-
-        #Add a canvas in that frame
-        canvas = tk.Canvas(frame0, bg="yellow")
-        canvas.grid(column=0, row=0, sticky = "nsew")
-
-
-        #Create a vertical scrollbar linked to the canvas
-        vsbar = tk.Scrollbar(frame0, orient=tk.VERTICAL, command=canvas.yview)
-        vsbar.grid(row=0, column=1, sticky="ns")
-        canvas.configure(yscrollcommand=vsbar.set)
-        
-        #Create a frame on the canvas to contain TickFrames
-        instancesPanel = tk.Frame(canvas, bg="red", bd=2)
-        instancesPanel.columnconfigure(0, weight=3, minsize=200)
-
-        canvas.create_window((0,0), window=instancesPanel, anchor="nw", tags="frame")
-
-        #TODO: i due qua sotto si sovrascrivono
-        canvas.bind("<Configure>", onFrameConfigure)
-        #canvas.bind("<Configure>", onCanvasConfigure)
-
-    
-        #TODO: make the scrollbar work when TickFrames have weight = 0
-
-        for count, name in enumerate(instances_names_array):
-            #TORESTORE: instancesPanel.rowconfigure(count, weight=1)
-            instancesPanel.rowconfigure(count, weight=0)
-            # TODO: capire come si può passare come argomenti relief e borderwidth
-            #instance = TickFrame(instancesPanel, name, relief=tk.SUNKEN, borderwidth=2)
-            instance = TickFrame(instancesPanel, name)
-            instance.grid(row=count, column=0, sticky = "nsew")
-
-
-        
         
 
 
@@ -118,6 +103,9 @@ if __name__ == "__main__":
     root = tk.Tk()
     root.geometry("400x600")
     
-    MainApplication(root).pack(side="top", fill="both", expand=True)
-    
+    mainapp = MainApplication(root)
+    mainapp.pack()
+    example = ScrollableFrame(mainapp)
+    example.grid(column=0, row=0)
+
     root.mainloop()
