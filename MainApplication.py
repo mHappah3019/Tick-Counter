@@ -16,10 +16,11 @@ class ScrollableFrame(tk.Frame):
             self.vsb.pack(side="right", fill="y")
             self.canvas.pack(side="left", fill="both", expand=True)
 
-            self.canvas.create_window((0,0), window=self.frame, anchor="nw",
+            self.canvas_frame = self.canvas.create_window((0,0), window=self.frame, anchor="nw",
                                   tags="self.frame")
 
             self.frame.bind("<Configure>", self.onFrameConfigure)
+            self.canvas.bind('<Configure>', self.FrameWidth)
 
             self.populate()
     
@@ -35,6 +36,11 @@ class ScrollableFrame(tk.Frame):
     def onFrameConfigure(self, event):
         '''Reset the scroll region to encompass the inner frame'''
         self.canvas.configure(scrollregion=self.canvas.bbox("all"))
+
+    
+    def FrameWidth(self, event):
+        canvas_width = event.width
+        self.canvas.itemconfig(self.canvas_frame, width = canvas_width)
 
 
 
@@ -104,8 +110,10 @@ if __name__ == "__main__":
     root.geometry("400x600")
     
     mainapp = MainApplication(root)
-    mainapp.pack()
+    mainapp.pack(side="top", fill="both", expand=True)
     example = ScrollableFrame(mainapp)
-    example.grid(column=0, row=0)
+    mainapp.columnconfigure(0, weight=1)
+    mainapp.rowconfigure(0, weight=1)
+    example.grid(column=0, row=0, sticky="nsew")
 
     root.mainloop()
