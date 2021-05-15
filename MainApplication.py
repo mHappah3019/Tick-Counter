@@ -22,6 +22,8 @@ class ScrollableFrame(tk.Frame):
             self.frame.bind("<Configure>", self.onFrameConfigure)
             self.canvas.bind('<Configure>', self.FrameWidth)
 
+
+            self.frame.columnconfigure(0, weight=1, minsize=200) 
             self.populate()
     
     def populate(self):
