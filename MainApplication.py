@@ -7,23 +7,37 @@ class ScrollableFrame(tk.Frame):
     def __init__(self, parent):
 
             tk.Frame.__init__(self,parent) #"parent" shall be MainApplication
-            self.canvas = tk.Canvas(self, borderwidth=3, bg="black")
+            
+            #USING COLORS FOR CLARITY
+
+            self.canvas = tk.Canvas(master=self, borderwidth=3, bg="black") #master denotes the parent window, that is the object whose class we are defining
+            
+            #We are creating the frame that shall be later embedded in the canvas as a per-se window
             self.frame = tk.Frame(self.canvas, bd=2, bg="yellow")
-            self.vsb = tk.Scrollbar(self, orient=tk.VERTICAL, command=self.canvas.yview)
+            
+            #We want the object frame whose class we are defining to be the parent of scrollbar
+            self.vsb = tk.Scrollbar(master=self, orient=tk.VERTICAL, command=self.canvas.yview) #ig we are telling to python to scroll the canvas in the "y" direction
+            #We are connecting the scrollbar to the canvas:
+            #in particular, with this instruction we are telling the scrollbar
+            #to keep its "relative position" in regards to the canvas
             self.canvas.configure(yscrollcommand=self.vsb.set)
 
            
-            self.vsb.pack(side="right", fill="y")
-            self.canvas.pack(side="left", fill="both", expand=True)
+            self.vsb.pack(side="right", fill="y") #inserting the scrollbar in the right side  of the ScrollableFrame
+            self.canvas.pack(side="left", fill="both", expand=True) #inserting the canvas in the left side of the ScrollableFrame
 
+            #creating the window where the self.frame (the frame where TickFrame instances will actually be set) is "virtually" set to be
             self.canvas_frame = self.canvas.create_window((0,0), window=self.frame, anchor="nw",
                                   tags="self.frame")
 
-            self.frame.bind("<Configure>", self.onFrameConfigure)
+
+
+            #self.frame.bind("<Configure>", self.onFrameConfigure)
             self.canvas.bind('<Configure>', self.FrameWidth)
 
-
             self.frame.columnconfigure(0, weight=1, minsize=200) 
+
+            #OOP approach: self.frame of the ScrollableFrame is being populated
             self.populate()
     
     def populate(self):
@@ -37,6 +51,7 @@ class ScrollableFrame(tk.Frame):
 
     def onFrameConfigure(self, event):
         '''Reset the scroll region to encompass the inner frame'''
+        #we are in fact setting the scroll region to be the bounding box of everything that is in the canvas
         self.canvas.configure(scrollregion=self.canvas.bbox("all"))
 
     
