@@ -32,9 +32,10 @@ class ScrollableFrame(tk.Frame):
 
 
 
-            #self.frame.bind("<Configure>", self.onFrameConfigure)
-            self.canvas.bind('<Configure>', self.FrameWidth)
+            self.frame.bind("<Configure>", self.onFrameConfigure)
+            self.canvas.bind("<Configure>", self.FrameWidth)
 
+            #We are specifying that the frame for the Tick instances has only one visible column
             self.frame.columnconfigure(0, weight=1, minsize=200) 
 
             #OOP approach: self.frame of the ScrollableFrame is being populated
@@ -43,10 +44,10 @@ class ScrollableFrame(tk.Frame):
     def populate(self):
         for count, name in enumerate(instances_names_array):
             
-            self.frame.rowconfigure(count, weight=1)
+            self.frame.rowconfigure(count, weight=1) # setting only the rows where Tick instances are appended to be visible
             # TODO: capire come si può passare come argomenti relief e borderwidth
-            #instance = TickFrame(instancesPanel, name, relief=tk.SUNKEN, borderwidth=2)
-            instance = TickFrame(self.frame, name)
+            instance = TickFrame(self.frame, name, relief=tk.SUNKEN, borderwidth=2)
+            #instance = TickFrame(self.frame, name)
             instance.grid(row=count, column=0, sticky = "nsew")
 
     def onFrameConfigure(self, event):
@@ -62,8 +63,8 @@ class ScrollableFrame(tk.Frame):
 
 
 class TickFrame(tk.Frame):
-        def __init__(self, parent, name):
-            tk.Frame.__init__(self, parent) #"parent" shall be "instancesPanel"
+        def __init__(self, parent, name,*args, **kwargs):
+            tk.Frame.__init__(self, parent, *args, **kwargs) #"parent" shall be "instancesPanel"
             
 
             # TORESTORE: name_lbl = tk.Label(master=self, text=name, width=25)
