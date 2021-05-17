@@ -46,7 +46,7 @@ class ScrollableFrame(tk.Frame):
         for count, name in enumerate(instances_names_array):
             
             self.frame.rowconfigure(count, weight=1) # setting only the rows where Tick instances are appended to be visible
-            instance = TickFrame(self.frame, name, relief=tk.SUNKEN, borderwidth=2)
+            instance = TickFrame(self.frame, name, relief=tk.SUNKEN, borderwidth=2, bg="blue", bd=2)
             #instance = TickFrame(self.frame, name)
             instance.grid(row=count, column=0, sticky = "nsew")
 
@@ -74,12 +74,12 @@ class TickFrame(tk.Frame):
             info_btn = tk.Button(master=self, text="...")
 
 
-            self.columnconfigure([0,1,2,3,4], weight=1) #we are setting every Tick instance to have only the 5 columns corresponding to our widget to be useful
+            self.columnconfigure([0,1,2,3,4], weight=1) #we are setting every Tick instance to have only the 5 columns corresponding to the number of our widgets to be useful
             self.rowconfigure(0, weight=1) #being any Tick instance implemented with a grid geometry manager we need to have only the "first" row to be visible
             
             #
             name_lbl.grid(row=0, column=0, sticky="nsew") #don't know if sticky is necessary
-            decrease_btn.grid(row=0, column=1)
+            decrease_btn.grid(row=0, column=1, sticky="nsew") #leaving it like this for illustrative purposes
             count_lbl.grid(row=0, column=2)
             increase_btn.grid(row=0, column=3)
             info_btn.grid(row=0, column=4)
@@ -91,6 +91,12 @@ class MainApplication(tk.Frame):
 
         #needed for "hiding" all the empty columns
         self.columnconfigure(0, weight=1, minsize=200)
+
+        #virtually holds the nx1 grid of instances
+        #the actualy frame is set inside the canvas, that is inside instancesPanel
+        instancesPanel = ScrollableFrame(self)
+        instancesPanel.grid(row=0, column=0, sticky="nsew")
+        self.rowconfigure(0, weight=1)
 
         #holds ADD button, for now
         extraPanel = tk.Frame(self, bg="white")
@@ -113,9 +119,5 @@ if __name__ == "__main__":
     
     mainapp = MainApplication(root)
     mainapp.pack(side="top", fill="both", expand=True)
-    example = ScrollableFrame(mainapp)
-    mainapp.columnconfigure(0, weight=1)
-    mainapp.rowconfigure(0, weight=1)
-    example.grid(column=0, row=0, sticky="nsew")
 
     root.mainloop()
