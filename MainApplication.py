@@ -39,13 +39,13 @@ class ScrollableFrame(tk.Frame):
             self.frame.columnconfigure(0, weight=1, minsize=200) 
 
             #OOP approach: self.frame of the ScrollableFrame is being populated
+            #self.frame holds the nx1 grid of instances
             self.populate()
     
     def populate(self):
         for count, name in enumerate(instances_names_array):
             
             self.frame.rowconfigure(count, weight=1) # setting only the rows where Tick instances are appended to be visible
-            # TODO: capire come si può passare come argomenti relief e borderwidth
             instance = TickFrame(self.frame, name, relief=tk.SUNKEN, borderwidth=2)
             #instance = TickFrame(self.frame, name)
             instance.grid(row=count, column=0, sticky = "nsew")
@@ -64,10 +64,9 @@ class ScrollableFrame(tk.Frame):
 
 class TickFrame(tk.Frame):
         def __init__(self, parent, name,*args, **kwargs):
-            tk.Frame.__init__(self, parent, *args, **kwargs) #"parent" shall be "instancesPanel"
+            tk.Frame.__init__(self, parent, *args, **kwargs) #"parent" shall be the frame inside the canvas that it implemented as a virtual window
             
 
-            # TORESTORE: name_lbl = tk.Label(master=self, text=name, width=25)
             name_lbl = tk.Label(master=self, text=name, width=25, height=2)
             decrease_btn = tk.Button(master=self, text="-")
             count_lbl = tk.Label(master=self, text=" ")
@@ -75,15 +74,13 @@ class TickFrame(tk.Frame):
             info_btn = tk.Button(master=self, text="...")
 
 
-            self.columnconfigure([0,1,2,3,4], weight=1)
-            self.rowconfigure(0, weight=1)
+            self.columnconfigure([0,1,2,3,4], weight=1) #we are setting every Tick instance to have only the 5 columns corresponding to our widget to be useful
+            self.rowconfigure(0, weight=1) #being any Tick instance implemented with a grid geometry manager we need to have only the "first" row to be visible
             
-    
-            name_lbl.grid(row=0, column=0, sticky="nsew")
-
+            #
+            name_lbl.grid(row=0, column=0, sticky="nsew") #don't know if sticky is necessary
             decrease_btn.grid(row=0, column=1)
             count_lbl.grid(row=0, column=2)
-
             increase_btn.grid(row=0, column=3)
             info_btn.grid(row=0, column=4)
 
@@ -94,19 +91,6 @@ class MainApplication(tk.Frame):
 
         #needed for "hiding" all the empty columns
         self.columnconfigure(0, weight=1, minsize=200)
-
-        #holds nx1 grid of instances
-        instancesPanel = tk.Frame(self)
-        instancesPanel.grid(column=0, row=0, sticky="nsew")
-        self.rowconfigure(0, weight=1, minsize=100)
-
-        instancesPanel.columnconfigure(0, weight=3, minsize=200) #setting only one column, the others are all hidden
-
-        #frame that occupies empty space between instancesPanel and extraPanel
-        #blankFrame = tk.Frame(self, bg ="blue", height=300)
-        #blankFrame.grid(column=0, row=1, sticky="nsew")
-        #self.rowconfigure(1, weight=3)
-
 
         #holds ADD button, for now
         extraPanel = tk.Frame(self, bg="white")
@@ -125,7 +109,7 @@ class MainApplication(tk.Frame):
 
 if __name__ == "__main__":
     root = tk.Tk()
-    root.geometry("400x600")
+    root.geometry("400x300")
     
     mainapp = MainApplication(root)
     mainapp.pack(side="top", fill="both", expand=True)
