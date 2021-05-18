@@ -1,5 +1,5 @@
 import tkinter as tk
-import time
+import csv
 
 instances_names_array = ["Tick1", "Tick2", "Tick3", "Tick3", "Tick3", "Tick3", "Tick3", "Tick3", "Tick3", "Tick3", "Tick3"]
 
@@ -49,6 +49,12 @@ class ScrollableFrame(tk.Frame):
             instance = TickFrame(self.frame, name, relief=tk.SUNKEN, borderwidth=2, bg="blue", bd=2)
             #instance = TickFrame(self.frame, name)
             instance.grid(row=count, column=0, sticky = "nsew")
+
+        with open("tick-instances.csv", "r") as file:
+            reader = csv.reader(file)
+            for row in reader:
+                print(row)
+
 
     def onFrameConfigure(self, event):
         '''Reset the scroll region to encompass the inner frame'''
