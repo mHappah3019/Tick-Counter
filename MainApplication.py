@@ -47,18 +47,9 @@ class ScrollableFrame(tk.Frame):
             csv_file = csv.DictReader(file)
             for count, row in enumerate(csv_file):
                 self.frame.rowconfigure(count, weight=1) # setting only the rows where Tick instances are appended to be visible
-                instance = TickFrame(self.frame, row["Name"], number=row["Daily"], relief=tk.SUNKEN, borderwidth=2, bg="blue", bd=2)
+                instance = TickFrame(self.frame, row["Name"], row["Daily"], relief=tk.SUNKEN, borderwidth=2, bg="blue", bd=2)
                 #instance = TickFrame(self.frame, name)
                 instance.grid(row=count, column=0, sticky = "nsew")
-                #instance.count_lbl['text'] = row["Daily"]
-
-        #for count, name in enumerate(instances_names_array):
-            
-        #    self.frame.rowconfigure(count, weight=1) # setting only the rows where Tick instances are appended to be visible
-        #    instance = TickFrame(self.frame, name, relief=tk.SUNKEN, borderwidth=2, bg="blue", bd=2)
-        #    #instance = TickFrame(self.frame, name)
-        #    instance.grid(row=count, column=0, sticky = "nsew")
-        #    self.frame.count_lbl['text'] = row
 
 
     def onFrameConfigure(self, event):
@@ -77,29 +68,28 @@ class TickFrame(tk.Frame):
         def __init__(self, parent, name, number, *args, **kwargs):
             tk.Frame.__init__(self, parent, *args, **kwargs) #"parent" shall be the frame inside the canvas that it implemented as a virtual window
             
-            session_count = 0 #count shall be read from the csv file
+            self.session_count = 0 #count shall be read from the csv file
 
-            name_lbl = tk.Label(master=self, text=name, width=25, height=2)
-            decrease_btn = tk.Button(master=self, text="-")
-            count_lbl = tk.Label(master=self, text=str(number))
-            increase_btn = tk.Button(master=self, text="+")
-            info_btn = tk.Button(master=self, text="...")
+            self.name_lbl = tk.Label(master=self, text=name, width=25, height=2)
+            self.decrease_btn = tk.Button(master=self, text="-")
+            self.count_lbl = tk.Label(master=self, text=str(number))
+            self.increase_btn = tk.Button(master=self, text="+", command=self.increment)
+            self.info_btn = tk.Button(master=self, text="...")
 
 
             self.columnconfigure([0,1,2,3,4], weight=1) #we are setting every Tick instance to have only the 5 columns corresponding to the number of our widgets to be useful
             self.rowconfigure(0, weight=1) #being any Tick instance implemented with a grid geometry manager we need to have only the "first" row to be visible
             
-            name_lbl.grid(row=0, column=0, sticky="nsew") #don't know if sticky is necessary
-            decrease_btn.grid(row=0, column=1, sticky="nsew") #leaving it like this for illustrative purposes
-            count_lbl.grid(row=0, column=2)
-            increase_btn.grid(row=0, column=3)
-            info_btn.grid(row=0, column=4)
-
-            #self.count_lbl['text'] = str(number)
+            self.name_lbl.grid(row=0, column=0, sticky="nsew") #don't know if sticky is necessary
+            self.decrease_btn.grid(row=0, column=1, sticky="nsew") #leaving it like this for illustrative purposes
+            self.count_lbl.grid(row=0, column=2)
+            self.increase_btn.grid(row=0, column=3)
+            self.info_btn.grid(row=0, column=4)
 
         def increment(self):
             self.session_count += 1
-            self.count_lbl['text'] = str(int(self.count_lbl['text']) + 1)
+            self.count_lbl['text'] = str(int(self.count_lbl['text']) + 1) #incrementa di 1 il valore e quindi lo mostra
+            print(self.session_count)
 
 class MainApplication(tk.Frame):
     def __init__(self, parent, *args, **kwargs):
@@ -110,21 +100,28 @@ class MainApplication(tk.Frame):
 
         #virtually holds the nx1 grid of instances
         #the actualy frame is set inside the canvas, that is inside instancesPanel
-        instancesPanel = ScrollableFrame(self)
-        instancesPanel.grid(row=0, column=0, sticky="nsew")
+        self.instancesPanel = ScrollableFrame(self)
+        self.instancesPanel.grid(row=0, column=0, sticky="nsew")
         self.rowconfigure(0, weight=1)
 
         #holds ADD button, for now
-        extraPanel = tk.Frame(self, bg="white")
-        extraPanel.grid(column=0, row=1, sticky="nsew")
+        self.extraPanel = tk.Frame(self, bg="white")
+        self.extraPanel.grid(column=0, row=1, sticky="nsew")
         self.rowconfigure(1, weight=0, minsize=25)
 
-        extraPanel.columnconfigure(0, weight=1, minsize=200) #setting up extraPanel
-        extraPanel.rowconfigure(0, weight=1, minsize=20) #setting up extraPanel
+        self.extraPanel.columnconfigure(0, weight=1, minsize=200) #setting up extraPanel
+        self.extraPanel.rowconfigure(0, weight=1, minsize=20) #setting up extraPanel
 
         #implementation of the ADD button
-        ADD_btn = tk.Button(extraPanel, text="ADD",)
+        ADD_btn = tk.Button(self.extraPanel, text="ADD",)
         ADD_btn.grid(row=0, column=0, sticky="nsew")
+
+    def __exit__(self):
+        with open("tick-instances.csv", "w") as file:
+            csv_file = csv.writer(file)
+            for i, row in enumerate(csv_file):
+                row[i+1][3] += session_count_array[i] #TODO: implement array that keeps track of counter of every instance
+        
         
 
 
@@ -137,3 +134,4 @@ if __name__ == "__main__":
     mainapp.pack(side="top", fill="both", expand=True)
 
     root.mainloop()
+    mainapp.__exit__()
