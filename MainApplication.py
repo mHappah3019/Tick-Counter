@@ -3,6 +3,8 @@ import csv
 
 instances_names_array = ["Tick1", "Tick2", "Tick3", "Tick3", "Tick3", "Tick3", "Tick3", "Tick3", "Tick3", "Tick3", "Tick3"]
 
+objects = []
+
 class ScrollableFrame(tk.Frame):
     def __init__(self, parent):
 
@@ -45,11 +47,13 @@ class ScrollableFrame(tk.Frame):
     def populate(self):
         with open("tick-instances.csv", "r") as file:
             csv_file = csv.DictReader(file)
-            for count, row in enumerate(csv_file):
-                self.frame.rowconfigure(count, weight=1) # setting only the rows where Tick instances are appended to be visible
+            for i, row in enumerate(csv_file):
+                self.frame.rowconfigure(i, weight=1) # setting only the rows where Tick instances are appended to be visible
                 instance = TickFrame(self.frame, row["Name"], row["Daily"], relief=tk.SUNKEN, borderwidth=2, bg="blue", bd=2)
-                #instance = TickFrame(self.frame, name)
-                instance.grid(row=count, column=0, sticky = "nsew")
+                instance.grid(row=i, column=0, sticky = "nsew")
+
+                objects.append(instance)
+                #session_count_dict[str(row["Name"])] = row["Daily"]
 
 
     def onFrameConfigure(self, event):
@@ -69,6 +73,8 @@ class TickFrame(tk.Frame):
             tk.Frame.__init__(self, parent, *args, **kwargs) #"parent" shall be the frame inside the canvas that it implemented as a virtual window
             
             self.session_count = 0 #count shall be read from the csv file
+            self.name = name #definisco anche un attributo "nome" per provare ad accedere piu' facilmente agli oggetti
+                            # in un secondo momento
 
             self.name_lbl = tk.Label(master=self, text=name, width=25, height=2)
             self.decrease_btn = tk.Button(master=self, text="-")
@@ -89,7 +95,7 @@ class TickFrame(tk.Frame):
         def increment(self):
             self.session_count += 1
             self.count_lbl['text'] = str(int(self.count_lbl['text']) + 1) #incrementa di 1 il valore e quindi lo mostra
-            print(self.session_count)
+            print(self.name + ": " + str(self.session_count))
 
 class MainApplication(tk.Frame):
     def __init__(self, parent, *args, **kwargs):
@@ -113,14 +119,15 @@ class MainApplication(tk.Frame):
         self.extraPanel.rowconfigure(0, weight=1, minsize=20) #setting up extraPanel
 
         #implementation of the ADD button
-        ADD_btn = tk.Button(self.extraPanel, text="ADD",)
+        ADD_btn = tk.Button(self.extraPanel, text="ADD")
         ADD_btn.grid(row=0, column=0, sticky="nsew")
 
     def __exit__(self):
-        with open("tick-instances.csv", "w") as file:
-            csv_file = csv.writer(file)
-            for i, row in enumerate(csv_file):
-                row[i+1][3] += session_count_array[i] #TODO: implement array that keeps track of counter of every instance
+        with open("tick-instances1.csv", "w") as file:
+            csv_file = csv.writer(file, delimiter=",", lineterminator='\n')
+            i = 0
+            
+
         
         
 

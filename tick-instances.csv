@@ -1,3 +1,4 @@
-Name,Comb,Pos,Daily,Weekly,Monthly
-Tick 1,x,x,5
-Tick 2,x,x,7
+Name,Comb,Daily,Weekly,Monthly
+x,x,5
+xx,xx,7
+xxx,xxx,8
