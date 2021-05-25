@@ -1,7 +1,7 @@
 import tkinter as tk
 import csv
 
-instances_names_array = ["Tick1", "Tick2", "Tick3", "Tick3", "Tick3", "Tick3", "Tick3", "Tick3", "Tick3", "Tick3", "Tick3"]
+#instances_names_array = ["Tick1", "Tick2", "Tick3", "Tick3", "Tick3", "Tick3", "Tick3", "Tick3", "Tick3", "Tick3", "Tick3"]
 
 objects = []
 
@@ -52,8 +52,6 @@ class ScrollableFrame(tk.Frame):
                 instance = TickFrame(self.frame, row["Name"], row["Daily"], relief=tk.SUNKEN, borderwidth=2, bg="blue", bd=2)
                 instance.grid(row=i, column=0, sticky = "nsew")
 
-                objects.append(instance)
-                #session_count_dict[str(row["Name"])] = row["Daily"]
 
 
     def onFrameConfigure(self, event):
@@ -92,6 +90,8 @@ class TickFrame(tk.Frame):
             self.increase_btn.grid(row=0, column=3)
             self.info_btn.grid(row=0, column=4)
 
+            objects.append(self) #"populate" (ScrollableFrame) creates tick instances, hence they are added to an array that keeps track of all of them
+
         def increment(self):
             self.session_count += 1
             self.count_lbl['text'] = str(int(self.count_lbl['text']) + 1) #incrementa di 1 il valore e quindi lo mostra
@@ -105,7 +105,7 @@ class MainApplication(tk.Frame):
         self.columnconfigure(0, weight=1, minsize=200)
 
         #virtually holds the nx1 grid of instances
-        #the actualy frame is set inside the canvas, that is inside instancesPanel
+        #the actual frame is set inside the canvas, that is inside instancesPanel
         self.instancesPanel = ScrollableFrame(self)
         self.instancesPanel.grid(row=0, column=0, sticky="nsew")
         self.rowconfigure(0, weight=1)
@@ -122,11 +122,31 @@ class MainApplication(tk.Frame):
         ADD_btn = tk.Button(self.extraPanel, text="ADD")
         ADD_btn.grid(row=0, column=0, sticky="nsew")
 
+    #this function, first, reads the "old" version of all the data
+    #then, it takes all the data and brings it in the form of a matrix;
+    #it updates the data inside the matrix
+    #then overwrites the file
     def __exit__(self):
-        with open("tick-instances1.csv", "w") as file:
-            csv_file = csv.writer(file, delimiter=",", lineterminator='\n')
-            i = 0
+        with open("tick-instances.csv", "r") as file:
+            csv_file = csv.reader(file)
+            matrix = list(csv_file) #stores data locally in the form of a matrix where every row represents one single instance and the columns represent different parameters
+                                    #NB. numbers are converted into string values
+            #daily = matrix[0].index("Daily")
+
+            for i, instance in enumerate(objects):
+                value = int(matrix[i+1][2]) + instance.session_count #we are converting to int the first value cause it is originally a string type
+                matrix[i+1][2] = value #actually updating the value
+                
+                #matrix[i+1][daily] = #daily takes an integer, and designates the column where "Daily" is set
             
+            print(matrix)
+
+        with open("tick-instances1.csv", "w", newline="") as file1:
+            csv_file1 = csv.writer(file1)
+            csv_file1.writerows(matrix)
+
+
+
 
         
         
