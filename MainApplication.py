@@ -5,6 +5,21 @@ import csv
 
 objects = []
 
+def update_file(filepath, tag):
+    #TODO: based on the tag, change time
+
+            index = matrix[0].index(tag)
+            for i, instance in enumerate(objects):
+                value = int(matrix[i+1][index]) + instance.session_count #we are converting to int the first value cause it is originally a string type
+                matrix[i+1][index] = value #actually updating the value
+                
+                #matrix[i+1][daily] = #daily takes an integer, and designates the column where "Daily" is set
+            
+            print(matrix)
+
+
+
+
 class ScrollableFrame(tk.Frame):
     def __init__(self, parent):
 
