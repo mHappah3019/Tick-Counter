@@ -1,5 +1,10 @@
 import tkinter as tk
 import csv
+import os
+
+#ATTENZIONEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
+#https://stackoverflow.com/questions/431684/equivalent-of-shell-cd-command-to-change-the-working-directory
+os.chdir("C:/Users/mkcam/Desktop/Tick Counter/Tick-Counter")
 
 #instances_names_array = ["Tick1", "Tick2", "Tick3", "Tick3", "Tick3", "Tick3", "Tick3", "Tick3", "Tick3", "Tick3", "Tick3"]
 
