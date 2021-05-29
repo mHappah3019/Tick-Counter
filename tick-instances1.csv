@@ -1,4 +1,4 @@
 Name,Comb,Daily,Weekly,Monthly
-x,x,0
-xx,xx,0
-xxx,xxx,0
+x,x,0,5
+xx,xx,0,12
+xxx,xxx,0,15
