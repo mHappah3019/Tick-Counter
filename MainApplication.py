@@ -82,7 +82,7 @@ class TickFrame(tk.Frame):
             self.name_lbl = tk.Label(master=self, text=name, width=25, height=2)
             self.decrease_btn = tk.Button(master=self, text="-")
             self.count_lbl = tk.Label(master=self, text=str(number))
-            self.increase_btn = tk.Button(master=self, text="+", command=self.increment)
+            self.increase_btn = tk.Button(master=self, text="+", command=self.increment) #when this button is clicked we shall increment session_count for this particular instance
             self.info_btn = tk.Button(master=self, text="...")
 
 
@@ -99,8 +99,8 @@ class TickFrame(tk.Frame):
 
         def increment(self):
             self.session_count += 1
-            self.count_lbl['text'] = str(int(self.count_lbl['text']) + 1) #incrementa di 1 il valore e quindi lo mostra
-            print(self.name + ": " + str(self.session_count))
+            self.count_lbl['text'] = str(int(self.count_lbl['text']) + 1) #shows in the label the new value; the old value is simply incremented by one
+            #print(self.name + ": " + str(self.session_count))
 
 class MainApplication(tk.Frame):
     def __init__(self, parent, *args, **kwargs):
@@ -139,9 +139,11 @@ class MainApplication(tk.Frame):
             #daily = matrix[0].index("Daily")
 
             for i, instance in enumerate(objects):
-                value = int(matrix[i+1][2]) + instance.session_count #we are converting to int the first value cause it is originally a string type
-                matrix[i+1][2] = value #actually updating the value
+                daily_value = int(matrix[i+1][2]) + instance.session_count #we are converting to int the first value cause it is originally a string type
+                matrix[i+1][2] = daily_value #actually updating the value
                 
+                weekly_value = int(matrix[i+1][3]) + instance.session_count #we are converting to int the first value cause it is originally a string type
+                matrix[i+1][3] = weekly_value #actually updating the value
                 #matrix[i+1][daily] = #daily takes an integer, and designates the column where "Daily" is set
             
             print(matrix)
