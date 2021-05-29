@@ -6,7 +6,9 @@ import os
 
 os.chdir("C:/Users/mkcam/Desktop/Tick Counter/Tick-Counter")
 
-dates = deque(maxlen=3) # contains 3 dates (even though I might have settled for 2 since I just need to know what was the date for yesterday, and not one day before yesterday too)
+#TODO: takes the dates to be stored from somewhere, ideally from the second file I was thinking to implement
+dates = deque(maxlen=2) # contains 3 dates (even though I might have settled for 2 since I just need to know what was the date for yesterday, and not one day before yesterday too)
+
 
 # function that checks if 2 dates fall in the same week or not
 # returns True if the 2 dates fall in the same week
@@ -35,10 +37,10 @@ def check_count_reset(dates):
     # TODO: da chiamare ad ogni avvio dell'applicazione
     # TODO: gestire le prime esecuzioni di questa funzione, in quanto l'array "dates" sarà necessariamente vuoto
     current_date = date.today()
-    if (current_date != dates[1]):
+    if (current_date != dates[0]):
         save_date(current_date, dates)
         count_reset("day")
-    elif ( not is_sameweek_dates(current_date, dates[1]) ):
+    elif ( not is_sameweek_dates(current_date, dates[0]) ):
         count_reset("week")
 
 
@@ -82,5 +84,6 @@ def count_reset(info):
  
 
 count_reset("week")
-count_reset("day")
+#count_reset("day")
+#check_count_reset(dates)
     
