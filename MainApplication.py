@@ -1,6 +1,8 @@
+from csv_wip import dates, current_date, save_daily_counts, is_same_date, check_count_reset, load_last_date
 import tkinter as tk
 import csv
 import os
+
 
 #ATTENZIONEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
 #https://stackoverflow.com/questions/431684/equivalent-of-shell-cd-command-to-change-the-working-directory
@@ -9,6 +11,7 @@ os.chdir("C:/Users/mkcam/Desktop/Tick Counter/Tick-Counter")
 #instances_names_array = ["Tick1", "Tick2", "Tick3", "Tick3", "Tick3", "Tick3", "Tick3", "Tick3", "Tick3", "Tick3", "Tick3"]
 
 objects = []
+
 
 class ScrollableFrame(tk.Frame):
     def __init__(self, parent):
@@ -127,6 +130,10 @@ class MainApplication(tk.Frame):
         ADD_btn = tk.Button(self.extraPanel, text="ADD")
         ADD_btn.grid(row=0, column=0, sticky="nsew")
 
+
+        load_last_date()
+        #check_count_reset(dates) TODO: ya know the drill, MA MI é VENUTO IN MENTE DI METTERE UNA DATA PLACEHOLDER IN DAILIES
+
     #this function, first, reads the "old" version of all the data
     #then, it takes all the data and brings it in the form of a matrix;
     #it updates the data inside the matrix
@@ -144,13 +151,18 @@ class MainApplication(tk.Frame):
                 
                 weekly_value = int(matrix[i+1][3]) + instance.session_count #we are converting to int the first value cause it is originally a string type
                 matrix[i+1][3] = weekly_value #actually updating the value
-                #matrix[i+1][daily] = #daily takes an integer, and designates the column where "Daily" is set
+            
+                monthly_value = int(matrix[i+1][4]) + instance.session_count #we are converting to int the first value cause it is originally a string type
+                matrix[i+1][4] = monthly_value #actually updating the value
             
             print(matrix)
 
         with open("tick-instances1.csv", "w", newline="") as file1:
             csv_file1 = csv.writer(file1)
             csv_file1.writerows(matrix)
+
+        if ( not is_same_date(current_date, dates[0]) ): #TODO: gestire accesso a dates, quando questo è vuoto
+            save_daily_counts()
 
 
 
