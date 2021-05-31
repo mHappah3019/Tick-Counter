@@ -131,10 +131,12 @@ class MainApplication(tk.Frame):
         ADD_btn.grid(row=0, column=0, sticky="nsew")
 
 
-        load_last_date() #(should do:) takes last date saved in dailies.csv and appends it to the "dates" queue, to check...
-         #TODO: capire perchè cazzo ho messo questa funzione qua
-        check_count_reset(dates) #checks if
-
+        load_last_date() #(should do:) takes last date saved in dailies.csv and appends it to the "dates" queue, to later check...
+        #TODO: capire perchè cazzo ho messo questa funzione qua
+        #TODO: aggiungere chiamata a funzione che verifica quali counters di tick-instances.csv debbano essere riazzerati
+        check_count_reset(dates) #...if we should reset, either the "Daily", "Weekly", "Monthly" counters or all of em and...
+                                 #......
+                                 
     #this function, first, reads the "old" version of all the data
     #then, it takes all the data and brings it in the form of a matrix;
     #it updates the data inside the matrix
@@ -147,13 +149,13 @@ class MainApplication(tk.Frame):
 
             for i, instance in enumerate(objects):
                 daily_value = int(matrix[i+1][2]) + instance.session_count #we are converting to int the first value cause it is originally a string type
-                matrix[i+1][2] = daily_value #actually updating the value
+                matrix[i+1][2] = daily_value #actually updating the daily value
                 
                 weekly_value = int(matrix[i+1][3]) + instance.session_count #we are converting to int the first value cause it is originally a string type
-                matrix[i+1][3] = weekly_value #actually updating the value
+                matrix[i+1][3] = weekly_value #actually updating the weekly value
             
                 monthly_value = int(matrix[i+1][4]) + instance.session_count #we are converting to int the first value cause it is originally a string type
-                matrix[i+1][4] = monthly_value #actually updating the value
+                matrix[i+1][4] = monthly_value #actually updating the monthly value
             
             print(matrix)
 

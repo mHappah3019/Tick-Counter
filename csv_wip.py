@@ -12,6 +12,7 @@ os.chdir("C:/Users/mkcam/Desktop/Tick Counter/Tick-Counter")
 dates = deque(maxlen=2) # contains 2 dates
 current_date = datetime.today()
 
+
 def save_daily_counts():
     
     current_date = datetime.today().strftime("%d/%m/%Y") #getting current_date and formatting it
@@ -19,19 +20,19 @@ def save_daily_counts():
 
     with open("tick-instances1.csv", "r") as f: #TODO: ATTENZIONE al nome del file
         csv_reader = csv.reader(f)
+        headers = next(csv_reader)   #skipping headers row
         for row in csv_reader:    #for every instance we want to store the daily count
-            #TODO: https://stackoverflow.com/questions/14674275/skip-first-linefield-in-loop-using-csv-file
-            fields.append(row[2]) #appending every instance daily count to be appended to one single row, correspoding to "current_date"
+            fields.append(row[2]) #appending every instance daily count, to be then appended to one single row, correspoding to "current_date"
+    
     with open("dailies.csv", "r") as file:
-        text = file.read()
-    
-    
+        text = file.read()                 #reading the file so that we can check later if it ends with a newline (\n)
     with open("dailies.csv", "a", newline='\n') as f1:
         writer = csv.writer(f1)
-        if ( not text.endswith("\n") ):
-            f1.write("\n")
+        if ( not text.endswith("\n") ):    #checking if file ends with a newline (\n)
+            f1.write("\n")                 #adding newline if file doesn't have a newline at the end
         writer.writerow(fields)  #writing as row this corresponding list: [current_date, <count-for-first-instance>, <count-for-second-instance>, <count-for-third-instance>, etc ... ]
                                  #all these counts are just DAILY counts
+
 
 # function that checks if 2 dates fall in the same week or not
 # returns True if the 2 dates fall in the same week
@@ -39,6 +40,7 @@ def is_sameweek_dates(date1, date2):
     dat1 = date1.isocalendar() # date1 and date2 are supposed to be "date" objects from datetime library
     dat2 = date2.isocalendar()
     return dat1[1] == dat2[1]
+
 
 # function that checks if 2 dates fall in the same month or not
 # returns True if the 2 dates fall in the same month
@@ -67,16 +69,21 @@ def save_date(today, dates):
     
 
 def check_count_reset(dates):
-    # TODO: gestire le prime esecuzioni di questa funzione, in quanto l'array "dates" sarà necessariamente vuoto
+    # "dates" dovrebbe arrivare con un solo elemento in prima posizione (indice 0)
+    # ovvero l'ultima data in "dailies.csv"
+
+    #TODO: valutare se ho veramente bisogno di una deque o se posso semplicemente salvare solo questa ultima data in dailies
+
     # questa funzione prende in INPUT "dates"
     # FUNZIONALITà: 
     current_date = datetime.today()
-    if ( not is_same_date(current_date, dates[0]) ):
+    #last_saved_date = dates[0] #TODO: portarla in oggetto datetime
+    if ( not is_same_date(current_date, dates[0]) ):        #se current_date e dates[0] (o "ultima data") non coincidono allora dovremmo resettare il daily count di ogni instanza
         #save_date(current_date, dates)
         count_reset("day")
-    elif ( not is_sameweek_dates(current_date, dates[0]) ):
+    elif ( not is_sameweek_dates(current_date, dates[0]) ): #se current_date e dates[0] (o "ultima data") non sono giorni della stessa settimana allora dovremmo resettare il weekly count di ogni instanza
         count_reset("week")
-    elif( not is_samemonth_dates(current_date, dates[0]) ):
+    elif( not is_samemonth_dates(current_date, dates[0]) ): #se current_date e dates[0] (o "ultima data") non sono giorni dello stesso mese allora dovremmo resettare il monthly count di ogni instanza
         count_reset("month")
 
 
@@ -119,7 +126,11 @@ def load_last_date():
         dates.append(last_date)
 
 
-load_last_date()
-print(dates)
+load_last_date()                        #ATTENZIONE
+print(dates)                            #ATTENZIONE: possiamo vedere che la prima data trovata in dailies viene salvata come STRINGA
 #print(dates)
+
+
     
+current_date = datetime.today()
+print(is_same_date(current_date, dates)) #GOTCHAAAAAAAA
