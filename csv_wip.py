@@ -9,7 +9,6 @@ import os
 
 os.chdir("C:/Users/mkcam/Desktop/Tick Counter/Tick-Counter")
 
-#TODO: takes the dates to be stored from somewhere, ideally from the second file I was thinking to implement (dailies.csv)
 dates = deque(maxlen=2) # contains 2 dates
 current_date = datetime.today()
 
@@ -18,13 +17,19 @@ def save_daily_counts():
     current_date = datetime.today().strftime("%d/%m/%Y") #getting current_date and formatting it
     fields = [current_date]
 
-    with open("tick-instances.csv", "r") as f:
+    with open("tick-instances1.csv", "r") as f: #TODO: ATTENZIONE al nome del file
         csv_reader = csv.reader(f)
         for row in csv_reader:    #for every instance we want to store the daily count
             #TODO: https://stackoverflow.com/questions/14674275/skip-first-linefield-in-loop-using-csv-file
             fields.append(row[2]) #appending every instance daily count to be appended to one single row, correspoding to "current_date"
-    with open("dailies.csv", "a") as f1:
+    with open("dailies.csv", "r") as file:
+        text = file.read()
+    
+    
+    with open("dailies.csv", "a", newline='\n') as f1:
         writer = csv.writer(f1)
+        if ( not text.endswith("\n") ):
+            f1.write("\n")
         writer.writerow(fields)  #writing as row this corresponding list: [current_date, <count-for-first-instance>, <count-for-second-instance>, <count-for-third-instance>, etc ... ]
                                  #all these counts are just DAILY counts
 
@@ -63,9 +68,11 @@ def save_date(today, dates):
 
 def check_count_reset(dates):
     # TODO: gestire le prime esecuzioni di questa funzione, in quanto l'array "dates" sarà necessariamente vuoto
+    # questa funzione prende in INPUT "dates"
+    # FUNZIONALITà: 
     current_date = datetime.today()
     if ( not is_same_date(current_date, dates[0]) ):
-        save_date(current_date, dates)
+        #save_date(current_date, dates)
         count_reset("day")
     elif ( not is_sameweek_dates(current_date, dates[0]) ):
         count_reset("week")
@@ -102,7 +109,6 @@ def count_reset(info):
 
 
 def load_last_date():
-    #TODO: capire da dove deve essere chiamata
     with open("dailies.csv", "r") as file:
         csv_reader = csv.reader(file)
         matrix = list(csv_reader)
@@ -114,5 +120,6 @@ def load_last_date():
 
 
 load_last_date()
+print(dates)
 #print(dates)
     

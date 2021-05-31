@@ -64,7 +64,7 @@ class ScrollableFrame(tk.Frame):
 
     def onFrameConfigure(self, event):
         '''Reset the scroll region to encompass the inner frame'''
-        #we are in fact setting the scroll region to be the bounding box of everything that is in the canvas
+        # we are in fact setting the scroll region to be the bounding box of everything that is in the canvas
         self.canvas.configure(scrollregion=self.canvas.bbox("all"))
 
     
@@ -80,7 +80,7 @@ class TickFrame(tk.Frame):
             
             self.session_count = 0 #count shall be read from the csv file
             self.name = name #definisco anche un attributo "nome" per provare ad accedere piu' facilmente agli oggetti
-                            # in un secondo momento
+                             #in un secondo momento
 
             self.name_lbl = tk.Label(master=self, text=name, width=25, height=2)
             self.decrease_btn = tk.Button(master=self, text="-")
@@ -131,8 +131,9 @@ class MainApplication(tk.Frame):
         ADD_btn.grid(row=0, column=0, sticky="nsew")
 
 
-        load_last_date()
-        #check_count_reset(dates) TODO: ya know the drill, MA MI é VENUTO IN MENTE DI METTERE UNA DATA PLACEHOLDER IN DAILIES
+        load_last_date() #(should do:) takes last date saved in dailies.csv and appends it to the "dates" queue, to check...
+         #TODO: capire perchè cazzo ho messo questa funzione qua
+        check_count_reset(dates) #checks if
 
     #this function, first, reads the "old" version of all the data
     #then, it takes all the data and brings it in the form of a matrix;
@@ -143,7 +144,6 @@ class MainApplication(tk.Frame):
             csv_file = csv.reader(file)
             matrix = list(csv_file) #stores data locally in the form of a matrix where every row represents one single instance and the columns represent different parameters
                                     #NB. numbers are converted into string values
-            #daily = matrix[0].index("Daily")
 
             for i, instance in enumerate(objects):
                 daily_value = int(matrix[i+1][2]) + instance.session_count #we are converting to int the first value cause it is originally a string type
@@ -161,7 +161,7 @@ class MainApplication(tk.Frame):
             csv_file1 = csv.writer(file1)
             csv_file1.writerows(matrix)
 
-        if ( not is_same_date(current_date, dates[0]) ): #TODO: gestire accesso a dates, quando questo è vuoto
+        if ( not is_same_date(current_date, dates[1]) ):
             save_daily_counts()
 
 
