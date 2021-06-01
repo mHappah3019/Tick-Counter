@@ -12,7 +12,6 @@ current_date = datetime.today()  # for now current_date can be thought as a glob
 
 
 def save_daily_counts():
-    
     current_date = datetime.today().strftime("%d/%m/%Y") #getting current_date and formatting it
     fields = [current_date]
 
@@ -38,14 +37,24 @@ def is_sameweek_dates(date1, date2):
     dat1 = date1.isocalendar() # date1 and date2 are supposed to be "date" objects from datetime library
     dat2 = date2.isocalendar()
     return dat1[1] == dat2[1]
+    #TODO: gestire la possibilità che l'applicazione sia avviata a distanza di un anno dall'ultima esecuzione
+    #e che quindi ci si possa imbattere nel bug dato dalla possibilità che le 2 date facciano parte della "stessa settimana" (0-53)
+    # IDC
+    # IDC
+    # IDC
 
 
 # function that checks if 2 dates fall in the same month or not
 # returns True if the 2 dates fall in the same month
-
 def is_samemonth_dates(date1, date2):
     dat1 = trunc_datetime(date1) # date1 and date2 are supposed to be "date" objects from datetime library
     dat2 = trunc_datetime(date2)
+
+    return dat1 == dat2
+
+def is_samemonth_dates1(date1, date2):
+    dat1 = trunc_datetime1(date1, "month") # date1 and date2 are supposed to be "date" objects from datetime library
+    dat2 = trunc_datetime1(date2, "month")
 
     return dat1 == dat2
 
@@ -63,6 +72,12 @@ def is_same_date(date1_object, date2):
     #TODO: pensare che a distanza di una settimana potrebbe riscontrarsi un bug, in quanto due lunedì diversi sarebbero considerati una stessa data
     #      aggiungere quindi logica per verificare successivamente se fanno parte della stessa settimana
     
+def is_same_date1(date1_object, date2_string):
+    date2_object = datetime.strptime(date2_string, "%d/%m/%Y")
+    dat1 = trunc_datetime1(date1_object, "day") # date1 and date2 are supposed to be "date" objects from datetime library
+    dat2 = trunc_datetime1(date2_object, "day")
+
+    return dat1 == dat2
     
 
 def check_count_reset(dates):
@@ -128,5 +143,14 @@ print(load_last_date())
 # funzione che presa una qualsiasi data "someDate" tiene il valore "originale" di mese e anno
 # ma rende un valore "univoco" al resto delle specifiche, quali: giorno, ora, minuto, secondo, etc...
 # usata perchè prese 2 date qualsiasi, ci permette di verificare se queste sono nello stesso mese o meno
+#TODO: da riimplementare (magari con un secondo parametro) per essere utilizzata per confrontare in is_same_week e/o is_same_date
 def trunc_datetime(someDate):
     return someDate.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+
+def trunc_datetime1(someDate, option):
+    if (option == "day"):
+        return someDate.replace(hour=0, minute=0, second=0, microsecond=0)
+    elif (option == "week"):                                                      # sta robba non funziona
+        return someDate.replace(day=1, hour=0, minute=0, second=0, microsecond=0) # sta robba non funziona
+    elif (option == "month"):
+        return someDate.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
