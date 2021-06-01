@@ -162,8 +162,12 @@ class MainApplication(tk.Frame):
             csv_file1 = csv.writer(file1)
             csv_file1.writerows(matrix)
 
-        if ( not is_same_date(current_date, dates[1]) ):
-            save_daily_counts()
+        # commentato fuori perchè da una parte is_same_date (currently) non funziona ancora
+        # e poi perchè mettendo la chiamata a save_daily_counts in chiusura dell'applicazione in questo modo
+        # garantisco che in seguito a aperture e chiusure successive (nello stesso giorno)
+        # la chiamata verrà fatta solo una volta, mancando l'obiettivo principale del file dailies.csv
+        """ if ( not is_same_date(current_date, dates[1]) ):
+            save_daily_counts() """
 
 
 

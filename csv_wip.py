@@ -51,26 +51,14 @@ def is_samemonth_dates(date1, date2):
 
 
 # TODO: modificare funzione in modo da poter comparare le stringhe delle date, in quanto datetime.today() rende informazioni ulteriori su ore:minuti:secondi che non permettono un confronto rispetto al solo giorno
+# o altrimenti usare lo stesso formato usato per  is_samewek_dates e is_samemonth_dates
 def is_same_date(date1_object, date2):
     date2_object = datetime.strptime(date2, "%d/%m/%Y")
     print("\n")
     print(date2_object)
     print("\n")
     return date1_object == date2_object
-
-
-#TODO: implementare "dates"
-def save_date(today, dates):
-    # prende in input un array con dates[0] == "ieri"
-    # e dates[1] == vuoto
-
-    # rende come output lo stesso array con dates[0] = "oggi"
-    # e dates[1] == "vuoto"
-
-    #appendo (ho ora quindi 2 elementi), e cancello la testa
-
-    dates.append(today)
-    dates.popleft()
+    
     
 
 def check_count_reset(dates):
