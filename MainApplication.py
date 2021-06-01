@@ -53,7 +53,7 @@ class ScrollableFrame(tk.Frame):
             self.populate()
     
     def populate(self):
-        with open("tick-instances.csv", "r") as file:
+        with open("tick-instances1.csv", "r") as file:
             csv_file = csv.DictReader(file)
             for i, row in enumerate(csv_file):
                 self.frame.rowconfigure(i, weight=1) # setting only the rows where Tick instances are appended to be visible
@@ -132,8 +132,7 @@ class MainApplication(tk.Frame):
 
 
         load_last_date() #(should do:) takes last date saved in dailies.csv and appends it to the "dates" queue, to later check...
-        #TODO: capire perchè cazzo ho messo questa funzione qua
-        #TODO: aggiungere chiamata a funzione che verifica quali counters di tick-instances.csv debbano essere riazzerati
+        
         check_count_reset(dates) #...if we should reset, either the "Daily", "Weekly", "Monthly" counters or all of em and...
                                  #......
                                  
@@ -142,7 +141,7 @@ class MainApplication(tk.Frame):
     #it updates the data inside the matrix
     #then overwrites the file
     def __exit__(self):
-        with open("tick-instances.csv", "r") as file:
+        with open("tick-instances1.csv", "r") as file:
             csv_file = csv.reader(file)
             matrix = list(csv_file) #stores data locally in the form of a matrix where every row represents one single instance and the columns represent different parameters
                                     #NB. numbers are converted into string values

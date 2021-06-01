@@ -50,8 +50,13 @@ def is_samemonth_dates(date1, date2):
     return dat1[2] == dat2[2]
 
 
-def is_same_date(date1, date2):
-    return date1 == date2
+# TODO: modificare funzione in modo da poter comparare le stringhe delle date, in quanto datetime.today() rende informazioni ulteriori su ore:minuti:secondi che non permettono un confronto rispetto al solo giorno
+def is_same_date(date1_object, date2):
+    date2_object = datetime.strptime(date2, "%d/%m/%Y")
+    print("\n")
+    print(date2_object)
+    print("\n")
+    return date1_object == date2_object
 
 
 #TODO: implementare "dates"
@@ -72,12 +77,16 @@ def check_count_reset(dates):
     # "dates" dovrebbe arrivare con un solo elemento in prima posizione (indice 0)
     # ovvero l'ultima data in "dailies.csv"
 
-    #TODO: valutare se ho veramente bisogno di una deque o se posso semplicemente salvare solo questa ultima data in dailies
+    # TODO: valutare se ho veramente bisogno di una deque o se posso semplicemente salvare solo questa ultima data in dailies
 
     # questa funzione prende in INPUT "dates"
     # FUNZIONALITà: 
     current_date = datetime.today()
-    #last_saved_date = dates[0] #TODO: portarla in oggetto datetime
+    
+
+    #TODO: capire se gli if statements messi così sono funzionali a quello che voglio fare o meno
+    # sto infatti pensando che probabilmente in python se il controllo entra nel primo if, ad esempio, non potrà rientrare nei successivi elif
+
     if ( not is_same_date(current_date, dates[0]) ):        #se current_date e dates[0] (o "ultima data") non coincidono allora dovremmo resettare il daily count di ogni instanza
         #save_date(current_date, dates)
         count_reset("day")
@@ -89,7 +98,7 @@ def check_count_reset(dates):
 
 def count_reset(info):
 
-    with open("tick-instances.csv", "r") as file:
+    with open("tick-instances1.csv", "r") as file:
         csv_file = csv.reader(file)
         matrix = list(csv_file) #stores data locally in the form of a matrix where every row represents one single instance and the columns represent different parameters
                                 #NB. numbers are converted into string values
@@ -110,11 +119,6 @@ def count_reset(info):
         csv_file1.writerows(matrix)
  
 
-#count_reset("week")
-#count_reset("day")
-#check_count_reset(dates)
-
-
 def load_last_date():
     with open("dailies.csv", "r") as file:
         csv_reader = csv.reader(file)
@@ -133,4 +137,6 @@ print(dates)                            #ATTENZIONE: possiamo vedere che la prim
 
     
 current_date = datetime.today()
-print(is_same_date(current_date, dates)) #GOTCHAAAAAAAA
+print(current_date)
+print(is_same_date(current_date, dates[0])) #GOTCHAAAAAAAA
+#print(is_same_date(current_date, "01/06/2021")) #GOTCHAAAAAAAA
