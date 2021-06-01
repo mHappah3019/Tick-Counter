@@ -13,4 +13,6 @@ print(current_date)
 date1 = datetime.date(2021, 5, 29)
 print(date1)
 
-print(is_sameweek_dates(current_date, date1))
+#print(is_sameweek_dates(current_date, date1))
+
+print(current_date.isocalendar()[2])
