@@ -130,11 +130,9 @@ class MainApplication(tk.Frame):
         ADD_btn = tk.Button(self.extraPanel, text="ADD")
         ADD_btn.grid(row=0, column=0, sticky="nsew")
 
-
-        load_last_date() #(should do:) takes last date saved in dailies.csv and appends it to the "dates" queue, to later check...
         
-        check_count_reset(dates) #...if we should reset, either the "Daily", "Weekly", "Monthly" counters or all of em and...
-                                 #......
+        check_count_reset() #...if we should reset, either the "Daily", "Weekly", "Monthly" counters or all of em and...
+                            #plus, it triggers all the functions to save the stats in dailies.csv, weeklies.csv, monthlies.csv
                                  
     #this function, first, reads the "old" version of all the data
     #then, it takes all the data and brings it in the form of a matrix;
@@ -162,18 +160,6 @@ class MainApplication(tk.Frame):
             csv_file1 = csv.writer(file1)
             csv_file1.writerows(matrix)
 
-        # commentato fuori perchè da una parte is_same_date (currently) non funziona ancora
-        # e poi perchè mettendo la chiamata a save_daily_counts in chiusura dell'applicazione in questo modo
-        # garantisco che in seguito a aperture e chiusure successive (nello stesso giorno)
-        # la chiamata verrà fatta solo una volta, mancando l'obiettivo principale del file dailies.csv
-        """ if ( not is_same_date(current_date, dates[1]) ):
-            save_daily_counts() """
-
-
-
-
-        
-        
 
 
 

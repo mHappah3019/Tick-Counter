@@ -5,7 +5,7 @@ import os
 
 os.chdir("C:/Users/mkcam/Desktop/Tick Counter/Tick-Counter")
 
-current_date = datetime.today()  #for now current_date can be thought as a global variable
+current_date = datetime.today()  #for now current_date can be thought as a global variable too
 
 
 def save_daily_counts():
@@ -88,7 +88,6 @@ def check_count_reset():
 
 
 def count_reset(info):  #TODO: test this function for different dates (different days, weeks and months)
-
     with open("tick-instances1.csv", "r") as file:
         csv_file = csv.reader(file)
         matrix = list(csv_file) #stores data locally in the form of a matrix where every row represents one single instance and the columns represent different parameters
@@ -121,11 +120,9 @@ def load_last_date():
         return last_date
 
 
-
 # function that takes any date (datetime object)
 # and truncates out of it any information we don't really care about for our comparisons
 def trunc_datetime1(someDate, option):
-
     if (option == "day"):
         return someDate.replace(hour=0, minute=0, second=0, microsecond=0)
     elif (option == "week"):                                                      
