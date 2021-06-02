@@ -28,6 +28,14 @@ def save_daily_counts():
                                  #all these counts are just DAILY counts
 
 
+def save_weekly_counts(): #TODO: implement
+    pass
+
+
+def save_monthly_counts(): #TODO: implement
+    pass
+
+
 # function that checks if 2 dates fall in the same week or not
 # returns True if the 2 dates fall in the same week
 def is_sameweek_dates(date1_object, date2_string):               #"date<>_objects" stands for datetime object coming from the datetime module
@@ -36,51 +44,50 @@ def is_sameweek_dates(date1_object, date2_string):               #"date<>_object
     week1 = date1_object.isocalendar()[1] # takes value 1 to 53 (number of the week of the year)
     week2 = date2_object.isocalendar()[1]
 
-    dat1 = trunc_datetime1(date1_object, "week") # makes month and year to be the only worthy "variables" for the later comparison
+    dat1 = trunc_datetime1(date1_object, "week") # makes month and year to be the only relevant "variables" for the later comparison
     dat2 = trunc_datetime1(date2_object, "week")
 
     #checks both if the 2 dates have the same "week number" (1-53) and if they are in the same month of the same year
-    return (week1 == week2) & (dat1==dat2) 
+    return (week1 == week2) & (dat1==dat2)
     
 
 # function that checks if 2 dates fall in the same month or not
 # returns True if the 2 dates fall in the same month
 def is_samemonth_dates(date1_object, date2_string):
     date2_object = datetime.strptime(date2_string, "%d/%m/%Y")
-    dat1 = trunc_datetime1(date1_object, "month") # date1 and date2 are supposed to be "date" objects from datetime library
+    dat1 = trunc_datetime1(date1_object, "month")  # makes month and year to be the only relevant "variables" for the later comparison
     dat2 = trunc_datetime1(date2_object, "month")
 
     return dat1 == dat2
 
   
+# function that checks if 2 dates are actually the same date
 def is_same_date(date1_object, date2_string):
     date2_object = datetime.strptime(date2_string, "%d/%m/%Y")
-    dat1 = trunc_datetime1(date1_object, "day") # date1 and date2 are supposed to be "date" objects from datetime library
+    dat1 = trunc_datetime1(date1_object, "day")  # makes DAY, month and year to be the only relevant "variables" for the later comparison
     dat2 = trunc_datetime1(date2_object, "day")
 
     return dat1 == dat2
     
 
-def check_count_reset(dates):
-    # "dates" dovrebbe arrivare con un solo elemento in prima posizione (indice 0)
-    # ovvero l'ultima data in "dailies.csv"
-
-    # questa funzione prende in INPUT "dates"
-    # FUNZIONALITà: 
-
+def check_count_reset():
     current_date = datetime.today()
-    last_saved_date = load_last_date()
+    last_saved_date = load_last_date() #taking this date from dailies.csv
 
-    if ( not is_same_date(current_date, last_saved_date) ):        #se current_date e dates[0] (o "ultima data") non coincidono allora dovremmo resettare il daily count di ogni instanza
-        save_daily_counts()
-        count_reset("day")
-    if ( not is_sameweek_dates(current_date, last_saved_date) ): #se current_date e dates[0] (o "ultima data") non sono giorni della stessa settimana allora dovremmo resettare il weekly count di ogni instanza
-        count_reset("week")
-    if ( not is_samemonth_dates(current_date, last_saved_date) ): #se current_date e dates[0] (o "ultima data") non sono giorni dello stesso mese allora dovremmo resettare il monthly count di ogni instanza
-        count_reset("month")
+    if ( not is_same_date(current_date, last_saved_date) ):       #if current_date and last_saved_date are not actually the same date, then we shall set to zero the "Daily" count (in tick-instances.csv) of every instance
+        save_daily_counts()  # before resetting the daily counts, we shall save them in dailies.csv
+        count_reset("day") #actually resetting the values
+        
+    if ( not is_sameweek_dates(current_date, last_saved_date) ):  #if current_date and last_saved_date are not in the same week, then we shall set to zero the "Weekly" count (in tick-instances.csv) of every instance
+        save_weekly_counts() # before resetting the weekly counts, we shall save them in dailies.csv
+        count_reset("week") #actually resetting the values
+        
+    if ( not is_samemonth_dates(current_date, last_saved_date) ): #if current_date and last_saved_date are not in the same month, then we shall set to zero the "Monthly" count (in tick-instances.csv) of every instance
+        save_monthly_counts() # before resetting the monthly counts, we shall save them in dailies.csv
+        count_reset("month") #actually resetting the values
 
 
-def count_reset(info):
+def count_reset(info):  #TODO: test this function for different dates (different days, weeks and months)
 
     with open("tick-instances1.csv", "r") as file:
         csv_file = csv.reader(file)
@@ -93,8 +100,8 @@ def count_reset(info):
         elif (info == "month"):
             option = 4
 
-        print(matrix)
-        print(len(matrix))
+        #print(matrix)
+        #print(len(matrix))
         for i in range(len(matrix) -1):
                 matrix[i+1][option] = 0 #RESETTING...
 
@@ -114,16 +121,14 @@ def load_last_date():
         return last_date
 
 
-print(load_last_date())
-#print(dates)
 
-# funzione che presa una qualsiasi data "someDate" tiene il valore "originale" di mese e anno
-# ma rende un valore "univoco" al resto delle specifiche, quali: giorno, ora, minuto, secondo, etc...
-# usata perchè prese 2 date qualsiasi, ci permette di verificare se queste sono nello stesso mese o meno
+# function that takes any date (datetime object)
+# and truncates out of it any information we don't really care about for our comparisons
 def trunc_datetime1(someDate, option):
+
     if (option == "day"):
         return someDate.replace(hour=0, minute=0, second=0, microsecond=0)
-    elif (option == "week"):                                                      # sta robba non funziona
-        return someDate.replace(day=1, hour=0, minute=0, second=0, microsecond=0) # sta robba non funziona
+    elif (option == "week"):                                                      
+        return someDate.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
     elif (option == "month"):
         return someDate.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
