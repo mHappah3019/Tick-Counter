@@ -1,78 +1,59 @@
-#from datetime import date
-from collections import deque
-from datetime import datetime
+from datetime import datetime #https://stackoverflow.com/questions/15707532/import-datetime-v-s-from-datetime-import-datetime
 
 import csv
 import os
 
 os.chdir("C:/Users/mkcam/Desktop/Tick Counter/Tick-Counter")
 
-current_date = datetime.today()  # for now current_date can be thought as a global variable
-
+current_date = datetime.today()  #for now current_date can be thought as a global variable
 
 
 def save_daily_counts():
     current_date = datetime.today().strftime("%d/%m/%Y") #getting current_date and formatting it
-    fields = [current_date]
+    fields = [current_date] #"appending" first element to the row (will go under header "Name" in dailies.csv)
 
-    with open("tick-instances1.csv", "r") as f: #TODO: ATTENZIONE al nome del file
+    with open("tick-instances1.csv", "r") as f: #ATTENZIONE al nome del file
         csv_reader = csv.reader(f)
-        headers = next(csv_reader)   #skipping headers row
+        headers = next(csv_reader)      #skipping headers row
         for row in csv_reader:    #for every instance we want to store the daily count
-            fields.append(row[2]) #appending every instance daily count, to be then appended to one single row, correspoding to "current_date"
+            fields.append(row[2]) #appending every instance's daily count, to be then appended to one single row, correspoding to "current_date"
     
     with open("dailies.csv", "r") as file:
-        text = file.read()                 #reading the file so that we can check later if it ends with a newline (\n)
+        text = file.read()                 #reading the file so that we can check later if it ends with a newline (\n)...
     with open("dailies.csv", "a", newline='\n') as f1:
         writer = csv.writer(f1)
-        if ( not text.endswith("\n") ):    #checking if file ends with a newline (\n)
-            f1.write("\n")                 #adding newline if file doesn't have a newline at the end
+        if ( not text.endswith("\n") ):    #...checking if file ends with a newline (\n)
+            f1.write("\n")                  #adding newline if file doesn't have a newline at the end
         writer.writerow(fields)  #writing as row this corresponding list: [current_date, <count-for-first-instance>, <count-for-second-instance>, <count-for-third-instance>, etc ... ]
                                  #all these counts are just DAILY counts
 
 
 # function that checks if 2 dates fall in the same week or not
 # returns True if the 2 dates fall in the same week
-def is_sameweek_dates(date1, date2): 
-    dat1 = date1.isocalendar() # date1 and date2 are supposed to be "date" objects from datetime library
-    dat2 = date2.isocalendar()
-    return dat1[1] == dat2[1]
-    #TODO: gestire la possibilità che l'applicazione sia avviata a distanza di un anno dall'ultima esecuzione
-    #e che quindi ci si possa imbattere nel bug dato dalla possibilità che le 2 date facciano parte della "stessa settimana" (0-53)
-    # IDC
-    # IDC
-    # IDC
+def is_sameweek_dates(date1_object, date2_string):               #"date<>_objects" stands for datetime object coming from the datetime module
+    date2_object = datetime.strptime(date2_string, "%d/%m/%Y")
+    
+    week1 = date1_object.isocalendar()[1] # takes value 1 to 53 (number of the week of the year)
+    week2 = date2_object.isocalendar()[1]
 
+    dat1 = trunc_datetime1(date1_object, "week") # makes month and year to be the only worthy "variables" for the later comparison
+    dat2 = trunc_datetime1(date2_object, "week")
+
+    #checks both if the 2 dates have the same "week number" (1-53) and if they are in the same month of the same year
+    return (week1 == week2) & (dat1==dat2) 
+    
 
 # function that checks if 2 dates fall in the same month or not
 # returns True if the 2 dates fall in the same month
-def is_samemonth_dates(date1, date2):
-    dat1 = trunc_datetime(date1) # date1 and date2 are supposed to be "date" objects from datetime library
-    dat2 = trunc_datetime(date2)
+def is_samemonth_dates(date1_object, date2_string):
+    date2_object = datetime.strptime(date2_string, "%d/%m/%Y")
+    dat1 = trunc_datetime1(date1_object, "month") # date1 and date2 are supposed to be "date" objects from datetime library
+    dat2 = trunc_datetime1(date2_object, "month")
 
     return dat1 == dat2
 
-def is_samemonth_dates1(date1, date2):
-    dat1 = trunc_datetime1(date1, "month") # date1 and date2 are supposed to be "date" objects from datetime library
-    dat2 = trunc_datetime1(date2, "month")
-
-    return dat1 == dat2
-
-
-# TODO: modificare funzione in modo da poter comparare le stringhe delle date, in quanto datetime.today() rende informazioni ulteriori su ore:minuti:secondi che non permettono un confronto rispetto al solo giorno
-# o altrimenti usare lo stesso formato usato per  is_samewek_dates e is_samemonth_dates
-def is_same_date(date1_object, date2):
-    date2_object = datetime.strptime(date2, "%d/%m/%Y")
-    
-    dat1 = date1_object.isocalendar()
-    dat2 = date2_object.isocalendar()
-
-    return dat1[2] == dat2[2]
-
-    #TODO: pensare che a distanza di una settimana potrebbe riscontrarsi un bug, in quanto due lunedì diversi sarebbero considerati una stessa data
-    #      aggiungere quindi logica per verificare successivamente se fanno parte della stessa settimana
-    
-def is_same_date1(date1_object, date2_string):
+  
+def is_same_date(date1_object, date2_string):
     date2_object = datetime.strptime(date2_string, "%d/%m/%Y")
     dat1 = trunc_datetime1(date1_object, "day") # date1 and date2 are supposed to be "date" objects from datetime library
     dat2 = trunc_datetime1(date2_object, "day")
@@ -89,17 +70,13 @@ def check_count_reset(dates):
 
     current_date = datetime.today()
     last_saved_date = load_last_date()
-    
-
-    #TODO: capire se gli if statements messi così sono funzionali a quello che voglio fare o meno
-    # sto infatti pensando che probabilmente in python se il controllo entra nel primo if, ad esempio, non potrà rientrare nei successivi elif
 
     if ( not is_same_date(current_date, last_saved_date) ):        #se current_date e dates[0] (o "ultima data") non coincidono allora dovremmo resettare il daily count di ogni instanza
-        #save_date(current_date, dates)  TODO: capire che cazzo ci fa questa chiamata qua
+        save_daily_counts()
         count_reset("day")
-    elif ( not is_sameweek_dates(current_date, last_saved_date) ): #se current_date e dates[0] (o "ultima data") non sono giorni della stessa settimana allora dovremmo resettare il weekly count di ogni instanza
+    if ( not is_sameweek_dates(current_date, last_saved_date) ): #se current_date e dates[0] (o "ultima data") non sono giorni della stessa settimana allora dovremmo resettare il weekly count di ogni instanza
         count_reset("week")
-    elif( not is_samemonth_dates(current_date, last_saved_date) ): #se current_date e dates[0] (o "ultima data") non sono giorni dello stesso mese allora dovremmo resettare il monthly count di ogni instanza
+    if ( not is_samemonth_dates(current_date, last_saved_date) ): #se current_date e dates[0] (o "ultima data") non sono giorni dello stesso mese allora dovremmo resettare il monthly count di ogni instanza
         count_reset("month")
 
 
@@ -143,10 +120,6 @@ print(load_last_date())
 # funzione che presa una qualsiasi data "someDate" tiene il valore "originale" di mese e anno
 # ma rende un valore "univoco" al resto delle specifiche, quali: giorno, ora, minuto, secondo, etc...
 # usata perchè prese 2 date qualsiasi, ci permette di verificare se queste sono nello stesso mese o meno
-#TODO: da riimplementare (magari con un secondo parametro) per essere utilizzata per confrontare in is_same_week e/o is_same_date
-def trunc_datetime(someDate):
-    return someDate.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
-
 def trunc_datetime1(someDate, option):
     if (option == "day"):
         return someDate.replace(hour=0, minute=0, second=0, microsecond=0)
