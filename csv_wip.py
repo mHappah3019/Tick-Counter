@@ -29,45 +29,56 @@ def save_daily_counts():
                                  #all these counts are just DAILY counts
 
 
-def save_weekly_counts(): #TODO: implement
-    current_date = datetime.today().strftime("%d/%m/%Y") #getting current_date and formatting it
+def save_weekly_counts():
+    current_date = datetime.today()
+    current_week = current_date.isocalendar()[1]
+    current_year = current_date.year
 
-    fields = [current_date] #"appending" first element to the row (will go under header "Date" in dailies.csv)
+    start_of_week = datetime.fromisocalendar(current_year, current_week, 1).strftime("%d/%m/%Y")
+    end_of_week = datetime.fromisocalendar(current_year, current_week, 7).strftime("%d/%m/%Y")
+    fields = [start_of_week + "-" + end_of_week] 
 
-    with open("tick-instances1.csv", "r") as f: #ATTENZIONE al nome del file
-        csv_reader = csv.reader(f)
-        headers = next(csv_reader)      #skipping headers row
-        for row in csv_reader:    #for every instance we want to store the daily count
-            fields.append(row[2]) #appending every instance's daily count, to be then appended to one single row, correspoding to "current_date"
-    
-    with open("dailies.csv", "r") as file:
-        text = file.read()                 #reading the file so that we can check later if it ends with a newline (\n)...
-    with open("dailies.csv", "a", newline='\n') as f1:
-        writer = csv.writer(f1)
-        if ( not text.endswith("\n") ):    #...checking if file ends with a newline (\n)
-            f1.write("\n")                  #adding newline if file doesn't have a newline at the end
-        writer.writerow(fields)  #writing as row this corresponding list: [current_date, <count-for-first-instance>, <count-for-second-instance>, <count-for-third-instance>, etc ... ]
-                                 #all these counts are just DAILY counts
-
-
-def save_monthly_counts(): #TODO: implement
-    current_date = datetime.today().strftime("%d/%m/%Y") #getting current_date and formatting it
-    fields = [current_date] #"appending" first element to the row (will go under header "Name" in dailies.csv)
+    #print(fields)
 
     with open("tick-instances1.csv", "r") as f: #ATTENZIONE al nome del file
         csv_reader = csv.reader(f)
         headers = next(csv_reader)      #skipping headers row
-        for row in csv_reader:    #for every instance we want to store the daily count
-            fields.append(row[2]) #appending every instance's daily count, to be then appended to one single row, correspoding to "current_date"
+        for row in csv_reader:    #for every instance we want to store the weekly count
+            fields.append(row[3]) #appending every instance's daily count, to be then appended to one single row, correspoding to the entire duration of the week
     
-    with open("dailies.csv", "r") as file:
+    with open("weeklies.csv", "r") as file:
         text = file.read()                 #reading the file so that we can check later if it ends with a newline (\n)...
-    with open("dailies.csv", "a", newline='\n') as f1:
+    with open("weeklies.csv", "a", newline='\n') as f1:
         writer = csv.writer(f1)
         if ( not text.endswith("\n") ):    #...checking if file ends with a newline (\n)
             f1.write("\n")                  #adding newline if file doesn't have a newline at the end
-        writer.writerow(fields)  #writing as row this corresponding list: [current_date, <count-for-first-instance>, <count-for-second-instance>, <count-for-third-instance>, etc ... ]
-                                 #all these counts are just DAILY counts
+        writer.writerow(fields)  #writing as row this corresponding list: [week, <count-for-first-instance>, <count-for-second-instance>, <count-for-third-instance>, etc ... ]
+                                 #all these counts ar e just WEEKLY counts
+
+
+def save_monthly_counts():
+    current_date = datetime.today()
+    current_month = current_date.strftime("%B")
+    current_year = str(current_date.year)
+
+    fields = [current_month + " " + current_year] 
+
+    print(fields)
+
+    with open("tick-instances1.csv", "r") as f: #ATTENZIONE al nome del file
+        csv_reader = csv.reader(f)
+        headers = next(csv_reader)      #skipping headers row
+        for row in csv_reader:    #for every instance we want to store the monthly count
+            fields.append(row[4]) #appending every instance's monthly count, to be then appended to one single row, correspoding to month name + year
+    
+    with open("monthlies.csv", "r") as file:
+        text = file.read()                 #reading the file so that we can check later if it ends with a newline (\n)...
+    with open("monthlies.csv", "a", newline='\n') as f1:
+        writer = csv.writer(f1)
+        if ( not text.endswith("\n") ):    #...checking if file ends with a newline (\n)
+            f1.write("\n")                  #adding newline if file doesn't have a newline at the end
+        writer.writerow(fields)  #writing as row this corresponding list: [actual month, <count-for-first-instance>, <count-for-second-instance>, <count-for-third-instance>, etc ... ]
+                                 #all these counts are just MONTHLY counts
 
 
 # function that checks if 2 dates fall in the same week or not
@@ -113,11 +124,11 @@ def check_count_reset():
         count_reset("day") #actually resetting the values
         
     if ( not is_sameweek_dates(current_date, last_saved_date) ):  #if current_date and last_saved_date are not in the same week, then we shall set to zero the "Weekly" count (in tick-instances.csv) of every instance
-        save_weekly_counts() # before resetting the weekly counts, we shall save them in dailies.csv
+        save_weekly_counts() # before resetting the weekly counts, we shall save them in weeklies.csv
         count_reset("week") #actually resetting the values
         
     if ( not is_samemonth_dates(current_date, last_saved_date) ): #if current_date and last_saved_date are not in the same month, then we shall set to zero the "Monthly" count (in tick-instances.csv) of every instance
-        save_monthly_counts() # before resetting the monthly counts, we shall save them in dailies.csv
+        save_monthly_counts() # before resetting the monthly counts, we shall save them in monthlies.csv
         count_reset("month") #actually resetting the values
 
 
@@ -170,3 +181,6 @@ last_saved_date = load_last_date()
 print(is_same_date(current_date, last_saved_date))
 print(is_same_date(current_date, "03/06/2021"))
 print(is_same_date(datetime.strptime("01/06/2021", "%d/%m/%Y"), last_saved_date))
+
+#save_weekly_counts()
+#save_monthly_counts()
