@@ -63,7 +63,7 @@ def save_monthly_counts():
 
     fields = [current_month + " " + current_year] 
 
-    print(fields)
+    #print(fields)
 
     with open("tick-instances1.csv", "r") as f: #ATTENZIONE al nome del file
         csv_reader = csv.reader(f)
