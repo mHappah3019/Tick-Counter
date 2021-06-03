@@ -9,6 +9,7 @@ current_date = datetime.today()  #for now current_date can be thought as a globa
 
 
 def save_daily_counts():
+    #TODO: guardare Notion
     current_date = datetime.today().strftime("%d/%m/%Y") #getting current_date and formatting it
     fields = [current_date] #"appending" first element to the row (will go under header "Name" in dailies.csv)
 
@@ -29,11 +30,44 @@ def save_daily_counts():
 
 
 def save_weekly_counts(): #TODO: implement
-    pass
+    current_date = datetime.today().strftime("%d/%m/%Y") #getting current_date and formatting it
+
+    fields = [current_date] #"appending" first element to the row (will go under header "Date" in dailies.csv)
+
+    with open("tick-instances1.csv", "r") as f: #ATTENZIONE al nome del file
+        csv_reader = csv.reader(f)
+        headers = next(csv_reader)      #skipping headers row
+        for row in csv_reader:    #for every instance we want to store the daily count
+            fields.append(row[2]) #appending every instance's daily count, to be then appended to one single row, correspoding to "current_date"
+    
+    with open("dailies.csv", "r") as file:
+        text = file.read()                 #reading the file so that we can check later if it ends with a newline (\n)...
+    with open("dailies.csv", "a", newline='\n') as f1:
+        writer = csv.writer(f1)
+        if ( not text.endswith("\n") ):    #...checking if file ends with a newline (\n)
+            f1.write("\n")                  #adding newline if file doesn't have a newline at the end
+        writer.writerow(fields)  #writing as row this corresponding list: [current_date, <count-for-first-instance>, <count-for-second-instance>, <count-for-third-instance>, etc ... ]
+                                 #all these counts are just DAILY counts
 
 
 def save_monthly_counts(): #TODO: implement
-    pass
+    current_date = datetime.today().strftime("%d/%m/%Y") #getting current_date and formatting it
+    fields = [current_date] #"appending" first element to the row (will go under header "Name" in dailies.csv)
+
+    with open("tick-instances1.csv", "r") as f: #ATTENZIONE al nome del file
+        csv_reader = csv.reader(f)
+        headers = next(csv_reader)      #skipping headers row
+        for row in csv_reader:    #for every instance we want to store the daily count
+            fields.append(row[2]) #appending every instance's daily count, to be then appended to one single row, correspoding to "current_date"
+    
+    with open("dailies.csv", "r") as file:
+        text = file.read()                 #reading the file so that we can check later if it ends with a newline (\n)...
+    with open("dailies.csv", "a", newline='\n') as f1:
+        writer = csv.writer(f1)
+        if ( not text.endswith("\n") ):    #...checking if file ends with a newline (\n)
+            f1.write("\n")                  #adding newline if file doesn't have a newline at the end
+        writer.writerow(fields)  #writing as row this corresponding list: [current_date, <count-for-first-instance>, <count-for-second-instance>, <count-for-third-instance>, etc ... ]
+                                 #all these counts are just DAILY counts
 
 
 # function that checks if 2 dates fall in the same week or not
@@ -64,7 +98,7 @@ def is_samemonth_dates(date1_object, date2_string):
 # function that checks if 2 dates are actually the same date
 def is_same_date(date1_object, date2_string):
     date2_object = datetime.strptime(date2_string, "%d/%m/%Y")
-    dat1 = trunc_datetime1(date1_object, "day")  # makes DAY, month and year to be the only relevant "variables" for the later comparison
+    dat1 = trunc_datetime1(date1_object, "day")  # makes DAY, month and year to be the only relevant information for the later comparison
     dat2 = trunc_datetime1(date2_object, "day")
 
     return dat1 == dat2
@@ -129,3 +163,10 @@ def trunc_datetime1(someDate, option):
         return someDate.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
     elif (option == "month"):
         return someDate.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+
+current_date = datetime.today()
+last_saved_date = load_last_date()
+
+print(is_same_date(current_date, last_saved_date))
+print(is_same_date(current_date, "03/06/2021"))
+print(is_same_date(datetime.strptime("01/06/2021", "%d/%m/%Y"), last_saved_date))

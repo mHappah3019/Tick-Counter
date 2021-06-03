@@ -13,6 +13,8 @@ os.chdir("C:/Users/mkcam/Desktop/Tick Counter/Tick-Counter")
 objects = []
 
 
+
+
 class ScrollableFrame(tk.Frame):
     def __init__(self, parent):
 
@@ -74,6 +76,7 @@ class ScrollableFrame(tk.Frame):
 
 
 
+
 class TickFrame(tk.Frame):
         def __init__(self, parent, name, number, *args, **kwargs):
             tk.Frame.__init__(self, parent, *args, **kwargs) #"parent" shall be the frame inside the canvas that it implemented as a virtual window
@@ -105,9 +108,17 @@ class TickFrame(tk.Frame):
             self.count_lbl['text'] = str(int(self.count_lbl['text']) + 1) #shows in the label the new value; the old value is simply incremented by one
             #print(self.name + ": " + str(self.session_count))
 
+
+
+
 class MainApplication(tk.Frame):
     def __init__(self, parent, *args, **kwargs):
         tk.Frame.__init__(self, parent, *args, **kwargs) #bg="black" to check how sticky="nsew" works for the Frames (instancesPanel etc)
+
+        check_count_reset() #...if we should reset, either the "Daily", "Weekly", "Monthly" counters or all of em and...
+                            #plus, it triggers all the functions to save the stats in dailies.csv, weeklies.csv, monthlies.csv
+                            #should be run before populating the application with all the data (when instantiating ScrollableFrame)
+
         self.parent = parent #"parent" shall be "root"
         #needed for "hiding" all the empty columns
         self.columnconfigure(0, weight=1, minsize=200)
@@ -129,10 +140,6 @@ class MainApplication(tk.Frame):
         #implementation of the ADD button
         ADD_btn = tk.Button(self.extraPanel, text="ADD")
         ADD_btn.grid(row=0, column=0, sticky="nsew")
-
-        
-        check_count_reset() #...if we should reset, either the "Daily", "Weekly", "Monthly" counters or all of em and...
-                            #plus, it triggers all the functions to save the stats in dailies.csv, weeklies.csv, monthlies.csv
                                  
     #this function, first, reads the "old" version of all the data
     #then, it takes all the data and brings it in the form of a matrix;
