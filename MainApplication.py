@@ -1,7 +1,8 @@
-from csv_wip import dates, current_date, save_daily_counts, is_same_date, check_count_reset, load_last_date
+from csv_wip import current_date, get_remaining_ms, save_daily_counts, is_same_date, check_count_reset, load_last_date, get_remaining_ms
 import tkinter as tk
 import csv
 import os
+import sys
 
 
 #ATTENZIONEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
@@ -140,7 +141,8 @@ class MainApplication(tk.Frame):
         #implementation of the ADD button
         ADD_btn = tk.Button(self.extraPanel, text="ADD")
         ADD_btn.grid(row=0, column=0, sticky="nsew")
-                                 
+
+
     #this function, first, reads the "old" version of all the data
     #then, it takes all the data and brings it in the form of a matrix;
     #it updates the data inside the matrix

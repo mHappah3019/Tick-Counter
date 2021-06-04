@@ -208,3 +208,14 @@ print(is_same_date(datetime.strptime("01/06/2021", "%d/%m/%Y"), last_saved_date)
 
 #save_weekly_counts()
 #save_monthly_counts()
+
+def get_passed_ms():
+    now = datetime.now()
+    hours = now.hour
+    minutes = hours*60 + now.minute
+    seconds = minutes*60 + now.second
+    return seconds*1000 #millisecondi
+
+def get_remaining_ms():
+    ms_in_aday = 86,400,000
+    return ms_in_aday - get_passed_ms()
