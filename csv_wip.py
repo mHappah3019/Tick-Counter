@@ -7,47 +7,44 @@ os.chdir("C:/Users/mkcam/Desktop/Tick Counter/Tick-Counter")
 
 current_date = datetime.today()  #for now current_date can be thought as a global variable too
 
+def skip_last(iterator):
+    prev = next(iterator)
+    for item in iterator:
+        yield prev
+        prev = item
+
 
 def save_daily_counts():
     #TODO: guardare Notion
-    """ current_date = datetime.today().strftime("%d/%m/%Y") #getting current_date and formatting it
-    fields = [current_date] #"appending" first element to the row (will go under header "Name" in dailies.csv) """
-    last_saved_date = load_last_date1("tick-instances1.csv")
+    last_saved_date = load_last_date1("tick-instances1.csv") #takes the date in which the program was LAST used
     fields = [last_saved_date]
 
     with open("tick-instances1.csv", "r") as f: #ATTENZIONE al nome del file
         csv_reader = csv.reader(f)
         headers = next(csv_reader)      #skipping headers row
-        for row in csv_reader:    #for every instance we want to store the daily count
-            fields.append(row[2]) #appending every instance's daily count, to be then appended to one single row, correspoding to "current_date"
-    
+        for row in skip_last(csv_reader):    #for every instance we want to store the daily count
+            fields.append(row[2]) #appending every instance's daily count, to be then appended to one single row, correspoding to "last_saved_date"
+                                            #TODO: make loop skip last row
     with open("dailies.csv", "r") as file:
         text = file.read()                 #reading the file so that we can check later if it ends with a newline (\n)...
     with open("dailies.csv", "a", newline='\n') as f1:
         writer = csv.writer(f1)
         if ( not text.endswith("\n") ):    #...checking if file ends with a newline (\n)
             f1.write("\n")                  #adding newline if file doesn't have a newline at the end
-        writer.writerow(fields)  #writing as row this corresponding list: [current_date, <count-for-first-instance>, <count-for-second-instance>, <count-for-third-instance>, etc ... ]
+        writer.writerow(fields)  #writing as row this corresponding list: [last_saved_date, <count-for-first-instance>, <count-for-second-instance>, <count-for-third-instance>, etc ... ]
                                  #all these counts are just DAILY counts
 
 
 def save_weekly_counts():
-    #current_date = datetime.today()
-    #current_week = current_date.isocalendar()[1]
-    #current_year = current_date.year
-
-    last_saved_date = load_last_date1("tick-instances1.csv")
-    date_object = datetime.strptime(last_saved_date, "%d/%m/%Y")
+    last_saved_date = load_last_date1("tick-instances1.csv")        #takes the date in which the program was LAST used...
+    date_object = datetime.strptime(last_saved_date, "%d/%m/%Y")    #...and taking it into datatime object
     
-    week = date_object.isocalendar()[1]
-    year = date_object.year
-    start_of_week = datetime.fromisocalendar(year, week, 1).strftime("%d/%m/%Y")
-    end_of_week = datetime.fromisocalendar(year, week, 7).strftime("%d/%m/%Y")
-    #start_of_week = datetime.fromisocalendar(current_year, current_week, 1).strftime("%d/%m/%Y")
-    #end_of_week = datetime.fromisocalendar(current_year, current_week, 7).strftime("%d/%m/%Y")
-    fields = [start_of_week + "-" + end_of_week] 
+    week = date_object.isocalendar()[1]  #taking the week of this specific datetime object
+    year = date_object.year              #taking the year of this specific datetime object
+    start_of_week = datetime.fromisocalendar(year, week, 1).strftime("%d/%m/%Y")                     #based on the week and the year of the last saved date we can...
+    end_of_week = datetime.fromisocalendar(year, week, 7).strftime("%d/%m/%Y")                       #...get monday and sunday for that specific week (start and end of the specific week)
 
-    #print(fields)
+    fields = [start_of_week + "-" + end_of_week] #formatting <start-of-week>-<end-of-week>
 
     with open("tick-instances1.csv", "r") as f: #ATTENZIONE al nome del file
         csv_reader = csv.reader(f)
@@ -68,16 +65,11 @@ def save_weekly_counts():
 def save_monthly_counts():
     last_saved_date = load_last_date1("tick-instances1.csv")
     date_object = datetime.strptime(last_saved_date, "%d/%m/%Y")
-    """ current_date = datetime.today()
-    current_month = current_date.strftime("%B")
-    current_year = str(current_date.year) """
 
     month_name = last_saved_date.strftime("%B")
     year = str(last_saved_date.year)
 
     fields = [month_name + " " + year] 
-
-    #print(fields)
 
     with open("tick-instances1.csv", "r") as f: #ATTENZIONE al nome del file
         csv_reader = csv.reader(f)
@@ -96,6 +88,7 @@ def save_monthly_counts():
 
 
 # function that checks if 2 dates fall in the same week or not
+#one is a datetime object, the other is a string formatted in a specific format
 # returns True if the 2 dates fall in the same week
 def is_sameweek_dates(date1_object, date2_string):               #"date<>_objects" stands for datetime object coming from the datetime module
     date2_object = datetime.strptime(date2_string, "%d/%m/%Y")
@@ -158,9 +151,9 @@ def count_reset(info):  #TODO: test this function for different dates (different
         elif (info == "month"):
             option = 4
 
-        #print(matrix)
-        #print(len(matrix))
-        for i in range(len(matrix) -1):
+        print(matrix)
+        print(len(matrix))
+        for i in range(len(matrix) -2):
                 matrix[i+1][option] = 0 #RESETTING...
 
     with open("tick-instances1.csv", "w", newline="") as file1:
@@ -208,6 +201,7 @@ print(is_same_date(datetime.strptime("01/06/2021", "%d/%m/%Y"), last_saved_date)
 
 #save_weekly_counts()
 #save_monthly_counts()
+check_count_reset()   #TODO: non funziona un granchè niente perchè solo check_count_reset non modifica la data in tick-instances1.csv
 
 def get_passed_ms():
     now = datetime.now()
