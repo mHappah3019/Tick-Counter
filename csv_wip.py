@@ -10,8 +10,10 @@ current_date = datetime.today()  #for now current_date can be thought as a globa
 
 def save_daily_counts():
     #TODO: guardare Notion
-    current_date = datetime.today().strftime("%d/%m/%Y") #getting current_date and formatting it
-    fields = [current_date] #"appending" first element to the row (will go under header "Name" in dailies.csv)
+    """ current_date = datetime.today().strftime("%d/%m/%Y") #getting current_date and formatting it
+    fields = [current_date] #"appending" first element to the row (will go under header "Name" in dailies.csv) """
+    last_saved_date = load_last_date1("tick-instances1.csv")
+    fields = [last_saved_date]
 
     with open("tick-instances1.csv", "r") as f: #ATTENZIONE al nome del file
         csv_reader = csv.reader(f)
@@ -30,12 +32,19 @@ def save_daily_counts():
 
 
 def save_weekly_counts():
-    current_date = datetime.today()
-    current_week = current_date.isocalendar()[1]
-    current_year = current_date.year
+    #current_date = datetime.today()
+    #current_week = current_date.isocalendar()[1]
+    #current_year = current_date.year
 
-    start_of_week = datetime.fromisocalendar(current_year, current_week, 1).strftime("%d/%m/%Y")
-    end_of_week = datetime.fromisocalendar(current_year, current_week, 7).strftime("%d/%m/%Y")
+    last_saved_date = load_last_date1("tick-instances1.csv")
+    date_object = datetime.strptime(last_saved_date, "%d/%m/%Y")
+    
+    week = date_object.isocalendar()[1]
+    year = date_object.year
+    start_of_week = datetime.fromisocalendar(year, week, 1).strftime("%d/%m/%Y")
+    end_of_week = datetime.fromisocalendar(year, week, 7).strftime("%d/%m/%Y")
+    #start_of_week = datetime.fromisocalendar(current_year, current_week, 1).strftime("%d/%m/%Y")
+    #end_of_week = datetime.fromisocalendar(current_year, current_week, 7).strftime("%d/%m/%Y")
     fields = [start_of_week + "-" + end_of_week] 
 
     #print(fields)
@@ -57,11 +66,16 @@ def save_weekly_counts():
 
 
 def save_monthly_counts():
-    current_date = datetime.today()
+    last_saved_date = load_last_date1("tick-instances1.csv")
+    date_object = datetime.strptime(last_saved_date, "%d/%m/%Y")
+    """ current_date = datetime.today()
     current_month = current_date.strftime("%B")
-    current_year = str(current_date.year)
+    current_year = str(current_date.year) """
 
-    fields = [current_month + " " + current_year] 
+    month_name = last_saved_date.strftime("%B")
+    year = str(last_saved_date.year)
+
+    fields = [month_name + " " + year] 
 
     #print(fields)
 
@@ -156,6 +170,16 @@ def count_reset(info):  #TODO: test this function for different dates (different
 
 def load_last_date():
     with open("dailies.csv", "r") as file:
+        csv_reader = csv.reader(file)
+        matrix = list(csv_reader)
+
+        print(matrix)
+
+        last_date = matrix[-1][0]
+        return last_date
+
+def load_last_date1(file):
+    with open(file, "r") as file:
         csv_reader = csv.reader(file)
         matrix = list(csv_reader)
 
