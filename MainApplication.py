@@ -1,5 +1,6 @@
 import tkinter as tk
 import csv
+import sys
 
 #instances_names_array = ["Tick1", "Tick2", "Tick3", "Tick3", "Tick3", "Tick3", "Tick3", "Tick3", "Tick3", "Tick3", "Tick3"]
 
@@ -161,19 +162,38 @@ class MainApplication(tk.Frame):
             csv_file1.writerows(matrix)
 
 
+        print("Applicazione chiusa con successo")
 
 
         
-        
+def get_passed_ms():
+    now = datetime.now()
+    hours = now.hour
+    minutes = hours*60 + now.minute
+    seconds = minutes*60 + now.second
+    return seconds*1000 #millisecondi
 
 
+def get_remaining_ms():
+    ms_in_aday = 86,400,000
+    return ms_in_aday - get_passed_ms()
 
-if __name__ == "__main__":
+
+def vp_start_gui():
+    global root
     root = tk.Tk()
     root.geometry("400x300")
     
     mainapp = MainApplication(root)
     mainapp.pack(side="top", fill="both", expand=True)
-
     root.mainloop()
     mainapp.__exit__()
+
+
+def refresh():  #https://stackoverflow.com/questions/44199332/removing-and-recreating-a-tkinter-window-with-a-restart-button
+    root.destroy()
+    vp_start_gui()
+
+if __name__ == "__main__":
+    vp_start_gui()
+    
