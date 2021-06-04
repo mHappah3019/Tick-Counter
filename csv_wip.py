@@ -155,6 +155,7 @@ def count_reset(info):  #TODO: test this function for different dates (different
         print(len(matrix))
         for i in range(len(matrix) -2):
                 matrix[i+1][option] = 0 #RESETTING...
+        matrix[-1][0] = current_date.strftime("%d/%m/%Y") #modifichiamo la data in tick-instances1.csv
 
     with open("tick-instances1.csv", "w", newline="") as file1:
         csv_file1 = csv.writer(file1)
