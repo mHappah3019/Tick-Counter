@@ -1,10 +1,14 @@
+from datetime import datetime
 import tkinter as tk
 import csv
 import sys
+import os
 
 #instances_names_array = ["Tick1", "Tick2", "Tick3", "Tick3", "Tick3", "Tick3", "Tick3", "Tick3", "Tick3", "Tick3", "Tick3"]
 
 objects = []
+
+os.chdir("C:/Users/mkcam/Desktop/Tick Counter/Tick-Counter")
 
 def update_file(filepath, tag):
     #TODO: based on the tag, change time
@@ -186,12 +190,16 @@ def vp_start_gui():
     
     mainapp = MainApplication(root)
     mainapp.pack(side="top", fill="both", expand=True)
+
+    root.after(5000, refresh) #TODO: come "ms" va messo il valore di ritorno di get_remaining_ms
+
     root.mainloop()
     mainapp.__exit__()
 
 
 def refresh():  #https://stackoverflow.com/questions/44199332/removing-and-recreating-a-tkinter-window-with-a-restart-button
     root.destroy()
+    root.after(3000)
     vp_start_gui()
 
 if __name__ == "__main__":
