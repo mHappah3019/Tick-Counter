@@ -1,26 +1,24 @@
-from datetime import datetime
+from csv_wip import current_date, get_remaining_ms, save_daily_counts, is_same_date, check_count_reset, load_last_date, get_remaining_ms
 import tkinter as tk
 import csv
-import sys
 import os
+import sys
+
+
+#ATTENZIONEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
+#https://stackoverflow.com/questions/431684/equivalent-of-shell-cd-command-to-change-the-working-directory
+os.chdir("C:/Users/mkcam/Desktop/Tick Counter/Tick-Counter")
 
 #instances_names_array = ["Tick1", "Tick2", "Tick3", "Tick3", "Tick3", "Tick3", "Tick3", "Tick3", "Tick3", "Tick3", "Tick3"]
 
 objects = []
 
-os.chdir("C:/Users/mkcam/Desktop/Tick Counter/Tick-Counter")
-
-def update_file(filepath, tag):
-
-            index = matrix[0].index(tag)
-            for i, instance in enumerate(objects):
-                value = int(matrix[i+1][index]) + instance.session_count #we are converting to int the first value cause it is originally a string type
-                matrix[i+1][index] = value #actually updating the value
-                
-                #matrix[i+1][daily] = #daily takes an integer, and designates the column where "Daily" is set
-            
-            print(matrix)
-
+#TODO: import this function directly from csv_wip.py
+def skip_last(iterator):
+    prev = next(iterator)
+    for item in iterator:
+        yield prev
+        prev = item
 
 
 
@@ -52,7 +50,6 @@ class ScrollableFrame(tk.Frame):
                                   tags="self.frame")
 
 
-
             self.frame.bind("<Configure>", self.onFrameConfigure)
             self.canvas.bind("<Configure>", self.FrameWidth)
 
@@ -63,10 +60,11 @@ class ScrollableFrame(tk.Frame):
             #self.frame holds the nx1 grid of instances
             self.populate()
     
+
     def populate(self):
-        with open("tick-instances.csv", "r") as file:
+        with open("tick-instances1.csv", "r") as file:
             csv_file = csv.DictReader(file)
-            for i, row in enumerate(csv_file):
+            for i, row in skip_last(enumerate(csv_file)):
                 self.frame.rowconfigure(i, weight=1) # setting only the rows where Tick instances are appended to be visible
                 instance = TickFrame(self.frame, row["Name"], row["Daily"], relief=tk.SUNKEN, borderwidth=2, bg="blue", bd=2)
                 instance.grid(row=i, column=0, sticky = "nsew")
@@ -75,7 +73,7 @@ class ScrollableFrame(tk.Frame):
 
     def onFrameConfigure(self, event):
         '''Reset the scroll region to encompass the inner frame'''
-        #we are in fact setting the scroll region to be the bounding box of everything that is in the canvas
+        # we are in fact setting the scroll region to be the bounding box of everything that is in the canvas
         self.canvas.configure(scrollregion=self.canvas.bbox("all"))
 
     
@@ -85,18 +83,19 @@ class ScrollableFrame(tk.Frame):
 
 
 
+
 class TickFrame(tk.Frame):
         def __init__(self, parent, name, number, *args, **kwargs):
             tk.Frame.__init__(self, parent, *args, **kwargs) #"parent" shall be the frame inside the canvas that it implemented as a virtual window
             
             self.session_count = 0 #count shall be read from the csv file
             self.name = name #definisco anche un attributo "nome" per provare ad accedere piu' facilmente agli oggetti
-                            # in un secondo momento
+                             #in un secondo momento
 
             self.name_lbl = tk.Label(master=self, text=name, width=25, height=2)
             self.decrease_btn = tk.Button(master=self, text="-")
             self.count_lbl = tk.Label(master=self, text=str(number))
-            self.increase_btn = tk.Button(master=self, text="+", command=self.increment)
+            self.increase_btn = tk.Button(master=self, text="+", command=self.increment) #when this button is clicked we shall increment session_count for this particular instance
             self.info_btn = tk.Button(master=self, text="...")
 
 
@@ -113,12 +112,20 @@ class TickFrame(tk.Frame):
 
         def increment(self):
             self.session_count += 1
-            self.count_lbl['text'] = str(int(self.count_lbl['text']) + 1) #incrementa di 1 il valore e quindi lo mostra
-            print(self.name + ": " + str(self.session_count))
+            self.count_lbl['text'] = str(int(self.count_lbl['text']) + 1) #shows in the label the new value; the old value is simply incremented by one
+            #print(self.name + ": " + str(self.session_count))
+
+
+
 
 class MainApplication(tk.Frame):
     def __init__(self, parent, *args, **kwargs):
         tk.Frame.__init__(self, parent, *args, **kwargs) #bg="black" to check how sticky="nsew" works for the Frames (instancesPanel etc)
+
+        check_count_reset() #...if we should reset, either the "Daily", "Weekly", "Monthly" counters or all of em and...
+                            #plus, it triggers all the functions to save the stats in dailies.csv, weeklies.csv, monthlies.csv
+                            #should be run before populating the application with all the data (when instantiating ScrollableFrame)
+
         self.parent = parent #"parent" shall be "root"
         #needed for "hiding" all the empty columns
         self.columnconfigure(0, weight=1, minsize=200)
@@ -141,22 +148,26 @@ class MainApplication(tk.Frame):
         ADD_btn = tk.Button(self.extraPanel, text="ADD")
         ADD_btn.grid(row=0, column=0, sticky="nsew")
 
+
     #this function, first, reads the "old" version of all the data
     #then, it takes all the data and brings it in the form of a matrix;
     #it updates the data inside the matrix
     #then overwrites the file
     def __exit__(self):
-        with open("tick-instances.csv", "r") as file:
+        with open("tick-instances1.csv", "r") as file:
             csv_file = csv.reader(file)
             matrix = list(csv_file) #stores data locally in the form of a matrix where every row represents one single instance and the columns represent different parameters
                                     #NB. numbers are converted into string values
-            #daily = matrix[0].index("Daily")
 
             for i, instance in enumerate(objects):
-                value = int(matrix[i+1][2]) + instance.session_count #we are converting to int the first value cause it is originally a string type
-                matrix[i+1][2] = value #actually updating the value
+                daily_value = int(matrix[i+1][2]) + instance.session_count #we are converting to int the first value cause it is originally a string type
+                matrix[i+1][2] = daily_value #actually updating the daily value
                 
-                #matrix[i+1][daily] = #daily takes an integer, and designates the column where "Daily" is set
+                weekly_value = int(matrix[i+1][3]) + instance.session_count #we are converting to int the first value cause it is originally a string type
+                matrix[i+1][3] = weekly_value #actually updating the weekly value
+            
+                monthly_value = int(matrix[i+1][4]) + instance.session_count #we are converting to int the first value cause it is originally a string type
+                matrix[i+1][4] = monthly_value #actually updating the monthly value
             
             print(matrix)
 
