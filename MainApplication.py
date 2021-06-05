@@ -138,7 +138,7 @@ class MainApplication(tk.Frame):
         self.extraPanel.rowconfigure(0, weight=1, minsize=20) #setting up extraPanel
 
         #implementation of the ADD button
-        ADD_btn = tk.Button(self.extraPanel, text="ADD")
+        ADD_btn = tk.Button(self.extraPanel, text="ADD", command=create_window)
         ADD_btn.grid(row=0, column=0, sticky="nsew")
 
 
@@ -169,6 +169,37 @@ class MainApplication(tk.Frame):
             csv_file1.writerows(matrix)
 
         print("Applicazione chiusa con successo")
+
+
+
+
+class InstancesManager(tk.Frame):
+    def __init__(self, parent, *args, **kwargs):
+        tk.Frame.__init__(self, parent, *args, **kwargs)
+
+        self.parent = parent #"parent" shall be "root"
+        #needed for "hiding" all the empty columns
+        self.columnconfigure(0, weight=1, minsize=200)
+
+        #virtually holds the nx1 grid of info parameters
+        #the actual frame is set inside the canvas, that is itself inside infoPanel
+        self.infoPanel = ScrollableFrame(self)                 #TODO: create new branch, then tweak ScrollableFrame so that it knows when create the frame for the instances and when to create frame for the info panel
+        self.infoPanel.grid(row=0, column=0, sticky="nsew")
+        self.rowconfigure(0, weight=1)
+
+        """ #holds ADD button, for now
+        self.extraPanel = tk.Frame(self, bg="white")
+        self.extraPanel.grid(column=0, row=1, sticky="nsew")
+        self.rowconfigure(1, weight=0, minsize=25) """
+
+        """ self.extraPanel.columnconfigure(0, weight=1, minsize=200) #setting up extraPanel
+        self.extraPanel.rowconfigure(0, weight=1, minsize=20) #setting up extraPanel """
+
+        #implementation of the ADD button
+        ADD_btn = tk.Button(self.extraPanel, text="ADD", command=pass) #TODO: implementing function that actually adds the new instance just defined to all the other instances
+        ADD_btn.grid(row=0, column=0, sticky="nsew")
+
+    pass
 
 
         
@@ -206,6 +237,9 @@ def refresh():  #https://stackoverflow.com/questions/44199332/removing-and-recre
     root.destroy()
     root.after(3000)
     vp_start_gui()
+
+def create_window():
+    window = tk.Toplevel(root)
 
 if __name__ == "__main__":
     vp_start_gui()
