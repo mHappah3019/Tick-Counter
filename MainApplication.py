@@ -1,4 +1,5 @@
-from csv_wip import current_date, get_remaining_ms, save_daily_counts, is_same_date, check_count_reset, load_last_date, get_remaining_ms
+from csv_wip import current_date, get_remaining_ms, save_daily_counts, is_same_date, check_count_reset, load_last_date, get_remaining_ms, skip_last
+from datetime import datetime
 import tkinter as tk
 import csv
 import os
@@ -12,14 +13,6 @@ os.chdir("C:/Users/mkcam/Desktop/Tick Counter/Tick-Counter")
 #instances_names_array = ["Tick1", "Tick2", "Tick3", "Tick3", "Tick3", "Tick3", "Tick3", "Tick3", "Tick3", "Tick3", "Tick3"]
 
 objects = []
-
-#TODO: import this function directly from csv_wip.py
-def skip_last(iterator):
-    prev = next(iterator)
-    for item in iterator:
-        yield prev
-        prev = item
-
 
 
 class ScrollableFrame(tk.Frame):
@@ -174,7 +167,6 @@ class MainApplication(tk.Frame):
         with open("tick-instances1.csv", "w", newline="") as file1:
             csv_file1 = csv.writer(file1)
             csv_file1.writerows(matrix)
-
 
         print("Applicazione chiusa con successo")
 

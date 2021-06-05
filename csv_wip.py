@@ -7,7 +7,7 @@ os.chdir("C:/Users/mkcam/Desktop/Tick Counter/Tick-Counter")
 
 current_date = datetime.today()  #for now current_date can be thought as a global variable too
 
-def skip_last(iterator):
+def skip_last(iterator):  #TODO: understand thiss
     prev = next(iterator)
     for item in iterator:
         yield prev
@@ -15,16 +15,14 @@ def skip_last(iterator):
 
 
 def save_daily_counts(date):
-    #TODO: guardare Notion
-    #last_saved_date = load_last_date("tick-instances1.csv") #takes the date in which the program was LAST used
-    fields = [date]
+    fields = [date]  #"date" comes from tick-instances1.csv
 
     with open("tick-instances1.csv", "r") as f: #ATTENZIONE al nome del file
         csv_reader = csv.reader(f)
         headers = next(csv_reader)      #skipping headers row
-        for row in skip_last(csv_reader):    #for every instance we want to store the daily count
+        for row in skip_last(csv_reader):    #for every instance we want to store the daily count; plus we are skipping the last row of tick-instances1
             fields.append(row[2]) #appending every instance's daily count, to be then appended to one single row, correspoding to "last_saved_date"
-                                            #TODO: make loop skip last row
+    
     with open("dailies.csv", "r") as file:
         text = file.read()                 #reading the file so that we can check later if it ends with a newline (\n)...
     with open("dailies.csv", "a", newline='\n') as f1:
@@ -36,8 +34,7 @@ def save_daily_counts(date):
 
 
 def save_weekly_counts(date):
-    #last_saved_date = load_last_date("tick-instances1.csv")        #takes the date in which the program was LAST used...
-    date_object = datetime.strptime(date, "%d/%m/%Y")    #...and taking it into datatime object
+    date_object = datetime.strptime(date, "%d/%m/%Y")    #takes "date" from tick-instances1.csv and converts it into datetime object
     
     week = date_object.isocalendar()[1]  #taking the week of this specific datetime object
     year = date_object.year              #taking the year of this specific datetime object
@@ -49,7 +46,7 @@ def save_weekly_counts(date):
     with open("tick-instances1.csv", "r") as f: #ATTENZIONE al nome del file
         csv_reader = csv.reader(f)
         headers = next(csv_reader)      #skipping headers row
-        for row in skip_last(csv_reader):    #for every instance we want to store the weekly count
+        for row in skip_last(csv_reader):    #for every instance we want to store the weekly count; plus skipping last row
             fields.append(row[3]) #appending every instance's daily count, to be then appended to one single row, correspoding to the entire duration of the week
     
     with open("weeklies.csv", "r") as file:
@@ -63,18 +60,17 @@ def save_weekly_counts(date):
 
 
 def save_monthly_counts(date):
-    #last_saved_date = load_last_date("tick-instances1.csv")
-    date_object = datetime.strptime(date, "%d/%m/%Y")
+    date_object = datetime.strptime(date, "%d/%m/%Y") #takes "date" from tick-instances1.csv
 
-    month_name = date_object.strftime("%B")
-    year = str(date_object.year)
+    month_name = date_object.strftime("%B")  #We want to save months with their actual name, and not the number representing them
+    year = str(date_object.year)             #taking the year
 
     fields = [month_name + " " + year] 
 
     with open("tick-instances1.csv", "r") as f: #ATTENZIONE al nome del file
         csv_reader = csv.reader(f)
         headers = next(csv_reader)      #skipping headers row
-        for row in skip_last(csv_reader):    #for every instance we want to store the monthly count
+        for row in skip_last(csv_reader):    #for every instance we want to store the monthly count; plus skipping last row
             fields.append(row[4]) #appending every instance's monthly count, to be then appended to one single row, correspoding to month name + year
     
     with open("monthlies.csv", "r") as file:
@@ -139,7 +135,7 @@ def check_count_reset():
         count_reset("month") #actually resetting the values
 
 
-def count_reset(info):  #TODO: test this function for different dates (different days, weeks and months)
+def count_reset(info): 
     with open("tick-instances1.csv", "r") as file:
         csv_file = csv.reader(file)
         matrix = list(csv_file) #stores data locally in the form of a matrix where every row represents one single instance and the columns represent different parameters
@@ -186,13 +182,6 @@ def trunc_datetime(someDate, option):
 
 
 current_date = datetime.today()
-
-""" print(is_same_date(current_date, last_saved_date))
-print(is_same_date(current_date, "03/06/2021"))
-print(is_same_date(datetime.strptime("01/06/2021", "%d/%m/%Y"), last_saved_date))
- """
-#save_weekly_counts()
-#save_monthly_counts()
 check_count_reset()
 
 
@@ -206,6 +195,3 @@ def get_passed_ms():
 def get_remaining_ms():
     ms_in_aday = 86,400,000
     return ms_in_aday - get_passed_ms()
-
-
-#TODO: capire perchè "Run Code" non funge mentre "Run Python File from Terminal" funge
