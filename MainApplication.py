@@ -11,7 +11,6 @@ objects = []
 os.chdir("C:/Users/mkcam/Desktop/Tick Counter/Tick-Counter")
 
 def update_file(filepath, tag):
-    #TODO: based on the tag, change time
 
             index = matrix[0].index(tag)
             for i, instance in enumerate(objects):
@@ -173,8 +172,11 @@ class MainApplication(tk.Frame):
 def get_passed_ms():
     now = datetime.now()
     hours = int(now.hour)
+    print(hours)
     minutes = hours*60 + int(now.minute)
+    print(minutes)
     seconds = minutes*60 + int(now.second)
+    print(seconds)
     return seconds*1000 #millisecondi
 
 
