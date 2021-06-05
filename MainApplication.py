@@ -1,7 +1,28 @@
+from datetime import datetime
 import tkinter as tk
-import time
+import csv
+import sys
+import os
 
-instances_names_array = ["Tick1", "Tick2", "Tick3", "Tick3", "Tick3", "Tick3", "Tick3", "Tick3", "Tick3", "Tick3", "Tick3"]
+#instances_names_array = ["Tick1", "Tick2", "Tick3", "Tick3", "Tick3", "Tick3", "Tick3", "Tick3", "Tick3", "Tick3", "Tick3"]
+
+objects = []
+
+os.chdir("C:/Users/mkcam/Desktop/Tick Counter/Tick-Counter")
+
+def update_file(filepath, tag):
+
+            index = matrix[0].index(tag)
+            for i, instance in enumerate(objects):
+                value = int(matrix[i+1][index]) + instance.session_count #we are converting to int the first value cause it is originally a string type
+                matrix[i+1][index] = value #actually updating the value
+                
+                #matrix[i+1][daily] = #daily takes an integer, and designates the column where "Daily" is set
+            
+            print(matrix)
+
+
+
 
 class ScrollableFrame(tk.Frame):
     def __init__(self, parent):
@@ -43,12 +64,14 @@ class ScrollableFrame(tk.Frame):
             self.populate()
     
     def populate(self):
-        for count, name in enumerate(instances_names_array):
-            
-            self.frame.rowconfigure(count, weight=1) # setting only the rows where Tick instances are appended to be visible
-            instance = TickFrame(self.frame, name, relief=tk.SUNKEN, borderwidth=2, bg="blue", bd=2)
-            #instance = TickFrame(self.frame, name)
-            instance.grid(row=count, column=0, sticky = "nsew")
+        with open("tick-instances.csv", "r") as file:
+            csv_file = csv.DictReader(file)
+            for i, row in enumerate(csv_file):
+                self.frame.rowconfigure(i, weight=1) # setting only the rows where Tick instances are appended to be visible
+                instance = TickFrame(self.frame, row["Name"], row["Daily"], relief=tk.SUNKEN, borderwidth=2, bg="blue", bd=2)
+                instance.grid(row=i, column=0, sticky = "nsew")
+
+
 
     def onFrameConfigure(self, event):
         '''Reset the scroll region to encompass the inner frame'''
@@ -63,26 +86,35 @@ class ScrollableFrame(tk.Frame):
 
 
 class TickFrame(tk.Frame):
-        def __init__(self, parent, name,*args, **kwargs):
+        def __init__(self, parent, name, number, *args, **kwargs):
             tk.Frame.__init__(self, parent, *args, **kwargs) #"parent" shall be the frame inside the canvas that it implemented as a virtual window
             
+            self.session_count = 0 #count shall be read from the csv file
+            self.name = name #definisco anche un attributo "nome" per provare ad accedere piu' facilmente agli oggetti
+                            # in un secondo momento
 
-            name_lbl = tk.Label(master=self, text=name, width=25, height=2)
-            decrease_btn = tk.Button(master=self, text="-")
-            count_lbl = tk.Label(master=self, text=" ")
-            increase_btn = tk.Button(master=self, text="+")
-            info_btn = tk.Button(master=self, text="...")
+            self.name_lbl = tk.Label(master=self, text=name, width=25, height=2)
+            self.decrease_btn = tk.Button(master=self, text="-")
+            self.count_lbl = tk.Label(master=self, text=str(number))
+            self.increase_btn = tk.Button(master=self, text="+", command=self.increment)
+            self.info_btn = tk.Button(master=self, text="...")
 
 
             self.columnconfigure([0,1,2,3,4], weight=1) #we are setting every Tick instance to have only the 5 columns corresponding to the number of our widgets to be useful
             self.rowconfigure(0, weight=1) #being any Tick instance implemented with a grid geometry manager we need to have only the "first" row to be visible
             
-            #
-            name_lbl.grid(row=0, column=0, sticky="nsew") #don't know if sticky is necessary
-            decrease_btn.grid(row=0, column=1, sticky="nsew") #leaving it like this for illustrative purposes
-            count_lbl.grid(row=0, column=2)
-            increase_btn.grid(row=0, column=3)
-            info_btn.grid(row=0, column=4)
+            self.name_lbl.grid(row=0, column=0, sticky="nsew") #don't know if sticky is necessary
+            self.decrease_btn.grid(row=0, column=1, sticky="nsew") #leaving it like this for illustrative purposes
+            self.count_lbl.grid(row=0, column=2)
+            self.increase_btn.grid(row=0, column=3)
+            self.info_btn.grid(row=0, column=4)
+
+            objects.append(self) #"populate" (ScrollableFrame) creates tick instances, hence they are added to an array that keeps track of all of them
+
+        def increment(self):
+            self.session_count += 1
+            self.count_lbl['text'] = str(int(self.count_lbl['text']) + 1) #incrementa di 1 il valore e quindi lo mostra
+            print(self.name + ": " + str(self.session_count))
 
 class MainApplication(tk.Frame):
     def __init__(self, parent, *args, **kwargs):
@@ -92,31 +124,86 @@ class MainApplication(tk.Frame):
         self.columnconfigure(0, weight=1, minsize=200)
 
         #virtually holds the nx1 grid of instances
-        #the actualy frame is set inside the canvas, that is inside instancesPanel
-        instancesPanel = ScrollableFrame(self)
-        instancesPanel.grid(row=0, column=0, sticky="nsew")
+        #the actual frame is set inside the canvas, that is inside instancesPanel
+        self.instancesPanel = ScrollableFrame(self)
+        self.instancesPanel.grid(row=0, column=0, sticky="nsew")
         self.rowconfigure(0, weight=1)
 
         #holds ADD button, for now
-        extraPanel = tk.Frame(self, bg="white")
-        extraPanel.grid(column=0, row=1, sticky="nsew")
+        self.extraPanel = tk.Frame(self, bg="white")
+        self.extraPanel.grid(column=0, row=1, sticky="nsew")
         self.rowconfigure(1, weight=0, minsize=25)
 
-        extraPanel.columnconfigure(0, weight=1, minsize=200) #setting up extraPanel
-        extraPanel.rowconfigure(0, weight=1, minsize=20) #setting up extraPanel
+        self.extraPanel.columnconfigure(0, weight=1, minsize=200) #setting up extraPanel
+        self.extraPanel.rowconfigure(0, weight=1, minsize=20) #setting up extraPanel
 
         #implementation of the ADD button
-        ADD_btn = tk.Button(extraPanel, text="ADD",)
+        ADD_btn = tk.Button(self.extraPanel, text="ADD")
         ADD_btn.grid(row=0, column=0, sticky="nsew")
+
+    #this function, first, reads the "old" version of all the data
+    #then, it takes all the data and brings it in the form of a matrix;
+    #it updates the data inside the matrix
+    #then overwrites the file
+    def __exit__(self):
+        with open("tick-instances.csv", "r") as file:
+            csv_file = csv.reader(file)
+            matrix = list(csv_file) #stores data locally in the form of a matrix where every row represents one single instance and the columns represent different parameters
+                                    #NB. numbers are converted into string values
+            #daily = matrix[0].index("Daily")
+
+            for i, instance in enumerate(objects):
+                value = int(matrix[i+1][2]) + instance.session_count #we are converting to int the first value cause it is originally a string type
+                matrix[i+1][2] = value #actually updating the value
+                
+                #matrix[i+1][daily] = #daily takes an integer, and designates the column where "Daily" is set
+            
+            print(matrix)
+
+        with open("tick-instances1.csv", "w", newline="") as file1:
+            csv_file1 = csv.writer(file1)
+            csv_file1.writerows(matrix)
+
+
+        print("Applicazione chiusa con successo")
+
+
         
+def get_passed_ms():
+    now = datetime.now()
+    hours = int(now.hour)
+    print(hours)
+    minutes = hours*60 + int(now.minute)
+    print(minutes)
+    seconds = minutes*60 + int(now.second)
+    print(seconds)
+    return seconds*1000 #millisecondi
 
 
+def get_remaining_ms():
+    ms_in_aday = 86400000
+    return (ms_in_aday - get_passed_ms())
 
-if __name__ == "__main__":
+
+def vp_start_gui():
+    global root
     root = tk.Tk()
     root.geometry("400x300")
     
     mainapp = MainApplication(root)
     mainapp.pack(side="top", fill="both", expand=True)
 
+    root.after(get_remaining_ms(), refresh)
+
     root.mainloop()
+    mainapp.__exit__()
+
+
+def refresh():  #https://stackoverflow.com/questions/44199332/removing-and-recreating-a-tkinter-window-with-a-restart-button
+    root.destroy()
+    root.after(3000)
+    vp_start_gui()
+
+if __name__ == "__main__":
+    vp_start_gui()
+    
