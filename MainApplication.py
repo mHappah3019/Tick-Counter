@@ -13,6 +13,12 @@ os.chdir("C:/Users/mkcam/Desktop/Tick Counter/Tick-Counter")
 
 objects = []
 
+#TODO: import this function directly from csv_wip.py
+def skip_last(iterator):
+    prev = next(iterator)
+    for item in iterator:
+        yield prev
+        prev = item
 
 
 
@@ -44,7 +50,6 @@ class ScrollableFrame(tk.Frame):
                                   tags="self.frame")
 
 
-
             self.frame.bind("<Configure>", self.onFrameConfigure)
             self.canvas.bind("<Configure>", self.FrameWidth)
 
@@ -55,10 +60,11 @@ class ScrollableFrame(tk.Frame):
             #self.frame holds the nx1 grid of instances
             self.populate()
     
+
     def populate(self):
         with open("tick-instances1.csv", "r") as file:
             csv_file = csv.DictReader(file)
-            for i, row in enumerate(csv_file):
+            for i, row in skip_last(enumerate(csv_file)):
                 self.frame.rowconfigure(i, weight=1) # setting only the rows where Tick instances are appended to be visible
                 instance = TickFrame(self.frame, row["Name"], row["Daily"], relief=tk.SUNKEN, borderwidth=2, bg="blue", bd=2)
                 instance.grid(row=i, column=0, sticky = "nsew")
