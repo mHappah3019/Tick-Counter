@@ -172,15 +172,15 @@ class MainApplication(tk.Frame):
         
 def get_passed_ms():
     now = datetime.now()
-    hours = now.hour
-    minutes = hours*60 + now.minute
-    seconds = minutes*60 + now.second
+    hours = int(now.hour)
+    minutes = hours*60 + int(now.minute)
+    seconds = minutes*60 + int(now.second)
     return seconds*1000 #millisecondi
 
 
 def get_remaining_ms():
-    ms_in_aday = 86,400,000
-    return ms_in_aday - get_passed_ms()
+    ms_in_aday = 86400000
+    return (ms_in_aday - get_passed_ms())
 
 
 def vp_start_gui():
