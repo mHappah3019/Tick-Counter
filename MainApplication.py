@@ -191,7 +191,7 @@ def vp_start_gui():
     mainapp = MainApplication(root)
     mainapp.pack(side="top", fill="both", expand=True)
 
-    root.after(5000, refresh) #TODO: come "ms" va messo il valore di ritorno di get_remaining_ms
+    root.after(get_remaining_ms(), refresh)
 
     root.mainloop()
     mainapp.__exit__()
