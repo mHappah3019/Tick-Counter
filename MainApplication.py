@@ -196,7 +196,7 @@ class InstancesManager(tk.Frame):
         self.extraPanel.rowconfigure(0, weight=1, minsize=20) #setting up extraPanel """
 
         #implementation of the ADD button
-        ADD_btn = tk.Button(self.extraPanel, text="ADD", command=pass) #TODO: implementing function that actually adds the new instance just defined to all the other instances
+        ADD_btn = tk.Button(self.extraPanel, text="ADD") #TODO: implementing function that actually adds the new instance just defined to all the other instances
         ADD_btn.grid(row=0, column=0, sticky="nsew")
 
     pass
