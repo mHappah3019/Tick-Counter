@@ -34,7 +34,6 @@ class ScrollableFrame(tk.Frame):
             #to keep its "relative position" in regards to the canvas
             self.canvas.configure(yscrollcommand=self.vsb.set)
 
-           
             self.vsb.pack(side="right", fill="y") #inserting the scrollbar in the right side  of the ScrollableFrame
             self.canvas.pack(side="left", fill="both", expand=True) #inserting the canvas in the left side of the ScrollableFrame
 
@@ -174,9 +173,9 @@ class MainApplication(tk.Frame):
             matrix = list(csv_file) #stores data locally in the form of a matrix where every row represents one single instance and the columns represent different parameters
                                     #NB. numbers are converted into string values
 
-            for i, instance in enumerate(objects):
+            for i, instance in skip_last(enumerate(objects)):
                 daily_value = int(matrix[i+1][2]) + instance.session_count #we are converting to int the first value cause it is originally a string type
-                matrix[i+1][2] = daily_value #actually updating the daily value
+                matrix[i+1][2] = daily_value #actually updating the daily value #TODO: fix this shit
                 
                 weekly_value = int(matrix[i+1][3]) + instance.session_count #we are converting to int the first value cause it is originally a string type
                 matrix[i+1][3] = weekly_value #actually updating the weekly value
@@ -195,18 +194,20 @@ class MainApplication(tk.Frame):
 
 
 
-class InstancesManager(tk.Frame):
+class InstancesManager(ScrollableFrame):
     def __init__(self, parent, *args, **kwargs):
-        tk.Frame.__init__(self, parent, *args, **kwargs)
+        #tk.Frame.__init__(self, parent, *args, **kwargs)
+        super.__init__(self, parent)  #parent shall be "root"
 
         self.parent = parent #"parent" shall be "root"
+
         #needed for "hiding" all the empty columns
         self.columnconfigure(0, weight=1, minsize=200)
 
         #virtually holds the nx1 grid of info parameters
         #the actual frame is set inside the canvas, that is itself inside infoPanel
-        self.infoPanel = ScrollableFrame(self)                 #TODO: create new branch, then tweak ScrollableFrame so that it knows when create the frame for the instances and when to create frame for the info panel
-        self.infoPanel.grid(row=0, column=0, sticky="nsew")
+        #self.infoPanel = ScrollableFrame(self)                 #TODO: create new branch, then tweak ScrollableFrame so that it knows when create the frame for the instances and when to create frame for the info panel
+        #self.infoPanel.grid(row=0, column=0, sticky="nsew")
         self.rowconfigure(0, weight=1)
 
 
@@ -216,6 +217,7 @@ class InstancesManager(tk.Frame):
 
 
         
+
 def get_passed_ms():
     now = datetime.now()
     hours = int(now.hour)
@@ -254,6 +256,7 @@ def refresh():  #https://stackoverflow.com/questions/44199332/removing-and-recre
 
 def create_window():           #TODO: make it modular
     window = tk.Toplevel(root)
+    return window
 
 
 if __name__ == "__main__":
