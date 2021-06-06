@@ -199,8 +199,6 @@ class InstancesManager(tk.Frame):
         ADD_btn = tk.Button(self.extraPanel, text="ADD") #TODO: implementing function that actually adds the new instance just defined to all the other instances
         ADD_btn.grid(row=0, column=0, sticky="nsew")
 
-    pass
-
 
         
 def get_passed_ms():
@@ -238,8 +236,10 @@ def refresh():  #https://stackoverflow.com/questions/44199332/removing-and-recre
     root.after(3000)
     vp_start_gui()
 
+
 def create_window():
     window = tk.Toplevel(root)
+
 
 if __name__ == "__main__":
     vp_start_gui()
