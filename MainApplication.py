@@ -18,7 +18,7 @@ objects = []
 class ScrollableFrame(tk.Frame):
     def __init__(self, parent):
 
-            tk.Frame.__init__(self,parent) #"parent" shall be MainApplication
+            tk.Frame.__init__(self, parent) #"parent" shall be MainApplication
             
             #USING COLORS FOR CLARITY
 
@@ -51,10 +51,12 @@ class ScrollableFrame(tk.Frame):
 
             #OOP approach: self.frame of the ScrollableFrame is being populated
             #self.frame holds the nx1 grid of instances
-            self.populate()
+            self.instances_populate()
     
 
-    def populate(self):
+            #self.infos_populate()
+
+    def instances_populate(self):
         with open("tick-instances1.csv", "r") as file:
             csv_file = csv.DictReader(file)
             for i, row in skip_last(enumerate(csv_file)):
@@ -62,6 +64,22 @@ class ScrollableFrame(tk.Frame):
                 instance = TickFrame(self.frame, row["Name"], row["Daily"], relief=tk.SUNKEN, borderwidth=2, bg="blue", bd=2)
                 instance.grid(row=i, column=0, sticky = "nsew")
 
+    def infos_populate(self): #TODO: implement
+        labels = [
+            "Name:",
+            "Hotkey:",
+            "POS"
+        ]
+
+        for idx, text in enumerate(labels):
+            # Create a Label widget with the text from the labels list
+            label = tk.Label(master=self.frame, text=text)
+            # Create an Entry widget
+            entry = tk.Entry(master=self.frame, width=50)
+            # Use the grid geometry manager to place the Label and
+            # Entry widgets in the row whose index is idx
+            label.grid(row=idx, column=0, sticky="e")
+            entry.grid(row=idx, column=1)
 
 
     def onFrameConfigure(self, event):
@@ -126,6 +144,10 @@ class MainApplication(tk.Frame):
         #virtually holds the nx1 grid of instances
         #the actual frame is set inside the canvas, that is inside instancesPanel
         self.instancesPanel = ScrollableFrame(self)
+        #OOP approach: self.frame of the ScrollableFrame is being populated
+        #self.frame holds the nx1 grid of instances
+        self.instancesPanel.instances_populate()
+
         self.instancesPanel.grid(row=0, column=0, sticky="nsew")
         self.rowconfigure(0, weight=1)
 
@@ -187,13 +209,6 @@ class InstancesManager(tk.Frame):
         self.infoPanel.grid(row=0, column=0, sticky="nsew")
         self.rowconfigure(0, weight=1)
 
-        """ #holds ADD button, for now
-        self.extraPanel = tk.Frame(self, bg="white")
-        self.extraPanel.grid(column=0, row=1, sticky="nsew")
-        self.rowconfigure(1, weight=0, minsize=25) """
-
-        """ self.extraPanel.columnconfigure(0, weight=1, minsize=200) #setting up extraPanel
-        self.extraPanel.rowconfigure(0, weight=1, minsize=20) #setting up extraPanel """
 
         #implementation of the ADD button
         ADD_btn = tk.Button(self.extraPanel, text="ADD") #TODO: implementing function that actually adds the new instance just defined to all the other instances
@@ -237,7 +252,7 @@ def refresh():  #https://stackoverflow.com/questions/44199332/removing-and-recre
     vp_start_gui()
 
 
-def create_window():
+def create_window():           #TODO: make it modular
     window = tk.Toplevel(root)
 
 
