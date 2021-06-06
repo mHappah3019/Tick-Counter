@@ -50,7 +50,7 @@ class ScrollableFrame(tk.Frame):
 
             #OOP approach: self.frame of the ScrollableFrame is being populated
             #self.frame holds the nx1 grid of instances
-            self.instances_populate()
+            #self.instances_populate()
     
 
             #self.infos_populate()
@@ -159,7 +159,7 @@ class MainApplication(tk.Frame):
         self.extraPanel.rowconfigure(0, weight=1, minsize=20) #setting up extraPanel
 
         #implementation of the ADD button
-        ADD_btn = tk.Button(self.extraPanel, text="ADD", command=create_window)
+        ADD_btn = tk.Button(self.extraPanel, text="ADD", command=InstancesManager.create_window)
         ADD_btn.grid(row=0, column=0, sticky="nsew")
 
 
@@ -212,9 +212,16 @@ class InstancesManager(ScrollableFrame):
 
 
         #implementation of the ADD button
-        ADD_btn = tk.Button(self.extraPanel, text="ADD") #TODO: implementing function that actually adds the new instance just defined to all the other instances
-        ADD_btn.grid(row=0, column=0, sticky="nsew")
+        Submit_btn = tk.Button(self.extraPanel, text="Submit") #TODO: implementing function that actually adds the new instance just defined to all the other instances
+        Submit_btn.grid(row=0, column=0, sticky="nsew")
 
+        self.infos_populate()
+
+
+    @staticmethod
+    def create_window():
+        window = tk.Toplevel(root)
+        instance_manager = InstancesManager(parent=window)
 
         
 
@@ -252,11 +259,6 @@ def refresh():  #https://stackoverflow.com/questions/44199332/removing-and-recre
     root.destroy()
     root.after(3000)
     vp_start_gui()
-
-
-def create_window():           #TODO: make it modular
-    window = tk.Toplevel(root)
-    return window
 
 
 if __name__ == "__main__":
