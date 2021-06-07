@@ -63,7 +63,8 @@ class ScrollableFrame(tk.Frame):
                 instance = TickFrame(self.frame, row["Name"], row["Daily"], relief=tk.SUNKEN, borderwidth=2, bg="blue", bd=2)
                 instance.grid(row=i, column=0, sticky = "nsew")
 
-    def infos_populate(self): #TODO: implement
+
+    def infos_populate(self):
         labels = [
             "Name:",
             "Hotkey:",
@@ -130,19 +131,19 @@ class TickFrame(tk.Frame):
 
 class MainApplication(tk.Frame):
     def __init__(self, parent, *args, **kwargs):
-        tk.Frame.__init__(self, parent, *args, **kwargs) #bg="black" to check how sticky="nsew" works for the Frames (instancesPanel etc)
+        tk.Frame.__init__(self, parent, *args, **kwargs)
 
         check_count_reset() #...if we should reset, either the "Daily", "Weekly", "Monthly" counters or all of em and...
                             #plus, it triggers all the functions to save the stats in dailies.csv, weeklies.csv, monthlies.csv
                             #should be run before populating the application with all the data (when instantiating ScrollableFrame)
 
-        self.parent = parent #"parent" shall be "root"
+        #self.parent = parent #"parent" shall be "root"
         #needed for "hiding" all the empty columns
         self.columnconfigure(0, weight=1, minsize=200)
 
         #virtually holds the nx1 grid of instances
         #the actual frame is set inside the canvas, that is inside instancesPanel
-        self.instancesPanel = ScrollableFrame(self)
+        self.instancesPanel = ScrollableFrame(parent=self)
         #OOP approach: self.frame of the ScrollableFrame is being populated
         #self.frame holds the nx1 grid of instances
         self.instancesPanel.instances_populate()
@@ -197,7 +198,7 @@ class MainApplication(tk.Frame):
 class InstancesManager(ScrollableFrame):
     def __init__(self, parent, *args, **kwargs):
         #tk.Frame.__init__(self, parent, *args, **kwargs)
-        super.__init__(self, parent)  #parent shall be "root"
+        ScrollableFrame.__init__(self, parent)  #parent shall be "root"
 
         self.parent = parent #"parent" shall be "root"
 
@@ -206,22 +207,33 @@ class InstancesManager(ScrollableFrame):
 
         #virtually holds the nx1 grid of info parameters
         #the actual frame is set inside the canvas, that is itself inside infoPanel
-        #self.infoPanel = ScrollableFrame(self)                 #TODO: create new branch, then tweak ScrollableFrame so that it knows when create the frame for the instances and when to create frame for the info panel
+        #self.infoPanel = ScrollableFrame(self)              
         #self.infoPanel.grid(row=0, column=0, sticky="nsew")
         self.rowconfigure(0, weight=1)
 
+        self.infos_populate()
+
+        self.frm_buttons = tk.Frame(parent)
+        self.frm_buttons.pack(fill=tk.X, side=tk.BOTTOM, ipadx=5, ipady=5)
 
         #implementation of the ADD button
-        Submit_btn = tk.Button(self.extraPanel, text="Submit") #TODO: implementing function that actually adds the new instance just defined to all the other instances
-        Submit_btn.grid(row=0, column=0, sticky="nsew")
+        #Submit_btn = tk.Button(self.frm_buttons, text="Submit") #TODO: implementing function that actually adds the new instance just defined to all the other instances
+        #Submit_btn.grid(row=0, column=0, sticky="nsew")
 
-        self.infos_populate()
+        btn_submit = tk.Button(master=self.frm_buttons, text="Submit")
+        btn_submit.pack(side=tk.RIGHT, padx=10, ipadx=10)
+
+        # Create the "Clear" button and pack it to the
+        #   right side of `frm_buttons`
+        btn_clear = tk.Button(master=self.frm_buttons, text="Clear")
+        btn_clear.pack(side=tk.RIGHT, ipadx=10)
 
 
     @staticmethod
     def create_window():
         window = tk.Toplevel(root)
         instance_manager = InstancesManager(parent=window)
+        instance_manager.pack()
 
         
 
