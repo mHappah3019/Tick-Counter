@@ -17,18 +17,17 @@ objects = []
 
 class ScrollableFrame(tk.Frame):
     def __init__(self, parent):
-
-            tk.Frame.__init__(self, parent) #"parent" shall be MainApplication
+            tk.Frame.__init__(self, parent) #"parent" shall be MainApplication for the "instance panel" and root for the "instance manager"
             
             #USING COLORS FOR CLARITY
 
-            self.canvas = tk.Canvas(master=self, borderwidth=3, bg="black") #master denotes the parent window, that is the object whose class we are defining
+            self.canvas = tk.Canvas(master=self, borderwidth=3, bg="black") #master denotes the parent window, that is the object whose class we are defining (parent is ScrollableFrame object)
             
             #We are creating the frame that shall be later embedded in the canvas as a per-se window
             self.frame = tk.Frame(self.canvas, bd=2, bg="yellow")
             
-            #We want the object frame whose class we are defining to be the parent of scrollbar
-            self.vsb = tk.Scrollbar(master=self, orient=tk.VERTICAL, command=self.canvas.yview) #ig we are telling to python to scroll the canvas in the "y" direction
+            #We want the object frame whose class we are defining to be the parent of scrollbar (parent of scrollbar is ScrollableFrame object)
+            self.vsb = tk.Scrollbar(master=self, orient=tk.VERTICAL, command=self.canvas.yview) #ig we are telling python to scroll the canvas in the "y" direction
             #We are connecting the scrollbar to the canvas:
             #in particular, with this instruction we are telling the scrollbar
             #to keep its "relative position" in regards to the canvas
@@ -41,27 +40,19 @@ class ScrollableFrame(tk.Frame):
             self.canvas_frame = self.canvas.create_window((0,0), window=self.frame, anchor="nw",
                                   tags="self.frame")
 
-
             self.frame.bind("<Configure>", self.onFrameConfigure)
             self.canvas.bind("<Configure>", self.FrameWidth)
 
-            #We are specifying that the frame for the Tick instances has only one visible column
-            self.frame.columnconfigure(0, weight=1, minsize=200) 
-
-            #OOP approach: self.frame of the ScrollableFrame is being populated
-            #self.frame holds the nx1 grid of instances
-            #self.instances_populate()
-    
-
-            #self.infos_populate()
 
     def instances_populate(self):
+        #We are specifying that the frame (for the Tick instances in case of MainApplication) has only one visible column
+        self.frame.columnconfigure(0, weight=1, minsize=200) 
         with open("tick-instances1.csv", "r") as file:
             csv_file = csv.DictReader(file)
             for i, row in skip_last(enumerate(csv_file)):
                 self.frame.rowconfigure(i, weight=1) # setting only the rows where Tick instances are appended to be visible
                 instance = TickFrame(self.frame, row["Name"], row["Daily"], relief=tk.SUNKEN, borderwidth=2, bg="blue", bd=2)
-                instance.grid(row=i, column=0, sticky = "nsew")
+                instance.grid(row=i, column=0, sticky="nsew")
 
 
     def infos_populate(self):
@@ -71,15 +62,23 @@ class ScrollableFrame(tk.Frame):
             "POS"
         ]
 
+        self.frm_form = tk.Frame(master=self.frame, relief=tk.SUNKEN, borderwidth=3)
+        # Pack the frame into the window
+        self.frm_form.pack(fill=tk.X)
+        #self.frm_form.pack()
+
+        #TODO. make the entry frame expand with the outer frames (window included)
+        #self.frm_form.columnconfigure(0, weight=1) #non funziona come avrei previsto
+
         for idx, text in enumerate(labels):
             # Create a Label widget with the text from the labels list
-            label = tk.Label(master=self.frame, text=text)
+            label = tk.Label(master=self.frm_form, text=text)
             # Create an Entry widget
-            entry = tk.Entry(master=self.frame, width=50)
+            entry = tk.Entry(master=self.frm_form, width=10)
             # Use the grid geometry manager to place the Label and
             # Entry widgets in the row whose index is idx
-            label.grid(row=idx, column=0, sticky="e")
-            entry.grid(row=idx, column=1)
+            label.grid(row=idx, column=0, sticky="nsew")
+            entry.grid(row=idx, column=1, sticky="nsew")
 
 
     def onFrameConfigure(self, event):
@@ -99,15 +98,15 @@ class TickFrame(tk.Frame):
         def __init__(self, parent, name, number, *args, **kwargs):
             tk.Frame.__init__(self, parent, *args, **kwargs) #"parent" shall be the frame inside the canvas that it implemented as a virtual window
             
-            self.session_count = 0 #count shall be read from the csv file
+            self.session_count = 0 #count shall be read from the csv file but session_count is naturally instantiated to 0
             self.name = name #definisco anche un attributo "nome" per provare ad accedere piu' facilmente agli oggetti
                              #in un secondo momento
 
             self.name_lbl = tk.Label(master=self, text=name, width=25, height=2)
             self.decrease_btn = tk.Button(master=self, text="-")
-            self.count_lbl = tk.Label(master=self, text=str(number))
+            self.count_lbl = tk.Label(master=self, text=str(number)) #number represents the daily counter
             self.increase_btn = tk.Button(master=self, text="+", command=self.increment) #when this button is clicked we shall increment session_count for this particular instance
-            self.info_btn = tk.Button(master=self, text="...")
+            self.info_btn = tk.Button(master=self, text="...") #TODO:  set a command that opens a window that kinda derives from InstancesManager
 
 
             self.columnconfigure([0,1,2,3,4], weight=1) #we are setting every Tick instance to have only the 5 columns corresponding to the number of our widgets to be useful
@@ -124,7 +123,6 @@ class TickFrame(tk.Frame):
         def increment(self):
             self.session_count += 1
             self.count_lbl['text'] = str(int(self.count_lbl['text']) + 1) #shows in the label the new value; the old value is simply incremented by one
-            #print(self.name + ": " + str(self.session_count))
 
 
 
@@ -149,6 +147,7 @@ class MainApplication(tk.Frame):
         self.instancesPanel.instances_populate()
 
         self.instancesPanel.grid(row=0, column=0, sticky="nsew")
+
         self.rowconfigure(0, weight=1)
 
         #holds ADD button, for now
@@ -174,9 +173,9 @@ class MainApplication(tk.Frame):
             matrix = list(csv_file) #stores data locally in the form of a matrix where every row represents one single instance and the columns represent different parameters
                                     #NB. numbers are converted into string values
 
-            for i, instance in skip_last(enumerate(objects)):
+            for i, instance in (enumerate(objects)):
                 daily_value = int(matrix[i+1][2]) + instance.session_count #we are converting to int the first value cause it is originally a string type
-                matrix[i+1][2] = daily_value #actually updating the daily value #TODO: fix this shit
+                matrix[i+1][2] = daily_value #actually updating the daily value
                 
                 weekly_value = int(matrix[i+1][3]) + instance.session_count #we are converting to int the first value cause it is originally a string type
                 matrix[i+1][3] = weekly_value #actually updating the weekly value
@@ -184,7 +183,7 @@ class MainApplication(tk.Frame):
                 monthly_value = int(matrix[i+1][4]) + instance.session_count #we are converting to int the first value cause it is originally a string type
                 matrix[i+1][4] = monthly_value #actually updating the monthly value
             
-            print(matrix)
+            #print(matrix)
 
         with open("tick-instances1.csv", "w", newline="") as file1:
             csv_file1 = csv.writer(file1)
@@ -197,44 +196,39 @@ class MainApplication(tk.Frame):
 
 class InstancesManager(ScrollableFrame):
     def __init__(self, parent, *args, **kwargs):
-        #tk.Frame.__init__(self, parent, *args, **kwargs)
         ScrollableFrame.__init__(self, parent)  #parent shall be "root"
 
         self.parent = parent #"parent" shall be "root"
 
         #needed for "hiding" all the empty columns
-        self.columnconfigure(0, weight=1, minsize=200)
-
-        #virtually holds the nx1 grid of info parameters
-        #the actual frame is set inside the canvas, that is itself inside infoPanel
-        #self.infoPanel = ScrollableFrame(self)              
-        #self.infoPanel.grid(row=0, column=0, sticky="nsew")
-        self.rowconfigure(0, weight=1)
+        #self.columnconfigure([0,1], weight=1, minsize=200)
+        #self.rowconfigure(0, weight=1)
 
         self.infos_populate()
 
         self.frm_buttons = tk.Frame(parent)
         self.frm_buttons.pack(fill=tk.X, side=tk.BOTTOM, ipadx=5, ipady=5)
 
-        #implementation of the ADD button
-        #Submit_btn = tk.Button(self.frm_buttons, text="Submit") #TODO: implementing function that actually adds the new instance just defined to all the other instances
-        #Submit_btn.grid(row=0, column=0, sticky="nsew")
-
-        btn_submit = tk.Button(master=self.frm_buttons, text="Submit")
-        btn_submit.pack(side=tk.RIGHT, padx=10, ipadx=10)
+        self.btn_submit = tk.Button(master=self.frm_buttons, text="Submit") #TODO: implementing function that actually adds the new instance just defined to all the other instances (command)
+        self.btn_submit.pack(side=tk.RIGHT, padx=10, ipadx=10)
 
         # Create the "Clear" button and pack it to the
         #   right side of `frm_buttons`
-        btn_clear = tk.Button(master=self.frm_buttons, text="Clear")
-        btn_clear.pack(side=tk.RIGHT, ipadx=10)
+        self.btn_clear = tk.Button(master=self.frm_buttons, text="Clear")
+        self.btn_clear.pack(side=tk.RIGHT, ipadx=10)
 
 
     @staticmethod
     def create_window():
         window = tk.Toplevel(root)
         instance_manager = InstancesManager(parent=window)
-        instance_manager.pack()
+        instance_manager.pack(fill="both", expand=True)
 
+
+def add_instance():
+    
+    
+    pass
         
 
 def get_passed_ms():
