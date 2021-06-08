@@ -209,7 +209,7 @@ class InstancesManager(ScrollableFrame):
         self.frm_buttons = tk.Frame(parent)
         self.frm_buttons.pack(fill=tk.X, side=tk.BOTTOM, ipadx=5, ipady=5)
 
-        self.btn_submit = tk.Button(master=self.frm_buttons, text="Submit", command=add_instance) #TODO: implementing function that actually adds the new instance just defined to all the other instances (command)
+        self.btn_submit = tk.Button(master=self.frm_buttons, text="Submit", command=add_instance)
         self.btn_submit.pack(side=tk.RIGHT, padx=10, ipadx=10)
 
         # Create the "Clear" button and pack it to the
@@ -225,16 +225,24 @@ class InstancesManager(ScrollableFrame):
         instance_manager.pack(fill="both", expand=True)
 
 
-def add_instance():
-    with open("dailies.csv", "r") as file:
-        text = file.read()                 #reading the file so that we can check later if it ends with a newline (\n)...
-    with open("dailies.csv", "a", newline='\n') as f1:
-        writer = csv.writer(f1)
-        if ( not text.endswith("\n") ):    #...checking if file ends with a newline (\n)
-            f1.write("\n")                  #adding newline if file doesn't have a newline at the end
-        writer.writerow(fields)
-    
-    pass
+def add_instance(): #TODO: implement
+    with open("tick-instances1.csv", "r") as file:
+            csv_file = csv.reader(file)
+            matrix = list(csv_file) #stores data locally in the form of a matrix where every row represents one single instance and the columns represent different parameters
+                                    #NB. numbers are converted into string values
+            text = file.read()
+            
+            if ( not text.endswith("\n") ):    #...checking if file ends with a newline (\n)
+                negative_index = 2             #if files ends with 1 or more newlines delete all of them from the "matrix", the append at index "-2" TODO: implement
+
+            fields = []
+            matrix.append()
+
+            #print(matrix)
+
+    with open("tick-instances1.csv", "w", newline="") as file1:
+        csv_file1 = csv.writer(file1)
+        csv_file1.writerows(matrix)
         
 
 def get_passed_ms():
