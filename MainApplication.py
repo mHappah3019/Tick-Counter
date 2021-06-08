@@ -56,7 +56,7 @@ class ScrollableFrame(tk.Frame):
 
 
     def infos_populate(self):
-        labels = [
+        labels = [          #TODO: valutare se rendere questa lista di labels come attributo di InstancesManager
             "Name:",
             "Hotkey:",
             "POS"
@@ -66,11 +66,13 @@ class ScrollableFrame(tk.Frame):
         # Pack the frame into the window
         self.frm_form.pack(fill=tk.X)
 
-        self.frm_form.columnconfigure(0, weight=1)
-        self.frm_form.columnconfigure(1, weight=2)
+        self.frm_form.columnconfigure(0, weight=1) # make only "Label" and "Entry" columns visible
+        self.frm_form.columnconfigure(1, weight=2) # since we are using a grid
+
+        self.labels_entries = {}
 
         for idx, text in enumerate(labels):
-            self.frm_form.rowconfigure(idx, weight=1)
+            self.frm_form.rowconfigure(idx, weight=1) #make the row at index "idx" visible (all the other rows are kept hidden)
             # Create a Label widget with the text from the labels list
             label = tk.Label(master=self.frm_form, text=text)
             # Create an Entry widget
@@ -80,13 +82,18 @@ class ScrollableFrame(tk.Frame):
             label.grid(row=idx, column=0, sticky="e")
             entry.grid(row=idx, column=1, sticky="nsew")
 
+            # populates dictionary as:
+            # keys correspond to text, directly taken from labels
+            # values are represented by entries object (references)
+            self.labels_entries[text] = entry
+
 
     def onFrameConfigure(self, event):
         '''Reset the scroll region to encompass the inner frame'''
         # we are in fact setting the scroll region to be the bounding box of everything that is in the canvas
         self.canvas.configure(scrollregion=self.canvas.bbox("all"))
 
-    
+
     def FrameWidth(self, event):
         canvas_width = event.width
         self.canvas.itemconfig(self.canvas_frame, width = canvas_width)
@@ -200,16 +207,14 @@ class InstancesManager(ScrollableFrame):
 
         self.parent = parent #"parent" shall be "root"
 
-        #needed for "hiding" all the empty columns
-        #self.columnconfigure([0,1], weight=1, minsize=200)
-        #self.rowconfigure(0, weight=1)
-
         self.infos_populate()
 
         self.frm_buttons = tk.Frame(parent)
         self.frm_buttons.pack(fill=tk.X, side=tk.BOTTOM, ipadx=5, ipady=5)
 
-        self.btn_submit = tk.Button(master=self.frm_buttons, text="Submit", command=add_instance)
+        # Create the "Submit" button and pack it to the
+        #   left side of `frm_buttons`
+        self.btn_submit = tk.Button(master=self.frm_buttons, text="Submit", command=self.add_instance)
         self.btn_submit.pack(side=tk.RIGHT, padx=10, ipadx=10)
 
         # Create the "Clear" button and pack it to the
@@ -219,30 +224,40 @@ class InstancesManager(ScrollableFrame):
 
 
     @staticmethod
-    def create_window():
-        window = tk.Toplevel(root)
-        instance_manager = InstancesManager(parent=window)
-        instance_manager.pack(fill="both", expand=True)
+    def create_window():                                     #Wants to simulate a "Factory", can call this method without an instance, but creates an instance
+        window = tk.Toplevel(root)                           #TODO: make it polymorphic; cause later I want to implement a new InstancesManager, that doesn't allow to change specific entries
+        instance_manager = InstancesManager(parent=window)   #creating the frame (parent is the new window created in the previous line of code) ...
+        instance_manager.pack(fill="both", expand=True)      #and directly packing it inside its parent (new window)
 
 
-def add_instance(): #TODO: implement
-    with open("tick-instances1.csv", "r") as file:
-            csv_file = csv.reader(file)
-            matrix = list(csv_file) #stores data locally in the form of a matrix where every row represents one single instance and the columns represent different parameters
-                                    #NB. numbers are converted into string values
-            text = file.read()
-            
-            if ( not text.endswith("\n") ):    #...checking if file ends with a newline (\n)
-                negative_index = 2             #if files ends with 1 or more newlines delete all of them from the "matrix", the append at index "-2" TODO: implement
+    def add_instance(self): #TODO: implement
+        with open("tick-instances1.csv", "r") as file:
+                csv_file = csv.reader(file)
+                matrix = list(csv_file) #stores data locally in the form of a matrix where every row represents one single instance and the columns represent different parameters
+                                        #NB. numbers are converted into string values
 
-            fields = []
-            matrix.append()
 
-            #print(matrix)
+                name = self.labels_entries["Name"].get()  #TODO: what's going on
+                comb = self.labels_entries["Comb"].get()
+                pos = self.labels_entries["Pos"].get()
 
-    with open("tick-instances1.csv", "w", newline="") as file1:
-        csv_file1 = csv.writer(file1)
-        csv_file1.writerows(matrix)
+                fields = [name, comb, pos]
+
+
+                print(matrix)
+
+                matrix.insert(-1, fields)
+
+                print(matrix)
+
+        
+        #refresh()
+        
+
+
+        """ with open("tick-instances1.csv", "w", newline="") as file1:
+            csv_file1 = csv.writer(file1)
+            csv_file1.writerows(matrix) """
         
 
 def get_passed_ms():
@@ -283,4 +298,3 @@ def refresh():  #https://stackoverflow.com/questions/44199332/removing-and-recre
 
 if __name__ == "__main__":
     vp_start_gui()
-    
