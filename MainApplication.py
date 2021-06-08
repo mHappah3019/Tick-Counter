@@ -65,19 +65,19 @@ class ScrollableFrame(tk.Frame):
         self.frm_form = tk.Frame(master=self.frame, relief=tk.SUNKEN, borderwidth=3)
         # Pack the frame into the window
         self.frm_form.pack(fill=tk.X)
-        #self.frm_form.pack()
 
-        #TODO. make the entry frame expand with the outer frames (window included)
-        #self.frm_form.columnconfigure(0, weight=1) #non funziona come avrei previsto
+        self.frm_form.columnconfigure(0, weight=1)
+        self.frm_form.columnconfigure(1, weight=2)
 
         for idx, text in enumerate(labels):
+            self.frm_form.rowconfigure(idx, weight=1)
             # Create a Label widget with the text from the labels list
             label = tk.Label(master=self.frm_form, text=text)
             # Create an Entry widget
             entry = tk.Entry(master=self.frm_form, width=10)
             # Use the grid geometry manager to place the Label and
             # Entry widgets in the row whose index is idx
-            label.grid(row=idx, column=0, sticky="nsew")
+            label.grid(row=idx, column=0, sticky="e")
             entry.grid(row=idx, column=1, sticky="nsew")
 
 
@@ -209,7 +209,7 @@ class InstancesManager(ScrollableFrame):
         self.frm_buttons = tk.Frame(parent)
         self.frm_buttons.pack(fill=tk.X, side=tk.BOTTOM, ipadx=5, ipady=5)
 
-        self.btn_submit = tk.Button(master=self.frm_buttons, text="Submit") #TODO: implementing function that actually adds the new instance just defined to all the other instances (command)
+        self.btn_submit = tk.Button(master=self.frm_buttons, text="Submit", command=add_instance) #TODO: implementing function that actually adds the new instance just defined to all the other instances (command)
         self.btn_submit.pack(side=tk.RIGHT, padx=10, ipadx=10)
 
         # Create the "Clear" button and pack it to the
@@ -226,7 +226,13 @@ class InstancesManager(ScrollableFrame):
 
 
 def add_instance():
-    
+    with open("dailies.csv", "r") as file:
+        text = file.read()                 #reading the file so that we can check later if it ends with a newline (\n)...
+    with open("dailies.csv", "a", newline='\n') as f1:
+        writer = csv.writer(f1)
+        if ( not text.endswith("\n") ):    #...checking if file ends with a newline (\n)
+            f1.write("\n")                  #adding newline if file doesn't have a newline at the end
+        writer.writerow(fields)
     
     pass
         
