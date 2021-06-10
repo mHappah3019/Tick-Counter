@@ -56,12 +56,6 @@ class ScrollableFrame(tk.Frame):
 
 
     def infos_populate(self):
-        labels = [          #TODO: valutare se rendere questa lista di labels come attributo di InstancesManager
-            "Name:",
-            "Hotkey:",
-            "POS"
-        ]
-
         self.frm_form = tk.Frame(master=self.frame, relief=tk.SUNKEN, borderwidth=3)
         # Pack the frame into the window
         self.frm_form.pack(fill=tk.X)
@@ -71,7 +65,7 @@ class ScrollableFrame(tk.Frame):
 
         self.labels_entries = {}
 
-        for idx, text in enumerate(labels):
+        for idx, text in enumerate(self.labels):
             self.frm_form.rowconfigure(idx, weight=1) #make the row at index "idx" visible (all the other rows are kept hidden)
             # Create a Label widget with the text from the labels list
             label = tk.Label(master=self.frm_form, text=text)
@@ -87,6 +81,7 @@ class ScrollableFrame(tk.Frame):
             # values are represented by entries object (references)
             self.labels_entries[text] = entry
 
+        #print(self.labels_entries)
 
     def onFrameConfigure(self, event):
         '''Reset the scroll region to encompass the inner frame'''
@@ -125,7 +120,10 @@ class TickFrame(tk.Frame):
             self.increase_btn.grid(row=0, column=3)
             self.info_btn.grid(row=0, column=4)
 
+            #print(objects)
             objects.append(self) #"populate" (ScrollableFrame) creates tick instances, hence they are added to an array that keeps track of all of them
+            #print(objects)
+            print(f"tickframe {self.name} instantiated")
 
         def increment(self):
             self.session_count += 1
@@ -180,6 +178,7 @@ class MainApplication(tk.Frame):
             matrix = list(csv_file) #stores data locally in the form of a matrix where every row represents one single instance and the columns represent different parameters
                                     #NB. numbers are converted into string values
 
+            #print(len(objects))
             for i, instance in (enumerate(objects)):
                 daily_value = int(matrix[i+1][2]) + instance.session_count #we are converting to int the first value cause it is originally a string type
                 matrix[i+1][2] = daily_value #actually updating the daily value
@@ -196,6 +195,7 @@ class MainApplication(tk.Frame):
             csv_file1 = csv.writer(file1)
             csv_file1.writerows(matrix)
 
+        del objects[:]
         print("Applicazione chiusa con successo")
 
 
@@ -206,6 +206,12 @@ class InstancesManager(ScrollableFrame):
         ScrollableFrame.__init__(self, parent)  #parent shall be "root"
 
         self.parent = parent #"parent" shall be "root"
+
+        self.labels = [ 
+            "Name:",
+            "Hotkey:",
+            "POS:"
+        ]
 
         self.infos_populate()
 
@@ -223,6 +229,8 @@ class InstancesManager(ScrollableFrame):
         self.btn_clear.pack(side=tk.RIGHT, ipadx=10)
 
 
+
+
     @staticmethod
     def create_window():                                     #Wants to simulate a "Factory", can call this method without an instance, but creates an instance
         window = tk.Toplevel(root)                           #TODO: make it polymorphic; cause later I want to implement a new InstancesManager, that doesn't allow to change specific entries
@@ -232,42 +240,39 @@ class InstancesManager(ScrollableFrame):
 
     def add_instance(self): #TODO: implement
         with open("tick-instances1.csv", "r") as file:
-                csv_file = csv.reader(file)
-                matrix = list(csv_file) #stores data locally in the form of a matrix where every row represents one single instance and the columns represent different parameters
-                                        #NB. numbers are converted into string values
+            csv_file = csv.reader(file)
+            matrix = list(csv_file) #stores data locally in the form of a matrix where every row represents one single instance and the columns represent different parameters
+                                    #NB. numbers are converted into string values
 
 
-                name = self.labels_entries["Name"].get()  #TODO: what's going on
-                comb = self.labels_entries["Comb"].get()
-                pos = self.labels_entries["Pos"].get()
+            name = self.labels_entries["Name:"].get()    #all the labels end with ":"
+            comb = self.labels_entries["Hotkey:"].get()
+            pos = self.labels_entries["POS:"].get()
 
-                fields = [name, comb, pos]
+            fields = [name, comb, 0, 0, 0] #TODO: add pos headder
+            
 
+            #print(matrix)
 
-                print(matrix)
+            matrix.insert(-1, fields)
 
-                matrix.insert(-1, fields)
-
-                print(matrix)
-
-        
-        #refresh()
-        
-
-
-        """ with open("tick-instances1.csv", "w", newline="") as file1:
+            #print(matrix)
+            
+        with open("tick-instances1.csv", "w", newline="") as file1:
             csv_file1 = csv.writer(file1)
-            csv_file1.writerows(matrix) """
+            csv_file1.writerows(matrix)
+
+        refresh()
         
 
 def get_passed_ms():
     now = datetime.now()
     hours = int(now.hour)
-    print(hours)
+    #print(hours)
     minutes = hours*60 + int(now.minute)
-    print(minutes)
+    #print(minutes)
     seconds = minutes*60 + int(now.second)
-    print(seconds)
+    #print(seconds)
     return seconds*1000 #millisecondi
 
 

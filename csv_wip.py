@@ -147,8 +147,8 @@ def count_reset(info):
         elif (info == "month"):
             option = 4
 
-        print(matrix)
-        print(len(matrix))
+        #print(matrix)
+        #print(len(matrix))
 
         for i in range(len(matrix) -2):
                 matrix[i+1][option] = 0 #RESETTING...
@@ -164,7 +164,7 @@ def load_last_date(file):
         csv_reader = csv.reader(file)
         matrix = list(csv_reader)
 
-        print(matrix)
+        #print(matrix)
 
         last_date = matrix[-1][0]
         return last_date
