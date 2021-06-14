@@ -55,34 +55,6 @@ class ScrollableFrame(tk.Frame):
                 instance.grid(row=i, column=0, sticky="nsew")
 
 
-    def infos_populate(self):
-        self.frm_form = tk.Frame(master=self.frame, relief=tk.SUNKEN, borderwidth=3)
-        # Pack the frame into the window
-        self.frm_form.pack(fill=tk.X)
-
-        self.frm_form.columnconfigure(0, weight=1) # make only "Label" and "Entry" columns visible...
-        self.frm_form.columnconfigure(1, weight=2) # ...since we are using a grid
-
-        self.labels_entries = {} #redefining the dictionary as empty before populating the frame, since we'll encounter a bug anytime we add a new tickframe instance
-
-        for idx, text in enumerate(self.labels):  #TODO: fix this shitty inheritance mess
-            self.frm_form.rowconfigure(idx, weight=1) #make the row at index "idx" visible (all the other rows are kept hidden)
-            # Create a Label widget with the text from the labels list
-            label = tk.Label(master=self.frm_form, text=text)
-            # Create an Entry widget
-            entry = tk.Entry(master=self.frm_form, width=10)
-            # Use the grid geometry manager to place the Label and
-            # Entry widgets in the row whose index is idx
-            label.grid(row=idx, column=0, sticky="e")
-            entry.grid(row=idx, column=1, sticky="nsew")
-
-            # populates dictionary as:
-            # keys correspond to text, directly taken from labels
-            # values are represented by entries object (references)
-            self.labels_entries[text] = entry
-
-        #print(self.labels_entries)
-
     def onFrameConfigure(self, event):
         '''Reset the scroll region to encompass the inner frame'''
         # we are in fact setting the scroll region to be the bounding box of everything that is in the canvas
@@ -108,7 +80,7 @@ class TickFrame(tk.Frame):
             self.decrease_btn = tk.Button(master=self, text="-")
             self.count_lbl = tk.Label(master=self, text=str(number)) #number represents the daily counter
             self.increase_btn = tk.Button(master=self, text="+", command=self.increment) #when this button is clicked we shall increment session_count for this particular instance
-            self.info_btn = tk.Button(master=self, text="...") #TODO:  set a command that opens a window that kinda derives from InstancesManager
+            self.info_btn = tk.Button(master=self, text="...", command=InstancesManager.create_window)
 
 
             self.columnconfigure([0,1,2,3,4], weight=1) #we are setting every Tick instance to have only the 5 columns corresponding to the number of our widgets to be useful
@@ -164,7 +136,7 @@ class MainApplication(tk.Frame):
         self.extraPanel.rowconfigure(0, weight=1, minsize=20) #setting up extraPanel
 
         #implementation of the ADD button
-        ADD_btn = tk.Button(self.extraPanel, text="ADD", command=InstancesManager.create_window) #TODO: make create_window an overloaded method so that we can use it for the other class that is used for the class that is responsible for just changing some parameters for any instancec
+        ADD_btn = tk.Button(self.extraPanel, text="ADD", command=InstancesAdder.create_window)
         ADD_btn.grid(row=0, column=0, sticky="nsew")
 
 
@@ -201,7 +173,7 @@ class MainApplication(tk.Frame):
 
 
 
-class InstancesManager(ScrollableFrame):
+class InstancesAdder(ScrollableFrame):
     def __init__(self, parent, *args, **kwargs):
         ScrollableFrame.__init__(self, parent)  #parent shall be "root"
 
@@ -220,7 +192,7 @@ class InstancesManager(ScrollableFrame):
 
         # Create the "Submit" button and pack it to the
         #   left side of `frm_buttons`
-        self.btn_submit = tk.Button(master=self.frm_buttons, text="Submit", command=self.add_instance) #TODO: this button is supposed to close both the InstancesManager Window and refreshing MainApplication
+        self.btn_submit = tk.Button(master=self.frm_buttons, text="Submit", command=self.add_instance)
         self.btn_submit.pack(side=tk.RIGHT, padx=10, ipadx=10)
 
         # Create the "Clear" button and pack it to the
@@ -233,12 +205,12 @@ class InstancesManager(ScrollableFrame):
 
     @staticmethod
     def create_window():                                     #Wants to simulate a "Factory", can call this method without an instance, but creates an instance
-        window = tk.Toplevel(root)                           #TODO: make it polymorphic; cause later I want to implement a new InstancesManager, that doesn't allow to change specific entries
-        instance_manager = InstancesManager(parent=window)   #creating the frame (parent is the new window created in the previous line of code) ...
-        instance_manager.pack(fill="both", expand=True)      #and directly packing it inside its parent (new window)
+        window = tk.Toplevel(root)                           
+        instance_adder = InstancesAdder(parent=window)   #creating the frame (parent is the new window created in the previous line of code) ...
+        instance_adder.pack(fill="both", expand=True)      #and directly packing it inside its parent (new window)
 
 
-    def add_instance(self): #TODO: implement
+    def add_instance(self):
         with open("tick-instances1.csv", "r") as file:
             csv_file = csv.reader(file)
             matrix = list(csv_file) #stores data locally in the form of a matrix where every row represents one single instance and the columns represent different parameters
@@ -262,8 +234,49 @@ class InstancesManager(ScrollableFrame):
             csv_file1 = csv.writer(file1)
             csv_file1.writerows(matrix)
 
-        refresh()
+        refresh() #closes MainApplication, hence it closes InstancesAdder too
+
+    def infos_populate(self):
+        self.frm_form = tk.Frame(master=self.frame, relief=tk.SUNKEN, borderwidth=3)
+        # Pack the frame into the window
+        self.frm_form.pack(fill=tk.X)
+
+        self.frm_form.columnconfigure(0, weight=1) # make only "Label" and "Entry" columns visible...
+        self.frm_form.columnconfigure(1, weight=2) # ...since we are using a grid
+
+        self.labels_entries = {} #redefining the dictionary as empty before populating the frame, since we'll encounter a bug anytime we add a new tickframe instance
+
+        for idx, text in enumerate(self.labels):
+            self.frm_form.rowconfigure(idx, weight=1) #make the row at index "idx" visible (all the other rows are kept hidden)
+            # Create a Label widget with the text from the labels list
+            label = tk.Label(master=self.frm_form, text=text)
+            # Create an Entry widget
+            entry = tk.Entry(master=self.frm_form, width=10)
+            # Use the grid geometry manager to place the Label and
+            # Entry widgets in the row whose index is idx
+            label.grid(row=idx, column=0, sticky="e")
+            entry.grid(row=idx, column=1, sticky="nsew")
+
+            # populates dictionary as:
+            # keys correspond to text, directly taken from labels
+            # values are represented by entries object (references)
+            self.labels_entries[text] = entry
+
+        #print(self.labels_entries)
         
+
+
+
+class InstancesManager(InstancesAdder):
+    def __init__(self, parent, *args, **kwargs):
+        super.__init__(self, parent)
+
+    @staticmethod
+    def create_window():                                     #Wants to simulate a "Factory", can call this method without an instance, but creates an instance
+        window = tk.Toplevel(root)                           
+        instance_manager = InstancesManager(parent=window)   #creating the frame (parent is the new window created in the previous line of code) ...
+        instance_manager.pack(fill="both", expand=True)
+
 
 def get_passed_ms():
     now = datetime.now()
@@ -299,6 +312,12 @@ def refresh():  #https://stackoverflow.com/questions/44199332/removing-and-recre
     root.destroy()
     root.after(3000)
     vp_start_gui()
+
+
+def order_matrix(): #TODO: implement
+    #INPUT unordered matrix
+    #OUTPUT ordered matrix based on POS header
+    pass
 
 
 if __name__ == "__main__":
