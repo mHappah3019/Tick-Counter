@@ -60,12 +60,12 @@ class ScrollableFrame(tk.Frame):
         # Pack the frame into the window
         self.frm_form.pack(fill=tk.X)
 
-        self.frm_form.columnconfigure(0, weight=1) # make only "Label" and "Entry" columns visible
-        self.frm_form.columnconfigure(1, weight=2) # since we are using a grid
+        self.frm_form.columnconfigure(0, weight=1) # make only "Label" and "Entry" columns visible...
+        self.frm_form.columnconfigure(1, weight=2) # ...since we are using a grid
 
-        self.labels_entries = {}
+        self.labels_entries = {} #redefining the dictionary as empty before populating the frame, since we'll encounter a bug anytime we add a new tickframe instance
 
-        for idx, text in enumerate(self.labels):
+        for idx, text in enumerate(self.labels):  #TODO: fix this shitty inheritance mess
             self.frm_form.rowconfigure(idx, weight=1) #make the row at index "idx" visible (all the other rows are kept hidden)
             # Create a Label widget with the text from the labels list
             label = tk.Label(master=self.frm_form, text=text)
@@ -98,7 +98,7 @@ class ScrollableFrame(tk.Frame):
 
 class TickFrame(tk.Frame):
         def __init__(self, parent, name, number, *args, **kwargs):
-            tk.Frame.__init__(self, parent, *args, **kwargs) #"parent" shall be the frame inside the canvas that it implemented as a virtual window
+            tk.Frame.__init__(self, parent, *args, **kwargs) #"parent" shall be the frame inside the canvas that is implemented as a virtual window (self.frame)
             
             self.session_count = 0 #count shall be read from the csv file but session_count is naturally instantiated to 0
             self.name = name #definisco anche un attributo "nome" per provare ad accedere piu' facilmente agli oggetti
@@ -140,7 +140,7 @@ class MainApplication(tk.Frame):
                             #plus, it triggers all the functions to save the stats in dailies.csv, weeklies.csv, monthlies.csv
                             #should be run before populating the application with all the data (when instantiating ScrollableFrame)
 
-        #self.parent = parent #"parent" shall be "root"
+        self.parent = parent #"parent" shall be "root"
         #needed for "hiding" all the empty columns
         self.columnconfigure(0, weight=1, minsize=200)
 
@@ -164,7 +164,7 @@ class MainApplication(tk.Frame):
         self.extraPanel.rowconfigure(0, weight=1, minsize=20) #setting up extraPanel
 
         #implementation of the ADD button
-        ADD_btn = tk.Button(self.extraPanel, text="ADD", command=InstancesManager.create_window)
+        ADD_btn = tk.Button(self.extraPanel, text="ADD", command=InstancesManager.create_window) #TODO: make create_window an overloaded method so that we can use it for the other class that is used for the class that is responsible for just changing some parameters for any instancec
         ADD_btn.grid(row=0, column=0, sticky="nsew")
 
 
@@ -207,20 +207,20 @@ class InstancesManager(ScrollableFrame):
 
         self.parent = parent #"parent" shall be "root"
 
-        self.labels = [ 
+        self.labels = [  #pay attention to all the ":"s
             "Name:",
             "Hotkey:",
             "POS:"
         ]
 
-        self.infos_populate()
+        self.infos_populate() #calling it no for simplicity purposes
 
         self.frm_buttons = tk.Frame(parent)
         self.frm_buttons.pack(fill=tk.X, side=tk.BOTTOM, ipadx=5, ipady=5)
 
         # Create the "Submit" button and pack it to the
         #   left side of `frm_buttons`
-        self.btn_submit = tk.Button(master=self.frm_buttons, text="Submit", command=self.add_instance)
+        self.btn_submit = tk.Button(master=self.frm_buttons, text="Submit", command=self.add_instance) #TODO: this button is supposed to close both the InstancesManager Window and refreshing MainApplication
         self.btn_submit.pack(side=tk.RIGHT, padx=10, ipadx=10)
 
         # Create the "Clear" button and pack it to the
@@ -254,7 +254,7 @@ class InstancesManager(ScrollableFrame):
 
             #print(matrix)
 
-            matrix.insert(-1, fields)
+            matrix.insert(-1, fields) #I'm happy that I don't have to handle the case where the file ends with none (or multiple) namespaces since matrix just "reads" rows with content
 
             #print(matrix)
             
