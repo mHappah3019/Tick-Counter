@@ -155,8 +155,9 @@ class MainApplication(tk.Frame):
             matrix = list(csv_file) #stores data locally in the form of a matrix where every row represents one single instance and the columns represent different parameters
                                     #NB. numbers are converted into string values
 
-            #print(len(objects))
-            for i, instance in (enumerate(objects)): #TODO: fix this shit, when we add a new instance it is appended to the "objects" list but this instance is still missing from tick-instances1.csv file
+            print(len(objects))
+            for i, instance in (enumerate(objects)):
+                print(f"tickframe {instance.name} updating")
                 daily_value = int(matrix[i+1][2]) + instance.session_count #we are converting to int the first value cause it is originally a string type
                 matrix[i+1][2] = daily_value #actually updating the daily value
                 
@@ -226,7 +227,7 @@ class InstancesAdder(ScrollableFrame):
             comb = self.labels_entries["Hotkey:"].get()
             pos = self.labels_entries["POS:"].get()
 
-            fields = [name, comb, 0, 0, 0] #TODO: add pos headder
+            fields = [name, comb, 0, 0, 0] #TODO: add pos header
             
 
             #print(matrix)
