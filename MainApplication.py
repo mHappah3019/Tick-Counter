@@ -21,6 +21,8 @@ class ScrollableFrame(tk.Frame):
             
             #USING COLORS FOR CLARITY
 
+            self.parent = parent
+
             self.canvas = tk.Canvas(master=self, borderwidth=3, bg="black") #master denotes the parent window, that is the object whose class we are defining (parent is ScrollableFrame object)
             
             #We are creating the frame that shall be later embedded in the canvas as a per-se window
@@ -54,6 +56,8 @@ class ScrollableFrame(tk.Frame):
                 instance = TickFrame(self.frame, row["Name"], row["Daily"], relief=tk.SUNKEN, borderwidth=2, bg="blue", bd=2)
                 instance.grid(row=i, column=0, sticky="nsew")
 
+        #link_combinations()
+
 
     def onFrameConfigure(self, event):
         '''Reset the scroll region to encompass the inner frame'''
@@ -75,6 +79,7 @@ class TickFrame(tk.Frame):
             self.session_count = 0 #count shall be read from the csv file but session_count is naturally instantiated to 0
             self.name = name #definisco anche un attributo "nome" per provare ad accedere piu' facilmente agli oggetti
                              #in un secondo momento
+            #self.combination = kwargs["combination"] # TODO: implement everything else
 
             self.name_lbl = tk.Label(master=self, text=name, width=25, height=2)
             self.decrease_btn = tk.Button(master=self, text="-")
@@ -97,7 +102,7 @@ class TickFrame(tk.Frame):
             #print(objects)
             print(f"tickframe {self.name} instantiated")
 
-        def increment(self):
+        def increment(self, event=None):
             self.session_count += 1
             self.count_lbl['text'] = str(int(self.count_lbl['text']) + 1) #shows in the label the new value; the old value is simply incremented by one
 
@@ -144,14 +149,14 @@ class MainApplication(tk.Frame):
     #then, it takes all the data and brings it in the form of a matrix;
     #it updates the data inside the matrix
     #then overwrites the file
-    def __exit__(self):
+    def __exit__(self, bool_refresh=None):
         with open("tick-instances1.csv", "r") as file:
             csv_file = csv.reader(file)
             matrix = list(csv_file) #stores data locally in the form of a matrix where every row represents one single instance and the columns represent different parameters
                                     #NB. numbers are converted into string values
 
             #print(len(objects))
-            for i, instance in (enumerate(objects)):
+            for i, instance in (enumerate(objects)): #TODO: fix this shit, when we add a new instance it is appended to the "objects" list but this instance is still missing from tick-instances1.csv file
                 daily_value = int(matrix[i+1][2]) + instance.session_count #we are converting to int the first value cause it is originally a string type
                 matrix[i+1][2] = daily_value #actually updating the daily value
                 
@@ -317,6 +322,13 @@ def refresh():  #https://stackoverflow.com/questions/44199332/removing-and-recre
 def order_matrix(): #TODO: implement
     #INPUT unordered matrix
     #OUTPUT ordered matrix based on POS header
+    pass
+ 
+
+def link_combinations(): #TODO: implement
+    for object in objects:
+        formatted_combination = object.combination #TODO: this is not formatted yet
+        object.parent.bind(formatted_combination, object.increment)
     pass
 
 
