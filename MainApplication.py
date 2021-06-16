@@ -147,9 +147,8 @@ class MainApplication(tk.Frame):
 
 
     def refresh(self):  #https://stackoverflow.com/questions/44199332/removing-and-recreating-a-tkinter-window-with-a-restart-button
+        del objects[:]
         self.__exit__()
-        for window in open_windows:
-            window.app = self
         root.after(3000)
         vp_start_gui()
 
@@ -251,7 +250,8 @@ class InstancesAdder(ScrollableFrame):
             csv_file1 = csv.writer(file1)
             csv_file1.writerows(matrix)
 
-        self.app.refresh() #closes MainApplication, hence it closes InstancesAdder too
+        #self.app.refresh() #closes MainApplication, hence it closes InstancesAdder too
+        refresh()
 
     def infos_populate(self):
         self.frm_form = tk.Frame(master=self.frame, relief=tk.SUNKEN, borderwidth=3)
