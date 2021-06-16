@@ -13,6 +13,7 @@ os.chdir("C:/Users/mkcam/Desktop/Tick Counter/Tick-Counter")
 #instances_names_array = ["Tick1", "Tick2", "Tick3", "Tick3", "Tick3", "Tick3", "Tick3", "Tick3", "Tick3", "Tick3", "Tick3"]
 
 objects = []
+open_windows = []
 
 
 class ScrollableFrame(tk.Frame):
@@ -145,6 +146,13 @@ class MainApplication(tk.Frame):
         ADD_btn.grid(row=0, column=0, sticky="nsew")
 
 
+    def refresh(self):  #https://stackoverflow.com/questions/44199332/removing-and-recreating-a-tkinter-window-with-a-restart-button
+        self.__exit__()
+        for window in open_windows:
+            window.app = self
+        root.after(3000)
+        vp_start_gui()
+
     #this function, first, reads the "old" version of all the data
     #then, it takes all the data and brings it in the form of a matrix;
     #it updates the data inside the matrix
@@ -180,10 +188,11 @@ class MainApplication(tk.Frame):
 
 
 class InstancesAdder(ScrollableFrame):
-    def __init__(self, parent, *args, **kwargs):
+    def __init__(self, parent, app=None, *args, **kwargs):
         ScrollableFrame.__init__(self, parent)  #parent shall be "root"
 
         self.parent = parent #"parent" shall be "root"
+        self.app = app
 
         self.labels = [  #pay attention to all the ":"s
             "Name:",
@@ -191,7 +200,7 @@ class InstancesAdder(ScrollableFrame):
             "POS:"
         ]
 
-        self.infos_populate() #calling it no for simplicity purposes
+        self.infos_populate() #calling it now for simplicity purposes
 
         self.frm_buttons = tk.Frame(parent)
         self.frm_buttons.pack(fill=tk.X, side=tk.BOTTOM, ipadx=5, ipady=5)
@@ -205,6 +214,8 @@ class InstancesAdder(ScrollableFrame):
         #   right side of `frm_buttons`
         self.btn_clear = tk.Button(master=self.frm_buttons, text="Clear")
         self.btn_clear.pack(side=tk.RIGHT, ipadx=10)
+
+        open_windows.append(self)
 
 
 
@@ -240,7 +251,7 @@ class InstancesAdder(ScrollableFrame):
             csv_file1 = csv.writer(file1)
             csv_file1.writerows(matrix)
 
-        refresh() #closes MainApplication, hence it closes InstancesAdder too
+        self.app.refresh() #closes MainApplication, hence it closes InstancesAdder too
 
     def infos_populate(self):
         self.frm_form = tk.Frame(master=self.frame, relief=tk.SUNKEN, borderwidth=3)
@@ -274,13 +285,13 @@ class InstancesAdder(ScrollableFrame):
 
 
 class InstancesManager(InstancesAdder):
-    def __init__(self, parent, *args, **kwargs):
+    def __init__(self, parent, app, *args, **kwargs):
         super.__init__(self, parent)
 
     @staticmethod
     def create_window():                                     #Wants to simulate a "Factory", can call this method without an instance, but creates an instance
         window = tk.Toplevel(root)                           
-        instance_manager = InstancesManager(parent=window)   #creating the frame (parent is the new window created in the previous line of code) ...
+        instance_manager = InstancesManager(parent=window, app=tk.mainloop)   #creating the frame (parent is the new window created in the previous line of code) ...
         instance_manager.pack(fill="both", expand=True)
 
 
@@ -308,16 +319,13 @@ def vp_start_gui():
     mainapp = MainApplication(root)
     mainapp.pack(side="top", fill="both", expand=True)
 
-    root.after(get_remaining_ms(), refresh)
+    root.after(get_remaining_ms(), mainapp.refresh)
 
+    """for window in open_windows: #il mio intento era quello di definire come attributo di ognunua delle finestre TopLevel "app" appunto la mainapp
+        window.app = mainapp """   # il problema sta però nel fatto che solo dopo il mainloop le finestre TopLevel possono essere create
+                                   # potrei quindi pensare di
     root.mainloop()
     mainapp.__exit__()
-
-
-def refresh():  #https://stackoverflow.com/questions/44199332/removing-and-recreating-a-tkinter-window-with-a-restart-button
-    root.destroy()
-    root.after(3000)
-    vp_start_gui()
 
 
 def order_matrix(): #TODO: implement
