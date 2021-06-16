@@ -82,7 +82,7 @@ class TickFrame(tk.Frame):
             #self.combination = kwargs["combination"] # TODO: implement everything else
 
             self.name_lbl = tk.Label(master=self, text=name, width=25, height=2)
-            self.decrease_btn = tk.Button(master=self, text="-")
+            self.decrease_btn = tk.Button(master=self, text="-")       #TODO: implement the functionality for this shitty button
             self.count_lbl = tk.Label(master=self, text=str(number)) #number represents the daily counter
             self.increase_btn = tk.Button(master=self, text="+", command=self.increment) #when this button is clicked we shall increment session_count for this particular instance
             self.info_btn = tk.Button(master=self, text="...", command=InstancesManager.create_window)
