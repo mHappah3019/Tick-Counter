@@ -13,7 +13,6 @@ os.chdir("C:/Users/mkcam/Desktop/Tick Counter/Tick-Counter")
 #instances_names_array = ["Tick1", "Tick2", "Tick3", "Tick3", "Tick3", "Tick3", "Tick3", "Tick3", "Tick3", "Tick3", "Tick3"]
 
 objects = []
-open_windows = []
 
 
 class ScrollableFrame(tk.Frame):
@@ -98,10 +97,10 @@ class TickFrame(tk.Frame):
             self.increase_btn.grid(row=0, column=3)
             self.info_btn.grid(row=0, column=4)
 
-            #print(objects)
+
             objects.append(self) #"populate" (ScrollableFrame) creates tick instances, hence they are added to an array that keeps track of all of them
-            #print(objects)
             print(f"tickframe {self.name} instantiated")
+
 
         def increment(self, event=None):
             self.session_count += 1
@@ -146,12 +145,6 @@ class MainApplication(tk.Frame):
         ADD_btn.grid(row=0, column=0, sticky="nsew")
 
 
-    def refresh(self):  #https://stackoverflow.com/questions/44199332/removing-and-recreating-a-tkinter-window-with-a-restart-button
-        del objects[:]
-        self.__exit__()
-        root.after(3000)
-        vp_start_gui()
-
     #this function, first, reads the "old" version of all the data
     #then, it takes all the data and brings it in the form of a matrix;
     #it updates the data inside the matrix
@@ -162,7 +155,6 @@ class MainApplication(tk.Frame):
             matrix = list(csv_file) #stores data locally in the form of a matrix where every row represents one single instance and the columns represent different parameters
                                     #NB. numbers are converted into string values
 
-            print(len(objects))
             for i, instance in (enumerate(objects)):
                 print(f"tickframe {instance.name} updating")
                 daily_value = int(matrix[i+1][2]) + instance.session_count #we are converting to int the first value cause it is originally a string type
@@ -174,13 +166,13 @@ class MainApplication(tk.Frame):
                 monthly_value = int(matrix[i+1][4]) + instance.session_count #we are converting to int the first value cause it is originally a string type
                 matrix[i+1][4] = monthly_value #actually updating the monthly value
             
-            #print(matrix)
 
         with open("tick-instances1.csv", "w", newline="") as file1:
             csv_file1 = csv.writer(file1)
             csv_file1.writerows(matrix)
 
-        del objects[:]
+        #del objects[:]
+
         print("Applicazione chiusa con successo")
 
 
@@ -214,10 +206,6 @@ class InstancesAdder(ScrollableFrame):
         self.btn_clear = tk.Button(master=self.frm_buttons, text="Clear")
         self.btn_clear.pack(side=tk.RIGHT, ipadx=10)
 
-        open_windows.append(self)
-
-
-
 
     @staticmethod
     def create_window():                                     #Wants to simulate a "Factory", can call this method without an instance, but creates an instance
@@ -238,20 +226,14 @@ class InstancesAdder(ScrollableFrame):
             pos = self.labels_entries["POS:"].get()
 
             fields = [name, comb, 0, 0, 0] #TODO: add pos header
-            
-
-            #print(matrix)
 
             matrix.insert(-1, fields) #I'm happy that I don't have to handle the case where the file ends with none (or multiple) namespaces since matrix just "reads" rows with content
 
-            #print(matrix)
-            
         with open("tick-instances1.csv", "w", newline="") as file1:
             csv_file1 = csv.writer(file1)
             csv_file1.writerows(matrix)
 
-        #self.app.refresh() #closes MainApplication, hence it closes InstancesAdder too
-        refresh()
+        refresh() #closes MainApplication, hence it closes InstancesAdder too
 
     def infos_populate(self):
         self.frm_form = tk.Frame(master=self.frame, relief=tk.SUNKEN, borderwidth=3)
@@ -278,8 +260,6 @@ class InstancesAdder(ScrollableFrame):
             # keys correspond to text, directly taken from labels
             # values are represented by entries object (references)
             self.labels_entries[text] = entry
-
-        #print(self.labels_entries)
         
 
 
@@ -319,13 +299,17 @@ def vp_start_gui():
     mainapp = MainApplication(root)
     mainapp.pack(side="top", fill="both", expand=True)
 
-    root.after(get_remaining_ms(), mainapp.refresh)
+    root.after(get_remaining_ms(), refresh)
 
-    """for window in open_windows: #il mio intento era quello di definire come attributo di ognunua delle finestre TopLevel "app" appunto la mainapp
-        window.app = mainapp """   # il problema sta però nel fatto che solo dopo il mainloop le finestre TopLevel possono essere create
-                                   # potrei quindi pensare di
     root.mainloop()
     mainapp.__exit__()
+
+
+def refresh():  #https://stackoverflow.com/questions/44199332/removing-and-recreating-a-tkinter-window-with-a-restart-button
+    del objects[:]
+    root.destroy()
+    root.after(3000)
+    vp_start_gui()
 
 
 def order_matrix(): #TODO: implement
@@ -340,6 +324,9 @@ def link_combinations(): #TODO: implement
         object.parent.bind(formatted_combination, object.increment)
     pass
 
+
+def format_combination(): #TODO: implement
+    pass
 
 if __name__ == "__main__":
     vp_start_gui()
