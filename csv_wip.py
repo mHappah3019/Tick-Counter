@@ -1,5 +1,6 @@
 from datetime import datetime #https://stackoverflow.com/questions/15707532/import-datetime-v-s-from-datetime-import-datetime
 
+import pandas as pd
 import csv
 import os
 
@@ -195,3 +196,23 @@ def get_passed_ms():
 def get_remaining_ms():
     ms_in_aday = 86,400,000
     return ms_in_aday - get_passed_ms()
+
+def delete_counts(instance_name):
+    pass
+
+
+def delete_type_count(instance_name, timeframe):
+    f=pd.read_csv(timeframe)
+    pass
+
+
+def delete_daily_count(instance_name):
+    f=pd.read_csv("dailies")
+    pass
+
+def delete_weekly_count(instance_name):
+    pass
+
+
+def delete_monthly_count(instace_name):
+    pass

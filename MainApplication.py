@@ -83,7 +83,7 @@ class TickFrame(tk.Frame):
             self.combination = combination
 
             self.name_lbl = tk.Label(master=self, text=name, width=25, height=2)
-            self.decrease_btn = tk.Button(master=self, text="-")       #TODO: implement the functionality for this shitty button
+            self.decrease_btn = tk.Button(master=self, text="-", command=self.decrement)
             self.count_lbl = tk.Label(master=self, text=str(number)) #number represents the daily counter
             self.increase_btn = tk.Button(master=self, text="+", command=self.increment) #when this button is clicked we shall increment session_count for this particular instance
             self.info_btn = tk.Button(master=self, text="...", command=InstancesManager.create_window)
@@ -106,6 +106,10 @@ class TickFrame(tk.Frame):
         def increment(self, event=None):
             self.session_count += 1
             self.count_lbl['text'] = str(int(self.count_lbl['text']) + 1) #shows in the label the new value; the old value is simply incremented by one
+        
+        def decrement(self):
+            self.session_count -= 1
+            self.count_lbl['text'] = str(int(self.count_lbl['text']) - 1) #shows in the label the new value; the old value is simply incremented by one
 
 
 
@@ -267,7 +271,10 @@ class InstancesAdder(ScrollableFrame):
 
 class InstancesManager(InstancesAdder):
     def __init__(self, parent, app, *args, **kwargs):
-        super.__init__(self, parent)
+        InstancesAdder.__init__(self, parent)
+
+        self.btn_delete = tk.Button(master=self.frm_buttons, text="Delete", command=self.delete_instance)
+        self.btn_delete.pack(side=tk.LEFT, padx=10, ipadx=10)
 
     @staticmethod
     def create_window():                                     #Wants to simulate a "Factory", can call this method without an instance, but creates an instance
@@ -275,6 +282,9 @@ class InstancesManager(InstancesAdder):
         instance_manager = InstancesManager(parent=window, app=tk.mainloop)   #creating the frame (parent is the new window created in the previous line of code) ...
         instance_manager.pack(fill="both", expand=True)
 
+
+    def delete_instance(self): #TODO: implement
+        pass    
 
 def get_passed_ms():
     now = datetime.now()
@@ -322,7 +332,7 @@ def order_matrix(): #TODO: implement
 def link_combinations():
     for object in objects:
         key = object.combination
-        print(key)
+        #print(key)
         root.bind(f"<Control-{key}>", object.increment)
 
 
