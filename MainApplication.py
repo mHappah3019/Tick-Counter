@@ -76,6 +76,7 @@ class TickFrame(tk.Frame):
         def __init__(self, parent, name, number, combination, *args, **kwargs):
             tk.Frame.__init__(self, parent, *args, **kwargs) #"parent" shall be the frame inside the canvas that is implemented as a virtual window (self.frame)
             
+            self.parent = parent
             self.session_count = 0 #count shall be read from the csv file but session_count is naturally instantiated to 0
             self.name = name #definisco anche un attributo "nome" per provare ad accedere piu' facilmente agli oggetti
                              #in un secondo momento
@@ -321,7 +322,9 @@ def order_matrix(): #TODO: implement
 def link_combinations():
     for object in objects:
         key = object.combination
-        object.parent.bind(f"<Control_L><Shift_L><{key}>", object.increment)
+        print(key)
+        root.bind(f"<Control_L><{key}>", object.increment)
+        #root.bind(f"<{key}>", object.increment)
 
 
 if __name__ == "__main__":
