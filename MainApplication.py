@@ -80,7 +80,7 @@ class TickFrame(tk.Frame):
             self.session_count = 0 #count shall be read from the csv file but session_count is naturally instantiated to 0
             self.name = name #definisco anche un attributo "nome" per provare ad accedere piu' facilmente agli oggetti
                              #in un secondo momento
-            self.combination = combination # TODO: implement everything else
+            self.combination = combination
 
             self.name_lbl = tk.Label(master=self, text=name, width=25, height=2)
             self.decrease_btn = tk.Button(master=self, text="-")       #TODO: implement the functionality for this shitty button
@@ -323,8 +323,7 @@ def link_combinations():
     for object in objects:
         key = object.combination
         print(key)
-        root.bind(f"<Control_L><{key}>", object.increment)
-        #root.bind(f"<{key}>", object.increment)
+        root.bind(f"<Control-{key}>", object.increment)
 
 
 if __name__ == "__main__":
