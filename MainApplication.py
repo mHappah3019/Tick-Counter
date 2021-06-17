@@ -53,10 +53,10 @@ class ScrollableFrame(tk.Frame):
             csv_file = csv.DictReader(file)
             for i, row in skip_last(enumerate(csv_file)):
                 self.frame.rowconfigure(i, weight=1) # setting only the rows where Tick instances are appended to be visible
-                instance = TickFrame(self.frame, row["Name"], row["Daily"], relief=tk.SUNKEN, borderwidth=2, bg="blue", bd=2)
+                instance = TickFrame(self.frame, row["Name"], row["Daily"], row["Comb"], relief=tk.SUNKEN, borderwidth=2, bg="blue", bd=2)
                 instance.grid(row=i, column=0, sticky="nsew")
 
-        #link_combinations()
+        link_combinations()
 
 
     def onFrameConfigure(self, event):
@@ -73,13 +73,13 @@ class ScrollableFrame(tk.Frame):
 
 
 class TickFrame(tk.Frame):
-        def __init__(self, parent, name, number, *args, **kwargs):
+        def __init__(self, parent, name, number, combination, *args, **kwargs):
             tk.Frame.__init__(self, parent, *args, **kwargs) #"parent" shall be the frame inside the canvas that is implemented as a virtual window (self.frame)
             
             self.session_count = 0 #count shall be read from the csv file but session_count is naturally instantiated to 0
             self.name = name #definisco anche un attributo "nome" per provare ad accedere piu' facilmente agli oggetti
                              #in un secondo momento
-            #self.combination = kwargs["combination"] # TODO: implement everything else
+            self.combination = combination # TODO: implement everything else
 
             self.name_lbl = tk.Label(master=self, text=name, width=25, height=2)
             self.decrease_btn = tk.Button(master=self, text="-")       #TODO: implement the functionality for this shitty button
@@ -318,15 +318,11 @@ def order_matrix(): #TODO: implement
     pass
  
 
-def link_combinations(): #TODO: implement
+def link_combinations():
     for object in objects:
-        formatted_combination = object.combination #TODO: this is not formatted yet
-        object.parent.bind(formatted_combination, object.increment)
-    pass
+        key = object.combination
+        object.parent.bind(f"<Control_L><Shift_L><{key}>", object.increment)
 
-
-def format_combination(): #TODO: implement
-    pass
 
 if __name__ == "__main__":
     vp_start_gui()
