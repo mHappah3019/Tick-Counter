@@ -1,5 +1,6 @@
-from csv_wip import current_date, get_remaining_ms, save_daily_counts, is_same_date, check_count_reset, load_last_date, get_remaining_ms, skip_last
+from csv_wip import current_date, get_remaining_ms, save_daily_counts, is_same_date, check_count_reset, load_last_date, get_remaining_ms, skip_last, delete_counts
 from datetime import datetime
+from functools import partial
 import tkinter as tk
 import csv
 import os
@@ -86,7 +87,9 @@ class TickFrame(tk.Frame):
             self.decrease_btn = tk.Button(master=self, text="-", command=self.decrement)
             self.count_lbl = tk.Label(master=self, text=str(number)) #number represents the daily counter
             self.increase_btn = tk.Button(master=self, text="+", command=self.increment) #when this button is clicked we shall increment session_count for this particular instance
-            self.info_btn = tk.Button(master=self, text="...", command=InstancesManager.create_window)
+            
+            create_with_arg = partial(InstancesManager.create_window, self)
+            self.info_btn = tk.Button(master=self, text="...", command=create_with_arg)
 
 
             self.columnconfigure([0,1,2,3,4], weight=1) #we are setting every Tick instance to have only the 5 columns corresponding to the number of our widgets to be useful
@@ -230,7 +233,7 @@ class InstancesAdder(ScrollableFrame):
             comb = self.labels_entries["Hotkey:"].get()
             pos = self.labels_entries["POS:"].get()
 
-            fields = [name, comb, 0, 0, 0] #TODO: add pos header
+            fields = [name, comb, 0, 0, 0]
 
             matrix.insert(-1, fields) #I'm happy that I don't have to handle the case where the file ends with none (or multiple) namespaces since matrix just "reads" rows with content
 
@@ -270,32 +273,35 @@ class InstancesAdder(ScrollableFrame):
 
 
 class InstancesManager(InstancesAdder):
-    def __init__(self, parent, app, *args, **kwargs):
+    def __init__(self, parent, instance, app, *args, **kwargs):
+        self.instance = instance #TODO: Understand: why tf this works????? 
+
         InstancesAdder.__init__(self, parent)
 
-        self.parent=
+        self.instance = instance #TODO: Understand: why tf this does NOT work????? 
 
         self.btn_delete = tk.Button(master=self.frm_buttons, text="Delete", command=self.delete_instance)
         self.btn_delete.pack(side=tk.LEFT, padx=10, ipadx=10)
 
 
     @staticmethod
-    def create_window():                                     #Wants to simulate a "Factory", can call this method without an instance, but creates an instance
+    def create_window(instance):                                     #Wants to simulate a "Factory", can call this method without an instance, but creates an instance
         window = tk.Toplevel(root)                           
-        instance_manager = InstancesManager(parent=window, app=tk.mainloop)   #creating the frame (parent is the new window created in the previous line of code) ...
+        instance_manager = InstancesManager(parent=window, instance=instance, app=tk.mainloop)   #creating the frame (parent is the new window created in the previous line of code) ...
         instance_manager.pack(fill="both", expand=True)
 
 
     def delete_instance(self): #TODO: implement
-        pass    
+        #delete_counts(self.instance.name)  
+        #TODO: implement functions that delete entire row (corresponding to our instance) from tick-instances1.csv
+        refresh()
 
 
     def infos_populate(self):
         super().infos_populate()
         
         #TODO: want to iterate over self.labels_entries to set the entry depending on the instance values...
-        for object in objects:
-            self.labels_entries["Name:"].insert(0, object.name)
+        self.labels_entries["Name:"].insert(0, self.instance.name)
 
 
 def get_passed_ms():

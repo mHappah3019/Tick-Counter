@@ -202,6 +202,7 @@ def delete_counts(instance_name):
     delete_type_count(instance_name, "dailies.csv")
     delete_type_count(instance_name, "weeklies.csv")
     delete_type_count(instance_name, "monthlies.csv")
+    delete_from_GUI(instance_name, "tick-instances1.csv")
 
 
 def delete_type_count(instance_name, file):
@@ -212,3 +213,9 @@ def delete_type_count(instance_name, file):
 
     new_f = f[keep_instancecs]
     new_f.to_csv(file, index=False)
+
+
+def delete_from_GUI(instance_name, file):
+    df = pd.read_csv(file)
+    idx = 0 #TODO: implement logic that search for the index where the instance is at
+    df.drop(df.index[idx], inplace=True)
