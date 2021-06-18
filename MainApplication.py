@@ -273,8 +273,11 @@ class InstancesManager(InstancesAdder):
     def __init__(self, parent, app, *args, **kwargs):
         InstancesAdder.__init__(self, parent)
 
+        self.parent=
+
         self.btn_delete = tk.Button(master=self.frm_buttons, text="Delete", command=self.delete_instance)
         self.btn_delete.pack(side=tk.LEFT, padx=10, ipadx=10)
+
 
     @staticmethod
     def create_window():                                     #Wants to simulate a "Factory", can call this method without an instance, but creates an instance
@@ -285,6 +288,15 @@ class InstancesManager(InstancesAdder):
 
     def delete_instance(self): #TODO: implement
         pass    
+
+
+    def infos_populate(self):
+        super().infos_populate()
+        
+        #TODO: want to iterate over self.labels_entries to set the entry depending on the instance values...
+        for object in objects:
+            self.labels_entries["Name:"].insert(0, object.name)
+
 
 def get_passed_ms():
     now = datetime.now()
