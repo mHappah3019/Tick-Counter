@@ -197,22 +197,18 @@ def get_remaining_ms():
     ms_in_aday = 86,400,000
     return ms_in_aday - get_passed_ms()
 
+
 def delete_counts(instance_name):
-    pass
+    delete_type_count(instance_name, "dailies.csv")
+    delete_type_count(instance_name, "weeklies.csv")
+    delete_type_count(instance_name, "monthlies.csv")
 
 
-def delete_type_count(instance_name, timeframe):
-    f=pd.read_csv(timeframe)
-    pass
+def delete_type_count(instance_name, file):
+    instances = pd.read_csv(file, index_col=0, nrows=0).columns.tolist() #"Date" header is present too
+    f=pd.read_csv(file, dtype=str)
+    
+    keep_instancecs = instances.remove(instance_name)
 
-
-def delete_daily_count(instance_name):
-    f=pd.read_csv("dailies")
-    pass
-
-def delete_weekly_count(instance_name):
-    pass
-
-
-def delete_monthly_count(instace_name):
-    pass
+    new_f = f[keep_instancecs]
+    new_f.to_csv(file, index=False)
