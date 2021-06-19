@@ -182,8 +182,8 @@ def trunc_datetime(someDate, option):
         return someDate.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
 
 
-current_date = datetime.today()
-check_count_reset()
+#current_date = datetime.today()
+#check_count_reset()
 
 
 def get_passed_ms():
@@ -205,7 +205,7 @@ def delete_counts(instance_name):
     delete_from_GUI(instance_name, "tick-instances1.csv")
 
 
-def delete_type_count(instance_name, file):
+def delete_type_count(instance_name, file): #TODO: test this shit
     instances = pd.read_csv(file, index_col=0, nrows=0).columns.tolist() #"Date" header is present too
     f=pd.read_csv(file, dtype=str)
     
@@ -217,5 +217,14 @@ def delete_type_count(instance_name, file):
 
 def delete_from_GUI(instance_name, file):
     df = pd.read_csv(file)
-    idx = 0 #TODO: implement logic that search for the index where the instance is at
+    idx = get_row_index(instance_name, df)
     df.drop(df.index[idx], inplace=True)
+    df.to_csv(file)
+
+
+def get_row_index(instance_name, df):
+    return df.index[df["Name"] == instance_name].tolist()[0]
+
+#df = pd.read_csv("tick-instances1.csv")
+#print(get_row_index("xxx", df))
+delete_from_GUI("ciccia33", "tick-instances1.csv")

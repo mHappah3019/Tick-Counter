@@ -1,7 +1,6 @@
-Name,Comb,Daily,Weekly,Monthly
-x,X,5,105,105
-xx,Y,3,100,100
-xxx,o,0,16,16
-basettoni,v,0,24,24
-ciccia33,Z,0,5,5
-18/06/2021
+,Name,Comb,Daily,Weekly,Monthly
+0,x,X,5.0,105.0,105.0
+1,xx,Y,3.0,100.0,100.0
+2,xxx,o,0.0,16.0,16.0
+3,basettoni,v,0.0,24.0,24.0
+5,18/06/2021,,,,

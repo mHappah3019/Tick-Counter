@@ -291,16 +291,13 @@ class InstancesManager(InstancesAdder):
         instance_manager.pack(fill="both", expand=True)
 
 
-    def delete_instance(self): #TODO: implement
-        #delete_counts(self.instance.name)  
-        #TODO: implement functions that delete entire row (corresponding to our instance) from tick-instances1.csv
+    def delete_instance(self):
+        delete_counts(self.instance.name)  
         refresh()
 
 
     def infos_populate(self):
         super().infos_populate()
-        
-        #TODO: want to iterate over self.labels_entries to set the entry depending on the instance values...
         self.labels_entries["Name:"].insert(0, self.instance.name)
 
 
