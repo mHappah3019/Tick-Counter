@@ -215,22 +215,26 @@ def delete_type_count(instance_name, file): #TODO: test this shit
     
     keep_instancecs = instances.remove(instance_name)
 
-    new_f = f[keep_instancecs]      #basically a filter: we get a dataframe composed of only the data corresponding to the "headers" in keep_instances
+    #basically a filter: we get a dataframe composed of only the data corresponding to the "headers" in keep_instances
+    new_f = f[keep_instancecs]
+
     new_f.to_csv(file, index=False)
 
 
 def delete_from_GUI(instance_name, file):
     df = pd.read_csv(file)
+
     idx = get_row_index(instance_name, df)
     df.drop(df.index[idx], inplace=True)
+
     df.to_csv(file, index=False)
 
 
 def get_row_index(instance_name, df):
-    return df.index[df["Name"] == instance_name].tolist()[0]
+    return df.index[df["Name"] == instance_name].tolist()[0] #TODO: implementare gestione IndexError
 
 
 
 #df = pd.read_csv("tick-instances1.csv")
 #print(get_row_index("xxx", df))
-#delete_from_GUI("ciccia33", "tick-instances1.csv")
+delete_from_GUI("ciccia33", "tick-instances1.csv")
