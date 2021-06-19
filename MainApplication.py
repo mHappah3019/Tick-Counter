@@ -11,9 +11,8 @@ import sys
 #https://stackoverflow.com/questions/431684/equivalent-of-shell-cd-command-to-change-the-working-directory
 os.chdir("C:/Users/mkcam/Desktop/Tick Counter/Tick-Counter")
 
-#instances_names_array = ["Tick1", "Tick2", "Tick3", "Tick3", "Tick3", "Tick3", "Tick3", "Tick3", "Tick3", "Tick3", "Tick3"]
 
-objects = []
+objects = [] #TODO: define it's use in a comment
 
 
 class ScrollableFrame(tk.Frame):
@@ -57,7 +56,7 @@ class ScrollableFrame(tk.Frame):
                 instance = TickFrame(self.frame, row["Name"], row["Daily"], row["Comb"], relief=tk.SUNKEN, borderwidth=2, bg="blue", bd=2)
                 instance.grid(row=i, column=0, sticky="nsew")
 
-        link_combinations()
+        link_combinations() #watch function definition additional comments
 
 
     def onFrameConfigure(self, event):
@@ -79,15 +78,18 @@ class TickFrame(tk.Frame):
             
             self.parent = parent
             self.session_count = 0 #count shall be read from the csv file but session_count is naturally instantiated to 0
-            self.name = name #definisco anche un attributo "nome" per provare ad accedere piu' facilmente agli oggetti
+            self.name = name #definisco anche un attributo "nome" per provare ad accedere più facilmente agli oggetti
                              #in un secondo momento
-            self.combination = combination
+            
+            #TODO:  see if defining the binding here (in init) is better than defining all of them together (as implemented in link_combinations)
+            self.combination = combination #will help us in link_combinations function
 
             self.name_lbl = tk.Label(master=self, text=name, width=25, height=2)
             self.decrease_btn = tk.Button(master=self, text="-", command=self.decrement)
             self.count_lbl = tk.Label(master=self, text=str(number)) #number represents the daily counter
             self.increase_btn = tk.Button(master=self, text="+", command=self.increment) #when this button is clicked we shall increment session_count for this particular instance
             
+            #this way I can call create_with_arg with arguments (1 in this case)
             create_with_arg = partial(InstancesManager.create_window, self)
             self.info_btn = tk.Button(master=self, text="...", command=create_with_arg)
 
@@ -103,13 +105,14 @@ class TickFrame(tk.Frame):
 
 
             objects.append(self) #"populate" (ScrollableFrame) creates tick instances, hence they are added to an array that keeps track of all of them
-            print(f"tickframe {self.name} instantiated")
+            #print(f"tickframe {self.name} instantiated")
 
 
         def increment(self, event=None):
             self.session_count += 1
             self.count_lbl['text'] = str(int(self.count_lbl['text']) + 1) #shows in the label the new value; the old value is simply incremented by one
         
+
         def decrement(self):
             self.session_count -= 1
             self.count_lbl['text'] = str(int(self.count_lbl['text']) - 1) #shows in the label the new value; the old value is simply incremented by one
@@ -179,8 +182,6 @@ class MainApplication(tk.Frame):
             csv_file1 = csv.writer(file1)
             csv_file1.writerows(matrix)
 
-        #del objects[:]
-
         print("Applicazione chiusa con successo")
 
 
@@ -191,7 +192,7 @@ class InstancesAdder(ScrollableFrame):
         ScrollableFrame.__init__(self, parent)  #parent shall be "root"
 
         self.parent = parent #"parent" shall be "root"
-        self.app = app
+        self.app = app #TODO: understand the use of this apparently fucking useless attribute
 
         self.labels = [  #pay attention to all the ":"s
             "Name:",
@@ -201,16 +202,17 @@ class InstancesAdder(ScrollableFrame):
 
         self.infos_populate() #calling it now for simplicity purposes
 
-        self.frm_buttons = tk.Frame(parent)
+        self.frm_buttons = tk.Frame(parent)     #so this shiet doesn't really belong here or yes???
         self.frm_buttons.pack(fill=tk.X, side=tk.BOTTOM, ipadx=5, ipady=5)
 
         # Create the "Submit" button and pack it to the
         #   left side of `frm_buttons`
-        self.btn_submit = tk.Button(master=self.frm_buttons, text="Submit", command=self.add_instance)
+        self.btn_submit = tk.Button(master=self.frm_buttons, text="Submit", command=self.add_instance) #add_instance will refresh the application
         self.btn_submit.pack(side=tk.RIGHT, padx=10, ipadx=10)
 
         # Create the "Clear" button and pack it to the
         #   right side of `frm_buttons`
+        # TODO: determine if I really need this Clear button
         self.btn_clear = tk.Button(master=self.frm_buttons, text="Clear")
         self.btn_clear.pack(side=tk.RIGHT, ipadx=10)
 
@@ -218,7 +220,7 @@ class InstancesAdder(ScrollableFrame):
     @staticmethod
     def create_window():                                     #Wants to simulate a "Factory", can call this method without an instance, but creates an instance
         window = tk.Toplevel(root)                           
-        instance_adder = InstancesAdder(parent=window)   #creating the frame (parent is the new window created in the previous line of code) ...
+        instance_adder = InstancesAdder(parent=window)   #creating the frame (parent is the new window created in the previous line of code) ... #TODO: probably defining "window" as "parent" is darn useless, cause to refresh the application we use "mainloop"
         instance_adder.pack(fill="both", expand=True)      #and directly packing it inside its parent (new window)
 
 
@@ -235,7 +237,7 @@ class InstancesAdder(ScrollableFrame):
 
             fields = [name, comb, 0, 0, 0]
 
-            matrix.insert(-1, fields) #I'm happy that I don't have to handle the case where the file ends with none (or multiple) namespaces since matrix just "reads" rows with content
+            matrix.insert(-1, fields) #I'm happy that I don't have to handle the case where the file ends with one (or multiple) namespaces since matrix just "reads", and shows, rows with actual content
 
         with open("tick-instances1.csv", "w", newline="") as file1:
             csv_file1 = csv.writer(file1)
@@ -245,6 +247,7 @@ class InstancesAdder(ScrollableFrame):
 
     def infos_populate(self):
         self.frm_form = tk.Frame(master=self.frame, relief=tk.SUNKEN, borderwidth=3)
+
         # Pack the frame into the window
         self.frm_form.pack(fill=tk.X)
 
@@ -274,7 +277,7 @@ class InstancesAdder(ScrollableFrame):
 
 class InstancesManager(InstancesAdder):
     def __init__(self, parent, instance, app, *args, **kwargs):
-        self.instance = instance #TODO: Understand: why tf this works????? 
+        self.instance = instance #TODO: Understand: why tf this works?????  https://stackoverflow.com/questions/8998608/why-superclass-attributes-are-not-available-in-the-current-class-namespace
 
         InstancesAdder.__init__(self, parent)
 
@@ -292,13 +295,14 @@ class InstancesManager(InstancesAdder):
 
 
     def delete_instance(self):
-        delete_counts(self.instance.name)  
-        refresh()
+        delete_counts(self.instance.name) #this function then calls all the "deletion" functions (1 for dailies, 1 for weeklies, 1 for monthlies and 1 for tick-instances1) 
+        refresh()                         #we shall reload the application to get the GUI for all the instances we have KEPT
 
 
     def infos_populate(self):
         super().infos_populate()
         self.labels_entries["Name:"].insert(0, self.instance.name)
+        #TODO: add "insertions" for Combination, POS and other parameters
 
 
 def get_passed_ms():
@@ -342,9 +346,14 @@ def order_matrix(): #TODO: implement
     #INPUT unordered matrix
     #OUTPUT ordered matrix based on POS header
     pass
- 
 
-def link_combinations():
+
+#TODO: implement a new binding method cause "bind" from Tkinter doesn't work when app is out of focus
+
+#for every object (in objects) we have defined a specific instance (of class TickFrame)
+#and every instance holds a "combination" attribute that we can use to then bind the increment of the count for every instance to the specific combination
+#we could have used a dictionary but this way we are making use of OOP: taking combination directly from instance
+def link_combinations():                                
     for object in objects:
         key = object.combination
         #print(key)

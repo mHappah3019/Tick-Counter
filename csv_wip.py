@@ -198,20 +198,24 @@ def get_remaining_ms():
     return ms_in_aday - get_passed_ms()
 
 
+#this function gets called by the InstancesManager method delete_instance
+#it takes instance_name from the InstanceManager attributes (self.instance.name):
+#for dailies, weeklies, monthlies, we're referencing the deletion of the corrisponding column
+#for tick-instances1, the deletion of the corresponding row
 def delete_counts(instance_name):
-    delete_type_count(instance_name, "dailies.csv")
+    delete_type_count(instance_name, "dailies.csv")     
     delete_type_count(instance_name, "weeklies.csv")
     delete_type_count(instance_name, "monthlies.csv")
     delete_from_GUI(instance_name, "tick-instances1.csv")
 
 
 def delete_type_count(instance_name, file): #TODO: test this shit
-    instances = pd.read_csv(file, index_col=0, nrows=0).columns.tolist() #"Date" header is present too
+    instances = pd.read_csv(file, index_col=0, nrows=0).columns.tolist() #"Date" header is present too, so the list is not properly a list of only instances names
     f=pd.read_csv(file, dtype=str)
     
     keep_instancecs = instances.remove(instance_name)
 
-    new_f = f[keep_instancecs]
+    new_f = f[keep_instancecs]      #basically a filter: we get a dataframe composed of only the data corresponding to the "headers" in keep_instances
     new_f.to_csv(file, index=False)
 
 
@@ -219,12 +223,14 @@ def delete_from_GUI(instance_name, file):
     df = pd.read_csv(file)
     idx = get_row_index(instance_name, df)
     df.drop(df.index[idx], inplace=True)
-    df.to_csv(file)
+    df.to_csv(file, index=False)
 
 
 def get_row_index(instance_name, df):
     return df.index[df["Name"] == instance_name].tolist()[0]
 
+
+
 #df = pd.read_csv("tick-instances1.csv")
 #print(get_row_index("xxx", df))
-delete_from_GUI("ciccia33", "tick-instances1.csv")
+#delete_from_GUI("ciccia33", "tick-instances1.csv")
