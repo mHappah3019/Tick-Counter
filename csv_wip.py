@@ -4,6 +4,8 @@ import pandas as pd
 import csv
 import os
 
+TICK_INSTANCES = "tick-instances1.csv"
+
 os.chdir("C:/Users/mkcam/Desktop/Tick Counter/Tick-Counter")
 
 current_date = datetime.today()  #for now current_date can be thought as a global variable too
@@ -18,7 +20,7 @@ def skip_last(iterator):  #TODO: understand thiss
 def save_daily_counts(date):
     fields = [date]  #"date" comes from tick-instances1.csv
 
-    with open("tick-instances1.csv", "r") as f: #ATTENZIONE al nome del file
+    with open(TICK_INSTANCES, "r") as f: #ATTENZIONE al nome del file
         csv_reader = csv.reader(f)
         headers = next(csv_reader)      #skipping headers row
         for row in skip_last(csv_reader):    #for every instance we want to store the daily count; plus we are skipping the last row of tick-instances1
@@ -44,7 +46,7 @@ def save_weekly_counts(date):
 
     fields = [start_of_week + "-" + end_of_week] #formatting <start-of-week>-<end-of-week>
 
-    with open("tick-instances1.csv", "r") as f: #ATTENZIONE al nome del file
+    with open(TICK_INSTANCES, "r") as f: #ATTENZIONE al nome del file
         csv_reader = csv.reader(f)
         headers = next(csv_reader)      #skipping headers row
         for row in skip_last(csv_reader):    #for every instance we want to store the weekly count; plus skipping last row
@@ -68,7 +70,7 @@ def save_monthly_counts(date):
 
     fields = [month_name + " " + year] 
 
-    with open("tick-instances1.csv", "r") as f: #ATTENZIONE al nome del file
+    with open(TICK_INSTANCES, "r") as f: #ATTENZIONE al nome del file
         csv_reader = csv.reader(f)
         headers = next(csv_reader)      #skipping headers row
         for row in skip_last(csv_reader):    #for every instance we want to store the monthly count; plus skipping last row
@@ -121,7 +123,7 @@ def is_same_date(date1_object, date2_string):
 
 def check_count_reset():
     current_date = datetime.today()
-    last_saved_date = load_last_date("tick-instances1.csv") #taking this date from tick-instances1.csv
+    last_saved_date = load_last_date(TICK_INSTANCES) #taking this date from tick-instances1.csv
 
     if ( not is_same_date(current_date, last_saved_date) ):       #if current_date and last_saved_date are not actually the same date, then we shall set to zero the "Daily" count (in tick-instances.csv) of every instance
         save_daily_counts(last_saved_date)  # before resetting the daily counts, we shall save them in dailies.csv
@@ -137,7 +139,7 @@ def check_count_reset():
 
 
 def count_reset(info): 
-    with open("tick-instances1.csv", "r") as file:
+    with open(TICK_INSTANCES, "r") as file:
         csv_file = csv.reader(file)
         matrix = list(csv_file) #stores data locally in the form of a matrix where every row represents one single instance and the columns represent different parameters
                                 #NB. numbers are converted into string values
@@ -155,7 +157,7 @@ def count_reset(info):
                 matrix[i+1][option] = 0 #RESETTING...
         matrix[-1][0] = current_date.strftime("%d/%m/%Y") #modifichiamo la data in tick-instances1.csv
 
-    with open("tick-instances1.csv", "w", newline="") as file1:
+    with open(TICK_INSTANCES, "w", newline="") as file1:
         csv_file1 = csv.writer(file1)
         csv_file1.writerows(matrix)
  
@@ -206,7 +208,7 @@ def delete_counts(instance_name):
     delete_type_count(instance_name, "dailies.csv")     
     delete_type_count(instance_name, "weeklies.csv")
     delete_type_count(instance_name, "monthlies.csv")
-    delete_from_GUI(instance_name, "tick-instances1.csv")
+    delete_from_GUI(instance_name, TICK_INSTANCES)
 
 
 def delete_type_count(instance_name, file): #TODO: test this shit

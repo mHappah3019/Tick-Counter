@@ -8,6 +8,8 @@ import csv
 import os
 import sys
 
+TICK_INSTANCES = "tick-instances1.csv"
+
 
 #ATTENZIONEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
 #https://stackoverflow.com/questions/431684/equivalent-of-shell-cd-command-to-change-the-working-directory
@@ -51,8 +53,9 @@ class ScrollableFrame(tk.Frame):
     def instances_populate(self):
         #We are specifying that the frame (for the Tick instances in case of MainApplication) has only one visible column
         self.frame.columnconfigure(0, weight=1, minsize=200) 
-        with open("tick-instances1.csv", "r") as file:
+        with open(TICK_INSTANCES, "r") as file:
             csv_file = csv.DictReader(file)
+
             for i, row in skip_last(enumerate(csv_file)):
                 self.frame.rowconfigure(i, weight=1) # setting only the rows where Tick instances are appended to be visible
                 instance = TickFrame(self.frame, row["Name"], row["Daily"], row["Comb"], relief=tk.SUNKEN, borderwidth=2, bg="blue", bd=2)
@@ -163,7 +166,9 @@ class MainApplication(tk.Frame):
     #it updates the data inside the matrix
     #then overwrites the file
     def __exit__(self, bool_refresh=None):
-        with open("tick-instances1.csv", "r") as file:
+
+        #TODO: define all the code below as single function
+        with open(TICK_INSTANCES, "r") as file: 
             csv_file = csv.reader(file)
             matrix = list(csv_file) #stores data locally in the form of a matrix where every row represents one single instance and the columns represent different parameters
                                     #NB. numbers are converted into string values
@@ -180,7 +185,7 @@ class MainApplication(tk.Frame):
                 matrix[i+1][4] = monthly_value #actually updating the monthly value
             
 
-        with open("tick-instances1.csv", "w", newline="") as file1:
+        with open(TICK_INSTANCES, "w", newline="") as file1:
             csv_file1 = csv.writer(file1)
             csv_file1.writerows(matrix)
 
@@ -227,7 +232,7 @@ class InstancesAdder(ScrollableFrame):
 
 
     def add_instance(self):
-        with open("tick-instances1.csv", "r") as file:
+        with open(TICK_INSTANCES, "r") as file:
             csv_file = csv.reader(file)
             matrix = list(csv_file) #stores data locally in the form of a matrix where every row represents one single instance and the columns represent different parameters
                                     #NB. numbers are converted into string values
@@ -241,7 +246,7 @@ class InstancesAdder(ScrollableFrame):
 
             matrix.insert(-1, fields) #I'm happy that I don't have to handle the case where the file ends with one (or multiple) namespaces since matrix just "reads", and shows, rows with actual content
 
-        with open("tick-instances1.csv", "w", newline="") as file1:
+        with open(TICK_INSTANCES, "w", newline="") as file1:
             csv_file1 = csv.writer(file1)
             csv_file1.writerows(matrix)
 
