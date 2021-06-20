@@ -1,3 +1,4 @@
+from pynput import keyboard
 from csv_wip import current_date, get_remaining_ms, save_daily_counts, is_same_date, check_count_reset, load_last_date, get_remaining_ms, skip_last, delete_counts
 from datetime import datetime
 from functools import partial
@@ -369,7 +370,6 @@ def on_press_all(pressed_key):
 
 
 def on_press_single(pressed_key, key, object):
-    #ctrl_pressed = check_for_ctrl(pressed_key)
     same = str(pressed_key).strip("\'") == str(key)
     print(same)
 
@@ -378,20 +378,22 @@ def on_press_single(pressed_key, key, object):
         object.increment()
 
 
-""" def check_for_ctrl(pressed_key):
-    if str(pressed_key).strip("\'") == "Key.ctrl_l":
-        print("control pressed")
-        return True """
+def on_activate():
+    print("Global hotkey activated!")
 
 
+def for_canonical(f):
+    return lambda k: f(listener.canonical(k))
 
-    
 
-
+hotkey = keyboard.HotKey(
+    keyboard.HotKey.parse("<ctrl>+<alt>+h"),
+    on_activate
+)
 
 
 if __name__ == "__main__":
-    listener = Listener(on_press=on_press_all)
+    listener = Listener(on_press=for_canonical(hotkey.press), on_release=for_canonical(hotkey.release))
     listener.start()
 
     vp_start_gui()
