@@ -362,19 +362,30 @@ def link_combinations():
 
 
 def on_press_all(pressed_key):
-    for object in objects:
-        key = object.combination
-        #print(id(object))
-        #print(key)
-        on_press_single(pressed_key, key, object)
+        for object in objects:
+            key = object.combination
+            print(pressed_key)
+            on_press_single(pressed_key, key, object)
 
 
 def on_press_single(pressed_key, key, object):
-    #print(id(object))
-    same = str(pressed_key) == str(key)
-    print(same) #TODO: fix this shit
-    if same:
+    #ctrl_pressed = check_for_ctrl(pressed_key)
+    same = str(pressed_key).strip("\'") == str(key)
+    print(same)
+
+    #TODO: fix this shit
+    if same: #add condition for control + alt to be held together
         object.increment()
+
+
+""" def check_for_ctrl(pressed_key):
+    if str(pressed_key).strip("\'") == "Key.ctrl_l":
+        print("control pressed")
+        return True """
+
+
+
+    
 
 
 
