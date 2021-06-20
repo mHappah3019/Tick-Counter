@@ -1,6 +1,7 @@
 from csv_wip import current_date, get_remaining_ms, save_daily_counts, is_same_date, check_count_reset, load_last_date, get_remaining_ms, skip_last, delete_counts
 from datetime import datetime
 from functools import partial
+from pynput.keyboard import Listener
 import tkinter as tk
 import csv
 import os
@@ -12,7 +13,7 @@ import sys
 os.chdir("C:/Users/mkcam/Desktop/Tick Counter/Tick-Counter")
 
 
-objects = [] #TODO: define it's use in a comment
+objects = [] #TODO: define its use in a comment
 
 
 class ScrollableFrame(tk.Frame):
@@ -56,7 +57,7 @@ class ScrollableFrame(tk.Frame):
                 instance = TickFrame(self.frame, row["Name"], row["Daily"], row["Comb"], relief=tk.SUNKEN, borderwidth=2, bg="blue", bd=2)
                 instance.grid(row=i, column=0, sticky="nsew")
 
-        link_combinations() #watch function definition additional comments
+        #TORESTORE: link_combinations() #watch function definition additional comments
 
 
     def onFrameConfigure(self, event):
@@ -360,5 +361,24 @@ def link_combinations():
         root.bind(f"<Control-{key}>", object.increment)
 
 
-if __name__ == "__main__":
-    vp_start_gui()
+""" if __name__ == "__main__":
+    vp_start_gui() """
+
+def on_press_all(pressed_key):
+    for object in objects:
+        key = object.combination
+        on_press_single(pressed_key, key, object)
+
+
+def on_press_single(pressed_key, key, object):
+    if str(pressed_key) == str(key):
+        object.increment()
+
+with Listener(on_press=on_press_all) as l:
+
+    if __name__ == "__main__":
+        vp_start_gui()
+    #TODO: try putting code to run in here https://stackoverflow.com/questions/59814041/pynput-not-letting-tkinter-make-window
+    # or https://stackoverflow.com/questions/57949353/key-listener-script-with-gui-wont-work-tkinter
+    
+    l.join()

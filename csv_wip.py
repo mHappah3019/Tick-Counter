@@ -237,4 +237,4 @@ def get_row_index(instance_name, df):
 
 #df = pd.read_csv("tick-instances1.csv")
 #print(get_row_index("xxx", df))
-delete_from_GUI("ciccia33", "tick-instances1.csv")
+#delete_from_GUI("ciccia33", "tick-instances1.csv")
