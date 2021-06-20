@@ -361,24 +361,30 @@ def link_combinations():
         root.bind(f"<Control-{key}>", object.increment)
 
 
-""" if __name__ == "__main__":
-    vp_start_gui() """
-
 def on_press_all(pressed_key):
     for object in objects:
         key = object.combination
+        #print(id(object))
+        #print(key)
         on_press_single(pressed_key, key, object)
 
 
 def on_press_single(pressed_key, key, object):
-    if str(pressed_key) == str(key):
+    #print(id(object))
+    same = str(pressed_key) == str(key)
+    print(same) #TODO: fix this shit
+    if same:
         object.increment()
 
-with Listener(on_press=on_press_all) as l:
 
-    if __name__ == "__main__":
-        vp_start_gui()
-    #TODO: try putting code to run in here https://stackoverflow.com/questions/59814041/pynput-not-letting-tkinter-make-window
-    # or https://stackoverflow.com/questions/57949353/key-listener-script-with-gui-wont-work-tkinter
-    
-    l.join()
+
+
+if __name__ == "__main__":
+    listener = Listener(on_press=on_press_all)
+    listener.start()
+
+    vp_start_gui()
+
+    listener.stop()
+    listener.join()
+
