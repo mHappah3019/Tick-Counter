@@ -21,6 +21,7 @@ os.chdir("C:/Users/mkcam/Desktop/Tick Counter/Tick-Counter")
 
 
 objects = [] #TODO: define its use in a comment
+hotkeys_dictionary = {}
 
 
 class ScrollableFrame(tk.Frame):
@@ -66,7 +67,7 @@ class ScrollableFrame(tk.Frame):
                 instance.grid(row=i, column=0, sticky="nsew")
 
         #TORESTORE: link_combinations() #watch function definition additional comments
-
+        link_combinations()
 
     def onFrameConfigure(self, event):
         '''Reset the scroll region to encompass the inner frame'''
@@ -246,6 +247,8 @@ class InstancesAdder(ScrollableFrame):
             comb = self.labels_entries["Hotkey:"].get()
             pos = self.labels_entries["POS:"].get()
 
+            
+
             fields = [name, comb, 0, 0, 0]
 
             matrix.insert(-1, fields) #I'm happy that I don't have to handle the case where the file ends with one (or multiple) namespaces since matrix just "reads", and shows, rows with actual content
@@ -342,8 +345,16 @@ def vp_start_gui():
 
     root.after(get_remaining_ms(), refresh)
 
-    root.mainloop()
-    mainapp.__exit__()
+    with keyboard.GlobalHotKeys(
+        hotkeys_dictionary
+    ) as h: 
+
+        print(hotkeys_dictionary)
+        root.mainloop()
+        h.stop()
+        h.join()
+        mainapp.__exit__()
+
 
 
 def refresh():  #https://stackoverflow.com/questions/44199332/removing-and-recreating-a-tkinter-window-with-a-restart-button
@@ -359,34 +370,6 @@ def order_matrix(): #TODO: implement
     pass
 
 
-#TODO: implement a new binding method cause "bind" from Tkinter doesn't work when app is out of focus
-
-#for every object (in objects) we have defined a specific instance (of class TickFrame)
-#and every instance holds a "combination" attribute that we can use to then bind the increment of the count for every instance to the specific combination
-#we could have used a dictionary but this way we are making use of OOP: taking combination directly from instance
-def link_combinations():                                
-    for object in objects:
-        key = object.combination
-        #print(key)
-        root.bind(f"<Control-{key}>", object.increment)
-
-
-def on_press_all(pressed_key):
-        for object in objects:
-            key = object.combination
-            print(pressed_key)
-            on_press_single(pressed_key, key, object)
-
-
-def on_press_single(pressed_key, key, object):
-    same = str(pressed_key).strip("\'") == str(key)
-    print(same)
-
-    #TODO: fix this shit
-    if same: #add condition for control + alt to be held together
-        object.increment()
-
-
 def on_activate():
     print("Global hotkey activated!")
 
@@ -395,18 +378,16 @@ def for_canonical(f):
     return lambda k: f(listener.canonical(k))
 
 
-hotkey = keyboard.HotKey(
-    keyboard.HotKey.parse("<ctrl>+<alt>+h"),
-    on_activate
-)
+def link_combinations():                                
+    for object in objects:
+        key = object.combination
+        #print(key)
+        hotkeys_dictionary[f"<ctrl>+<alt>+{key}"] = object.increment
+
+
+
 
 
 if __name__ == "__main__":
-    listener = Listener(on_press=for_canonical(hotkey.press), on_release=for_canonical(hotkey.release))
-    listener.start()
-
     vp_start_gui()
-
-    listener.stop()
-    listener.join()
 
