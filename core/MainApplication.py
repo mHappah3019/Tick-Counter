@@ -1,6 +1,10 @@
 from pynput import keyboard
 from csv_wip import current_date, get_remaining_ms, save_daily_counts, is_same_date, check_count_reset, load_last_date, get_remaining_ms, skip_last, delete_counts
 from datetime import datetime
+
+""" from database_interaction import *
+from database123_interaction import *  #TODO: fix this shit
+ """
 from functools import partial
 from pynput.keyboard import Listener
 import tkinter as tk
