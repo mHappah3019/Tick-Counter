@@ -1,8 +1,11 @@
-from database_interaction import *
+#from database_interaction import *
 
 from datetime import datetime
 import csv
+import os
 import pandas as pd
+
+os.chdir("C:/Users/mkcam/Desktop/Tick Counter/Tick-Counter")
 
 
 def save_daily_counts(date):
@@ -84,3 +87,12 @@ def delete_type_count(instance_name, file): #TODO: test this shit
     new_f = f[keep_instancecs]
 
     new_f.to_csv(file, index=False)
+
+
+def add_to_header(instance_name, file):
+    df = pd.read_csv(file)
+    #TODO: icchene
+    df = df.assign(e=pd.Series().values)
+
+""" df = pd.read_csv("dailies.csv", dtype=str)
+print(df) """

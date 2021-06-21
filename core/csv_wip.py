@@ -240,3 +240,30 @@ def get_row_index(instance_name, df):
 #df = pd.read_csv("tick-instances1.csv")
 #print(get_row_index("xxx", df))
 #delete_from_GUI("ciccia33", "tick-instances1.csv")
+
+
+#this function, first, reads the "old" version of all the data
+#then, it takes all the data and brings it in the form of a matrix;
+#it updates the data inside the matrix
+#then overwrites the file
+def save_upon_closing(objects):
+    with open(TICK_INSTANCES, "r") as file: 
+                csv_file = csv.reader(file)
+                matrix = list(csv_file) #stores data locally in the form of a matrix where every row represents one single instance and the columns represent different parameters
+                                        #NB. numbers are converted into string values
+
+                for i, instance in (enumerate(objects)):
+                    print(f"tickframe {instance.name} updating")
+                    daily_value = int(matrix[i+1][2]) + instance.session_count #we are converting to int the first value cause it is originally a string type
+                    matrix[i+1][2] = daily_value #actually updating the daily value
+                    
+                    weekly_value = int(matrix[i+1][3]) + instance.session_count #we are converting to int the first value cause it is originally a string type
+                    matrix[i+1][3] = weekly_value #actually updating the weekly value
+                
+                    monthly_value = int(matrix[i+1][4]) + instance.session_count #we are converting to int the first value cause it is originally a string type
+                    matrix[i+1][4] = monthly_value #actually updating the monthly value
+                
+
+    with open(TICK_INSTANCES, "w", newline="") as file1:
+                csv_file1 = csv.writer(file1)
+                csv_file1.writerows(matrix)

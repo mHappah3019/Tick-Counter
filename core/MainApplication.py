@@ -1,5 +1,5 @@
 from pynput import keyboard
-from csv_wip import current_date, get_remaining_ms, save_daily_counts, is_same_date, check_count_reset, load_last_date, get_remaining_ms, skip_last, delete_counts
+from csv_wip import current_date, get_remaining_ms, save_daily_counts, is_same_date, check_count_reset, load_last_date, get_remaining_ms, skip_last, delete_counts, save_upon_closing
 from datetime import datetime
 
 """ from database_interaction import *
@@ -19,8 +19,10 @@ TICK_INSTANCES = "tick-instances.csv"
 #https://stackoverflow.com/questions/431684/equivalent-of-shell-cd-command-to-change-the-working-directory
 os.chdir("C:/Users/mkcam/Desktop/Tick Counter/Tick-Counter")
 
+#"objects" is used to access to every TickFrame object when needed (i.e. see instances_populate)
+objects = []              
 
-objects = [] #TODO: define its use in a comment
+#"hotkeys_dictionary" is used by keyboard.GlobalHotkeys (pynput Class)
 hotkeys_dictionary = {}
 
 
@@ -91,7 +93,6 @@ class TickFrame(tk.Frame):
             self.name = name #definisco anche un attributo "nome" per provare ad accedere più facilmente agli oggetti
                              #in un secondo momento
             
-            #TODO:  see if defining the binding here (in init) is better than defining all of them together (as implemented in link_combinations)
             self.combination = combination #will help us in link_combinations function
 
             self.name_lbl = tk.Label(master=self, text=name, width=25, height=2)
@@ -166,33 +167,13 @@ class MainApplication(tk.Frame):
         ADD_btn.grid(row=0, column=0, sticky="nsew")
 
 
-    #this function, first, reads the "old" version of all the data
-    #then, it takes all the data and brings it in the form of a matrix;
-    #it updates the data inside the matrix
-    #then overwrites the file
     def __exit__(self, bool_refresh=None):
 
-        #TODO: define all the code below as single function
-        with open(TICK_INSTANCES, "r") as file: 
-            csv_file = csv.reader(file)
-            matrix = list(csv_file) #stores data locally in the form of a matrix where every row represents one single instance and the columns represent different parameters
-                                    #NB. numbers are converted into string values
-
-            for i, instance in (enumerate(objects)):
-                print(f"tickframe {instance.name} updating")
-                daily_value = int(matrix[i+1][2]) + instance.session_count #we are converting to int the first value cause it is originally a string type
-                matrix[i+1][2] = daily_value #actually updating the daily value
-                
-                weekly_value = int(matrix[i+1][3]) + instance.session_count #we are converting to int the first value cause it is originally a string type
-                matrix[i+1][3] = weekly_value #actually updating the weekly value
-            
-                monthly_value = int(matrix[i+1][4]) + instance.session_count #we are converting to int the first value cause it is originally a string type
-                matrix[i+1][4] = monthly_value #actually updating the monthly value
-            
-
-        with open(TICK_INSTANCES, "w", newline="") as file1:
-            csv_file1 = csv.writer(file1)
-            csv_file1.writerows(matrix)
+        #this function, first, reads the "old" version of all the data
+        #then, it takes all the data and brings it in the form of a matrix;
+        #it updates the data inside the matrix
+        #then overwrites the file
+        save_upon_closing(objects)
 
         print("Applicazione chiusa con successo")
 
@@ -204,7 +185,7 @@ class InstancesAdder(ScrollableFrame):
         ScrollableFrame.__init__(self, parent)  #parent shall be "root"
 
         self.parent = parent #"parent" shall be "root"
-        self.app = app #TODO: understand the use of this apparently fucking useless attribute
+        #self.app = app #TODO: understand the use of this apparently fucking useless attribute
 
         self.labels = [  #pay attention to all the ":"s
             "Name:",
@@ -237,6 +218,8 @@ class InstancesAdder(ScrollableFrame):
 
 
     def add_instance(self):
+
+        #
         with open(TICK_INSTANCES, "r") as file:
             csv_file = csv.reader(file)
             matrix = list(csv_file) #stores data locally in the form of a matrix where every row represents one single instance and the columns represent different parameters
@@ -247,7 +230,7 @@ class InstancesAdder(ScrollableFrame):
             comb = self.labels_entries["Hotkey:"].get()
             pos = self.labels_entries["POS:"].get()
 
-            
+            #TODO: handle repeated (over different instances) combinations
 
             fields = [name, comb, 0, 0, 0]
 
@@ -256,6 +239,10 @@ class InstancesAdder(ScrollableFrame):
         with open(TICK_INSTANCES, "w", newline="") as file1:
             csv_file1 = csv.writer(file1)
             csv_file1.writerows(matrix)
+
+        #TODO: add instance name to headers of dailies, weeklies e monthlies
+        
+    
 
         refresh() #closes MainApplication, hence it closes InstancesAdder too
 
@@ -318,6 +305,7 @@ class InstancesManager(InstancesAdder):
         self.labels_entries["Name:"].insert(0, self.instance.name)
         #TODO: add "insertions" for Combination, POS and other parameters
 
+    #TODO: "override" submit button
 
 def get_passed_ms():
     now = datetime.now()
