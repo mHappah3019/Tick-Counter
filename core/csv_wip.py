@@ -4,7 +4,7 @@ import pandas as pd
 import csv
 import os
 
-TICK_INSTANCES = "tick-instances1.csv"
+TICK_INSTANCES = "tick-instances.csv"
 
 os.chdir("C:/Users/mkcam/Desktop/Tick Counter/Tick-Counter")
 
@@ -23,7 +23,7 @@ def save_daily_counts(date):
     with open(TICK_INSTANCES, "r") as f: #ATTENZIONE al nome del file
         csv_reader = csv.reader(f)
         headers = next(csv_reader)      #skipping headers row
-        for row in skip_last(csv_reader):    #for every instance we want to store the daily count; plus we are skipping the last row of tick-instances1
+        for row in skip_last(csv_reader):    #for every instance we want to store the daily count; plus we are skipping the last row of tick-instances
             fields.append(row[2]) #appending every instance's daily count, to be then appended to one single row, correspoding to "last_saved_date"
     
     with open("dailies.csv", "r") as file:
@@ -87,7 +87,7 @@ def save_monthly_counts(date):
 
 
 # function that checks if 2 dates fall in the same week or not
-#one is a datetime object, the other is a string formatted in a specific format
+# one is a datetime object, the other is a string formatted in a specific format
 # returns True if the 2 dates fall in the same week
 def is_sameweek_dates(date1_object, date2_string):               #"date<>_objects" stands for datetime object coming from the datetime module
     date2_object = datetime.strptime(date2_string, "%d/%m/%Y")

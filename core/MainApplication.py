@@ -8,7 +8,7 @@ import csv
 import os
 import sys
 
-TICK_INSTANCES = "tick-instances1.csv"
+TICK_INSTANCES = "tick-instances.csv"
 
 
 #ATTENZIONEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
