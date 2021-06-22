@@ -104,7 +104,18 @@ def add_to_headers(instance_name):
 
 
 df = pd.read_csv("dailies.csv", dtype=str)
-cacca = [i for i in list(range(0,14))]
+cacca = [i for i in list(range(0,15))]
 df["instance_cacca"] = cacca
 
 print(df)
+
+def rename_type(old_name, new_name, file):
+    df = pd.read_csv(file)
+    df.rename(columns = {f'{old_name}':f'{new_name}'}, inplace = True)
+    df.to_csv(file, index=False)
+
+
+def rename_DATABASE(old_name, new_name):
+    rename_type(old_name, new_name, "dailies.csv")
+    rename_type(old_name, new_name, "weeklies.csv")
+    rename_type(old_name, new_name, "monthlies.csv")

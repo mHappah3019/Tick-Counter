@@ -304,6 +304,10 @@ class InstancesManager(InstancesAdder):
 
 
     def modify_instance(self): #TODO: implement
+        
+        
+        
+        refresh()
         pass
 
     def delete_instance(self):

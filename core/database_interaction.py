@@ -77,3 +77,13 @@ def check_count_reset():
     if ( not is_samemonth_dates(current_date, last_saved_date) ): #if current_date and last_saved_date are not in the same month, then we shall set to zero the "Monthly" count (in tick-instances.csv) of every instance
         save_monthly_counts(last_saved_date) # before resetting the monthly counts, we shall save them in monthlies.csv
         count_reset("month") #actually resetting the values
+
+
+#https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.at.html
+def rename_GUI(old_name, new_name): 
+    df = pd.read_csv(TICK_INSTANCES)
+    idx = get_row_index(old_name, df)
+
+    df.at[idx, "Name"] = new_name
+
+    df.to_csv(TICK_INSTANCES, index=False)
