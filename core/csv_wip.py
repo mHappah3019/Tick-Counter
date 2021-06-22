@@ -267,3 +267,16 @@ def save_upon_closing(objects):
     with open(TICK_INSTANCES, "w", newline="") as file1:
                 csv_file1 = csv.writer(file1)
                 csv_file1.writerows(matrix)
+
+
+def add_to_header(instance_name, file):
+    df = pd.read_csv(file, dtype=str)
+    rowIndex = df.index[0]
+    df.loc[rowIndex, instance_name] = None
+    df.to_csv(file, index=False)
+
+
+def add_to_headers(instance_name):
+    add_to_header(instance_name, "dailies.csv")
+    add_to_header(instance_name, "weeklies.csv")
+    add_to_header(instance_name, "monthlies.csv")

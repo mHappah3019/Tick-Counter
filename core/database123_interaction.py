@@ -89,23 +89,22 @@ def delete_type_count(instance_name, file): #TODO: test this shit
     new_f.to_csv(file, index=False)
 
 
-def add_to_header(instance_name, file):
-    """ with open(file, "r") as file:
-        csv_file = csv.reader(file)
-        matrix = list(csv_file)
-
-        matrix[0][-1] = instance_name
-
-    with open(file, "w") as file1:
-        csv_file1 = csv.writer(file1)
-        csv_file1.writerows(matrix) """
-    pass
-
 #https://stackoverflow.com/questions/46113078/pandas-add-value-at-specific-iloc-into-new-dataframe-column
-#https://stackoverflow.com/questions/12555323/adding-new-column-to-existing-dataframe-in-python-pandas
+def add_to_header(instance_name, file):
+    df = pd.read_csv(file, dtype=str)
+    rowIndex = df.index[0]
+    df.loc[rowIndex, instance_name] = None
+    df.to_csv(file, index=False)
+
+
+def add_to_headers(instance_name):
+    add_to_header(instance_name, "dailies.csv")
+    add_to_header(instance_name, "weeklies.csv")
+    add_to_header(instance_name, "monthlies.csv")
 
 
 df = pd.read_csv("dailies.csv", dtype=str)
 cacca = [i for i in list(range(0,14))]
 df["instance_cacca"] = cacca
+
 print(df)

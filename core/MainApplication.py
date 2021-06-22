@@ -1,5 +1,5 @@
 from pynput import keyboard
-from csv_wip import current_date, get_remaining_ms, save_daily_counts, is_same_date, check_count_reset, load_last_date, get_remaining_ms, skip_last, delete_counts, save_upon_closing
+from csv_wip import current_date, get_remaining_ms, save_daily_counts, is_same_date, check_count_reset, load_last_date, get_remaining_ms, skip_last, delete_counts, save_upon_closing, add_to_headers
 from datetime import datetime
 
 """ from database_interaction import *
@@ -240,7 +240,7 @@ class InstancesAdder(ScrollableFrame):
             csv_file1 = csv.writer(file1)
             csv_file1.writerows(matrix)
 
-        #TODO: add instance name to headers of dailies, weeklies e monthlies
+        add_to_headers(name)
         
     
 
