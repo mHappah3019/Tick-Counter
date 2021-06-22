@@ -167,7 +167,7 @@ class MainApplication(tk.Frame):
         ADD_btn.grid(row=0, column=0, sticky="nsew")
 
 
-    def __exit__(self, bool_refresh=None):
+    def __exit__(self, bool_refresh=None): #bool_refresh is fucking useless #TODO: fix
 
         #this function, first, reads the "old" version of all the data
         #then, it takes all the data and brings it in the form of a matrix;
@@ -305,7 +305,7 @@ class InstancesManager(InstancesAdder):
 
     def modify_instance(self): #TODO: implement
         
-        
+        #TODO: add calls to "renaming" functions
         
         refresh()
         pass

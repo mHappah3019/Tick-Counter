@@ -119,3 +119,5 @@ def rename_DATABASE(old_name, new_name):
     rename_type(old_name, new_name, "dailies.csv")
     rename_type(old_name, new_name, "weeklies.csv")
     rename_type(old_name, new_name, "monthlies.csv")
+
+#rename_type("sosa", "sosa2", "dailies.csv")
