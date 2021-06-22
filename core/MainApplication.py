@@ -1,10 +1,12 @@
 from pynput import keyboard
+
+#TODO: fix this shit
 from csv_wip import current_date, get_remaining_ms, save_daily_counts, is_same_date, check_count_reset, load_last_date, get_remaining_ms, skip_last, delete_counts, save_upon_closing, add_to_headers
 from datetime import datetime
 
-""" from database_interaction import *
+from database_interaction import *
 from database123_interaction import *  #TODO: fix this shit
- """
+
 from functools import partial
 from pynput.keyboard import Listener
 import tkinter as tk
@@ -13,11 +15,15 @@ import os
 import sys
 
 TICK_INSTANCES = "tick-instances.csv"
-
+print(sys.path)
+print("\n\n\n")
 
 #ATTENZIONEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
 #https://stackoverflow.com/questions/431684/equivalent-of-shell-cd-command-to-change-the-working-directory
 os.chdir("C:/Users/mkcam/Desktop/Tick Counter/Tick-Counter")
+
+print(sys.path)
+print("\n\n\n")
 
 #"objects" is used to access to every TickFrame object when needed (i.e. see instances_populate)
 objects = []              

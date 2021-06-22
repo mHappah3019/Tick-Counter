@@ -1,9 +1,17 @@
-from datetime_utils import *
+#from datetime_utils import *
 
 from datetime import datetime
 import csv
 import pandas as pd
+import sys
+import os
 
+sys.path.append("C:/Users/mkcam/Desktop/Tick Counter/Tick-Counter")
+os.chdir("C:/Users/mkcam/Desktop/Tick Counter/Tick-Counter")
+print(sys.path)
+print("gg")
+
+from tests import datetime_utils
 
 TICK_INSTANCES = "tick-instances.csv"
 
