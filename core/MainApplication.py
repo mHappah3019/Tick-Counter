@@ -200,14 +200,19 @@ class InstancesAdder(ScrollableFrame):
 
         # Create the "Submit" button and pack it to the
         #   left side of `frm_buttons`
-        self.btn_submit = tk.Button(master=self.frm_buttons, text="Submit", command=self.add_instance) #add_instance will refresh the application
-        self.btn_submit.pack(side=tk.RIGHT, padx=10, ipadx=10)
+        #   can have add_instance or modify_instance commands depending on inheritance
+        self.define_submit()
 
         # Create the "Clear" button and pack it to the
         #   right side of `frm_buttons`
         # TODO: determine if I really need this Clear button
         self.btn_clear = tk.Button(master=self.frm_buttons, text="Clear")
         self.btn_clear.pack(side=tk.RIGHT, ipadx=10)
+
+
+    def define_submit(self):
+        self.btn_submit = tk.Button(master=self.frm_buttons, text="Submit", command=self.add_instance) #add_instance will refresh the application
+        self.btn_submit.pack(side=tk.RIGHT, padx=10, ipadx=10)
 
 
     @staticmethod
@@ -240,10 +245,8 @@ class InstancesAdder(ScrollableFrame):
             csv_file1 = csv.writer(file1)
             csv_file1.writerows(matrix)
 
-        add_to_headers(name)
-        
-    
 
+        add_to_headers(name)
         refresh() #closes MainApplication, hence it closes InstancesAdder too
 
     def infos_populate(self):
@@ -288,12 +291,20 @@ class InstancesManager(InstancesAdder):
         self.btn_delete.pack(side=tk.LEFT, padx=10, ipadx=10)
 
 
+    def define_submit(self):
+        self.btn_submit = tk.Button(master=self.frm_buttons, text="Submit", command=self.modify_instance) #add_instance will refresh the application
+        self.btn_submit.pack(side=tk.RIGHT, padx=10, ipadx=10)
+
+
     @staticmethod
     def create_window(instance):                                     #Wants to simulate a "Factory", can call this method without an instance, but creates an instance
         window = tk.Toplevel(root)                           
         instance_manager = InstancesManager(parent=window, instance=instance, app=tk.mainloop)   #creating the frame (parent is the new window created in the previous line of code) ...
         instance_manager.pack(fill="both", expand=True)
 
+
+    def modify_instance(self): #TODO: implement
+        pass
 
     def delete_instance(self):
         delete_counts(self.instance.name) #this function then calls all the "deletion" functions (1 for dailies, 1 for weeklies, 1 for monthlies and 1 for tick-instances1) 
@@ -305,7 +316,6 @@ class InstancesManager(InstancesAdder):
         self.labels_entries["Name:"].insert(0, self.instance.name)
         #TODO: add "insertions" for Combination, POS and other parameters
 
-    #TODO: "override" submit button
 
 def get_passed_ms():
     now = datetime.now()
@@ -358,19 +368,12 @@ def order_matrix(): #TODO: implement
     pass
 
 
-def on_activate():
-    print("Global hotkey activated!")
-
-
-def for_canonical(f):
-    return lambda k: f(listener.canonical(k))
-
-
 def link_combinations():                                
     for object in objects:
         key = object.combination
         #print(key)
-        hotkeys_dictionary[f"<ctrl>+<alt>+{key}"] = object.increment
+        if key :
+            hotkeys_dictionary[f"<ctrl>+<alt>+{key}"] = object.increment
 
 
 
