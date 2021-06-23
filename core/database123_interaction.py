@@ -3,9 +3,18 @@
 from datetime import datetime
 import csv
 import os
+import sys
 import pandas as pd
 
-os.chdir("C:/Users/mkcam/Desktop/Tick Counter/Tick-Counter")
+os.chdir("C:/Users/mkcam/Desktop/Tick Counter/Tick-Counter/data") #might be a solution to make "dailies.csv" visible
+
+#TODO: why tf dailies can't be accessed ???
+sys.path.append("C:/Users/mkcam/Desktop/Tick Counter/Tick-Counter/data") #doesn't work
+sys.path.append('c:\\Users\\mkcam\\Desktop\\Tick Counter\\Tick-Counter\\data') #doesn't work
+
+print(sys.path)
+
+#from data import dailies
 
 
 def save_daily_counts(date):

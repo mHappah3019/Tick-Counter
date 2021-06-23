@@ -6,7 +6,7 @@ import os
 
 TICK_INSTANCES = "tick-instances.csv"
 
-os.chdir("C:/Users/mkcam/Desktop/Tick Counter/Tick-Counter")
+#os.chdir("C:/Users/mkcam/Desktop/Tick Counter/Tick-Counter")
 
 current_date = datetime.today()  #for now current_date can be thought as a global variable too
 

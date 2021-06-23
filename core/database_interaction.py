@@ -7,11 +7,11 @@ import sys
 import os
 
 sys.path.append("C:/Users/mkcam/Desktop/Tick Counter/Tick-Counter")
-os.chdir("C:/Users/mkcam/Desktop/Tick Counter/Tick-Counter")
 print(sys.path)
 print("gg")
 
-from tests import datetime_utils
+#from tests import datetime_utils #works
+import tests.datetime_utils #works too
 
 TICK_INSTANCES = "tick-instances.csv"
 
@@ -95,3 +95,8 @@ def rename_GUI(old_name, new_name):
     df.at[idx, "Name"] = new_name
 
     df.to_csv(TICK_INSTANCES, index=False)
+
+
+with open("tick-instances.csv", "r") as file:
+        csv_reader = csv.reader(file)
+        matrix = list(csv_reader)

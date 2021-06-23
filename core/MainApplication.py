@@ -21,6 +21,7 @@ print("\n\n\n")
 #ATTENZIONEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
 #https://stackoverflow.com/questions/431684/equivalent-of-shell-cd-command-to-change-the-working-directory
 os.chdir("C:/Users/mkcam/Desktop/Tick Counter/Tick-Counter")
+sys.path.append("C:/Users/mkcam/Desktop/Tick Counter/Tick-Counter/data")
 
 print(sys.path)
 print("\n\n\n")
