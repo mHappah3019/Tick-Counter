@@ -1,11 +1,17 @@
-#from database_interaction import *
+import core.database_interaction
+import utils.general_utils as gen
 
 from datetime import datetime
 import csv
 import os
+import sys
 import pandas as pd
 
-os.chdir("C:/Users/mkcam/Desktop/Tick Counter/Tick-Counter")
+
+TICK_INSTANCES=gen.find_abs_path("tick-instances.csv")
+DAILIES=gen.find_abs_path("dailies.csv")
+WEEKLIES = gen.find_abs_path("weeklies.csv")
+MONTHLIES = DAILIES=gen.find_abs_path("monthlies.csv")
 
 
 def save_daily_counts(date):
@@ -14,12 +20,12 @@ def save_daily_counts(date):
     with open(TICK_INSTANCES, "r") as f: #ATTENZIONE al nome del file
         csv_reader = csv.reader(f)
         headers = next(csv_reader)      #skipping headers row
-        for row in skip_last(csv_reader):    #for every instance we want to store the daily count; plus we are skipping the last row of tick-instances
+        for row in gen.skip_last(csv_reader):    #for every instance we want to store the daily count; plus we are skipping the last row of tick-instances
             fields.append(row[2]) #appending every instance's daily count, to be then appended to one single row, correspoding to "last_saved_date"
     
-    with open("dailies.csv", "r") as file:
+    with open(DAILIES, "r") as file:
         text = file.read()                 #reading the file so that we can check later if it ends with a newline (\n)...
-    with open("dailies.csv", "a", newline='\n') as f1:
+    with open(DAILIES, "a", newline='\n') as f1:
         writer = csv.writer(f1)
         if ( not text.endswith("\n") ):    #...checking if file ends with a newline (\n)
             f1.write("\n")                  #adding newline if file doesn't have a newline at the end
@@ -40,12 +46,12 @@ def save_weekly_counts(date):
     with open(TICK_INSTANCES, "r") as f: #ATTENZIONE al nome del file
         csv_reader = csv.reader(f)
         headers = next(csv_reader)      #skipping headers row
-        for row in skip_last(csv_reader):    #for every instance we want to store the weekly count; plus skipping last row
+        for row in gen.skip_last(csv_reader):    #for every instance we want to store the weekly count; plus skipping last row
             fields.append(row[3]) #appending every instance's daily count, to be then appended to one single row, correspoding to the entire duration of the week
     
-    with open("weeklies.csv", "r") as file:
+    with open(WEEKLIES, "r") as file:
         text = file.read()                 #reading the file so that we can check later if it ends with a newline (\n)...
-    with open("weeklies.csv", "a", newline='\n') as f1:
+    with open(WEEKLIES, "a", newline='\n') as f1:
         writer = csv.writer(f1)
         if ( not text.endswith("\n") ):    #...checking if file ends with a newline (\n)
             f1.write("\n")                  #adding newline if file doesn't have a newline at the end
@@ -64,17 +70,24 @@ def save_monthly_counts(date):
     with open(TICK_INSTANCES, "r") as f: #ATTENZIONE al nome del file
         csv_reader = csv.reader(f)
         headers = next(csv_reader)      #skipping headers row
-        for row in skip_last(csv_reader):    #for every instance we want to store the monthly count; plus skipping last row
+        for row in gen.skip_last(csv_reader):    #for every instance we want to store the monthly count; plus skipping last row
             fields.append(row[4]) #appending every instance's monthly count, to be then appended to one single row, correspoding to month name + year
     
-    with open("monthlies.csv", "r") as file:
+    with open(MONTHLIES, "r") as file:
         text = file.read()                 #reading the file so that we can check later if it ends with a newline (\n)...
-    with open("monthlies.csv", "a", newline='\n') as f1:
+    with open(MONTHLIES, "a", newline='\n') as f1:
         writer = csv.writer(f1)
         if ( not text.endswith("\n") ):    #...checking if file ends with a newline (\n)
             f1.write("\n")                  #adding newline if file doesn't have a newline at the end
         writer.writerow(fields)  #writing as row this corresponding list: [actual month, <count-for-first-instance>, <count-for-second-instance>, <count-for-third-instance>, etc ... ]
                                  #all these counts are just MONTHLY counts
+
+
+def delete_counts(instance_name):
+    delete_type_count(instance_name, "dailies.csv")     
+    delete_type_count(instance_name, "weeklies.csv")
+    delete_type_count(instance_name, "monthlies.csv")
+    core.database_interaction.delete_from_GUI(instance_name, TICK_INSTANCES)
 
 
 def delete_type_count(instance_name, file): #TODO: test this shit
@@ -91,23 +104,23 @@ def delete_type_count(instance_name, file): #TODO: test this shit
 
 #https://stackoverflow.com/questions/46113078/pandas-add-value-at-specific-iloc-into-new-dataframe-column
 def add_to_header(instance_name, file):
-    df = pd.read_csv(file, dtype=str)
+    df = pd.read_csv(file)
     rowIndex = df.index[0]
     df.loc[rowIndex, instance_name] = None
     df.to_csv(file, index=False)
 
 
 def add_to_headers(instance_name):
-    add_to_header(instance_name, "dailies.csv")
-    add_to_header(instance_name, "weeklies.csv")
-    add_to_header(instance_name, "monthlies.csv")
+    add_to_header(instance_name, DAILIES)
+    add_to_header(instance_name, WEEKLIES)
+    add_to_header(instance_name, MONTHLIES)
 
 
-df = pd.read_csv("dailies.csv", dtype=str)
+""" df = pd.read_csv("dailies.csv", dtype=str)
 cacca = [i for i in list(range(0,15))]
 df["instance_cacca"] = cacca
 
-print(df)
+print(df) """
 
 def rename_type(old_name, new_name, file):
     df = pd.read_csv(file)
@@ -116,8 +129,8 @@ def rename_type(old_name, new_name, file):
 
 
 def rename_DATABASE(old_name, new_name):
-    rename_type(old_name, new_name, "dailies.csv")
-    rename_type(old_name, new_name, "weeklies.csv")
-    rename_type(old_name, new_name, "monthlies.csv")
+    rename_type(old_name, new_name, DAILIES)
+    rename_type(old_name, new_name, WEEKLIES)
+    rename_type(old_name, new_name, MONTHLIES)
 
 #rename_type("sosa", "sosa2", "dailies.csv")

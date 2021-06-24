@@ -1,4 +1,4 @@
-import datetime as datetime
+from datetime import datetime
 
 
 # function that checks if 2 dates fall in the same week or not

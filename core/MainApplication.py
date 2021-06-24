@@ -1,23 +1,30 @@
-from pynput import keyboard
-from csv_wip import current_date, get_remaining_ms, save_daily_counts, is_same_date, check_count_reset, load_last_date, get_remaining_ms, skip_last, delete_counts, save_upon_closing, add_to_headers
-from datetime import datetime
+import sys
+import os
 
-""" from database_interaction import *
-from database123_interaction import *  #TODO: fix this shit
- """
-from functools import partial
-from pynput.keyboard import Listener
 import tkinter as tk
 import csv
-import os
-import sys
 
-TICK_INSTANCES = "tick-instances.csv"
+from pynput import keyboard
+from functools import partial
+from datetime import datetime
+
+import database_interaction
+import database123_interaction
+import utils.general_utils as gen
+
+
+
+
+
+
+TICK_INSTANCES = gen.find_abs_path("tick-instances.csv")
+
+
 
 
 #ATTENZIONEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
 #https://stackoverflow.com/questions/431684/equivalent-of-shell-cd-command-to-change-the-working-directory
-os.chdir("C:/Users/mkcam/Desktop/Tick Counter/Tick-Counter")
+#os.chdir("C:/Users/mkcam/Desktop/Tick Counter/Tick-Counter")
 
 #"objects" is used to access to every TickFrame object when needed (i.e. see instances_populate)
 objects = []              
@@ -63,7 +70,7 @@ class ScrollableFrame(tk.Frame):
         with open(TICK_INSTANCES, "r") as file:
             csv_file = csv.DictReader(file)
 
-            for i, row in skip_last(enumerate(csv_file)):
+            for i, row in gen.skip_last(enumerate(csv_file)):
                 self.frame.rowconfigure(i, weight=1) # setting only the rows where Tick instances are appended to be visible
                 instance = TickFrame(self.frame, row["Name"], row["Daily"], row["Comb"], relief=tk.SUNKEN, borderwidth=2, bg="blue", bd=2)
                 instance.grid(row=i, column=0, sticky="nsew")
@@ -135,7 +142,7 @@ class MainApplication(tk.Frame):
     def __init__(self, parent, *args, **kwargs):
         tk.Frame.__init__(self, parent, *args, **kwargs)
 
-        check_count_reset() #...if we should reset, either the "Daily", "Weekly", "Monthly" counters or all of em and...
+        database_interaction.check_count_reset() #...if we should reset, either the "Daily", "Weekly", "Monthly" counters or all of em and...
                             #plus, it triggers all the functions to save the stats in dailies.csv, weeklies.csv, monthlies.csv
                             #should be run before populating the application with all the data (when instantiating ScrollableFrame)
 
@@ -173,7 +180,7 @@ class MainApplication(tk.Frame):
         #then, it takes all the data and brings it in the form of a matrix;
         #it updates the data inside the matrix
         #then overwrites the file
-        save_upon_closing(objects)
+        database_interaction.save_upon_closing(objects)
 
         print("Applicazione chiusa con successo")
 
@@ -246,7 +253,7 @@ class InstancesAdder(ScrollableFrame):
             csv_file1.writerows(matrix)
 
 
-        add_to_headers(name)
+        database123_interaction.add_to_headers(name)
         refresh() #closes MainApplication, hence it closes InstancesAdder too
 
     def infos_populate(self):
@@ -311,7 +318,7 @@ class InstancesManager(InstancesAdder):
         pass
 
     def delete_instance(self):
-        delete_counts(self.instance.name) #this function then calls all the "deletion" functions (1 for dailies, 1 for weeklies, 1 for monthlies and 1 for tick-instances1) 
+        database123_interaction.delete_counts(self.instance.name) #this function then calls all the "deletion" functions (1 for dailies, 1 for weeklies, 1 for monthlies and 1 for tick-instances1) 
         refresh()                         #we shall reload the application to get the GUI for all the instances we have KEPT
 
 
