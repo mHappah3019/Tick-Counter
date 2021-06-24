@@ -14,4 +14,5 @@ def find_abs_path(file):
     csv_path = os.path.abspath(os.path.join(cwd, given_path))
     return csv_path
 
+
 print(find_abs_path("dailies.csv"))

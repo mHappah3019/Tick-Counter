@@ -18,7 +18,7 @@ import os
 TICK_INSTANCES = gen.find_abs_path("tick-instances.csv")
 DAILIES = gen.find_abs_path("dailies.csv")
 WEEKLIES = gen.find_abs_path("weeklies.csv")
-MONTHLIES = DAILIES=gen.find_abs_path("monthlies.csv")
+MONTHLIES = gen.find_abs_path("monthlies.csv")
 
 
 

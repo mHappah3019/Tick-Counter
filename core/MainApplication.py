@@ -106,7 +106,7 @@ class TickFrame(tk.Frame):
             self.count_lbl = tk.Label(master=self, text=str(number)) #number represents the daily counter
             self.increase_btn = tk.Button(master=self, text="+", command=self.increment) #when this button is clicked we shall increment session_count for this particular instance
             
-            #this way I can call create_with_arg with arguments (1 in this case)
+            #this way I can call "create_window" (through create_with_arg) with arguments (1 in this case)
             create_with_arg = partial(InstancesManager.create_window, self)
             self.info_btn = tk.Button(master=self, text="...", command=create_with_arg)
 
@@ -122,7 +122,6 @@ class TickFrame(tk.Frame):
 
 
             objects.append(self) #"populate" (ScrollableFrame) creates tick instances, hence they are added to an array that keeps track of all of them
-            #print(f"tickframe {self.name} instantiated")
 
 
         def increment(self, event=None):
@@ -132,7 +131,7 @@ class TickFrame(tk.Frame):
 
         def decrement(self):
             self.session_count -= 1
-            self.count_lbl['text'] = str(int(self.count_lbl['text']) - 1) #shows in the label the new value; the old value is simply incremented by one
+            self.count_lbl['text'] = str(int(self.count_lbl['text']) - 1) #shows in the label the new value; the old value is simply decremented by one
 
 
 
@@ -141,9 +140,10 @@ class MainApplication(tk.Frame):
     def __init__(self, parent, *args, **kwargs):
         tk.Frame.__init__(self, parent, *args, **kwargs)
 
-        database_interaction.check_count_reset() #...if we should reset, either the "Daily", "Weekly", "Monthly" counters or all of em and...
-                            #plus, it triggers all the functions to save the stats in dailies.csv, weeklies.csv, monthlies.csv
-                            #should be run before populating the application with all the data (when instantiating ScrollableFrame)
+        #...if we should reset, either the "Daily", "Weekly", "Monthly" counters or all of em and...
+        #plus, it triggers all the functions to save the stats in dailies.csv, weeklies.csv, monthlies.csv
+        #should be run before populating the application with all the data (when instantiating ScrollableFrame)
+        database_interaction.check_count_reset()
 
         self.parent = parent #"parent" shall be "root"
         #needed for "hiding" all the empty columns
@@ -152,6 +152,7 @@ class MainApplication(tk.Frame):
         #virtually holds the nx1 grid of instances
         #the actual frame is set inside the canvas, that is inside instancesPanel
         self.instancesPanel = ScrollableFrame(parent=self)
+
         #OOP approach: self.frame of the ScrollableFrame is being populated
         #self.frame holds the nx1 grid of instances
         self.instancesPanel.instances_populate()
@@ -169,12 +170,12 @@ class MainApplication(tk.Frame):
         self.extraPanel.rowconfigure(0, weight=1, minsize=20) #setting up extraPanel
 
         #implementation of the ADD button
+        #"InstancesAdder.create_window" creates an "InstancesAdder window"
         ADD_btn = tk.Button(self.extraPanel, text="ADD", command=InstancesAdder.create_window)
         ADD_btn.grid(row=0, column=0, sticky="nsew")
 
 
-    def __exit__(self, bool_refresh=None): #bool_refresh is fucking useless #TODO: fix
-
+    def __exit__(self): 
         #this function, first, reads the "old" version of all the data
         #then, it takes all the data and brings it in the form of a matrix;
         #it updates the data inside the matrix
@@ -187,15 +188,14 @@ class MainApplication(tk.Frame):
 
 
 class InstancesAdder(ScrollableFrame):
-    def __init__(self, parent, app=None, *args, **kwargs):
+    def __init__(self, parent, *args, **kwargs):
         ScrollableFrame.__init__(self, parent)  #parent shall be "root"
 
         self.parent = parent #"parent" shall be "root"
-        #self.app = app #TODO: understand the use of this apparently fucking useless attribute
 
         self.labels = [  #pay attention to all the ":"s
             "Name:",
-            "Hotkey:",
+            "Comb:",
             "POS:"
         ]
 
@@ -209,12 +209,6 @@ class InstancesAdder(ScrollableFrame):
         #   can have add_instance or modify_instance commands depending on inheritance
         self.define_submit()
 
-        # Create the "Clear" button and pack it to the
-        #   right side of `frm_buttons`
-        # TODO: determine if I really need this Clear button
-        self.btn_clear = tk.Button(master=self.frm_buttons, text="Clear")
-        self.btn_clear.pack(side=tk.RIGHT, ipadx=10)
-
 
     def define_submit(self):
         self.btn_submit = tk.Button(master=self.frm_buttons, text="Submit", command=self.add_instance) #add_instance will refresh the application
@@ -222,9 +216,9 @@ class InstancesAdder(ScrollableFrame):
 
 
     @staticmethod
-    def create_window():                                     #Wants to simulate a "Factory", can call this method without an instance, but creates an instance
+    def create_window():                                 #Wants to simulate a "Factory", can call this method without an instance, but creates an instance
         window = tk.Toplevel(root)                           
-        instance_adder = InstancesAdder(parent=window)   #creating the frame (parent is the new window created in the previous line of code) ... #TODO: probably defining "window" as "parent" is darn useless, cause to refresh the application we use "mainloop"
+        instance_adder = InstancesAdder(parent=window)   #creating the frame (parent is the new window created in the previous line of code)
         instance_adder.pack(fill="both", expand=True)      #and directly packing it inside its parent (new window)
 
 
@@ -236,7 +230,7 @@ class InstancesAdder(ScrollableFrame):
 
 
             name = self.labels_entries["Name:"].get()    #all the labels end with ":"
-            comb = self.labels_entries["Hotkey:"].get()
+            comb = self.labels_entries["Comb:"].get()
             pos = self.labels_entries["POS:"].get()
 
             fields = [name, comb, 0, 0, 0]
@@ -281,12 +275,12 @@ class InstancesAdder(ScrollableFrame):
 
 
 class InstancesManager(InstancesAdder):
-    def __init__(self, parent, instance, app, *args, **kwargs):
+    def __init__(self, parent, instance, *args, **kwargs):
         self.instance = instance #TODO: Understand: why tf this works?????  https://stackoverflow.com/questions/8998608/why-superclass-attributes-are-not-available-in-the-current-class-namespace
 
         InstancesAdder.__init__(self, parent)
 
-        self.instance = instance #TODO: Understand: why tf this does NOT work????? 
+        #self.instance = instance #TODO: Understand: why tf this does NOT work????? 
 
         self.btn_delete = tk.Button(master=self.frm_buttons, text="Delete", command=self.delete_instance)
         self.btn_delete.pack(side=tk.LEFT, padx=10, ipadx=10)
@@ -300,14 +294,14 @@ class InstancesManager(InstancesAdder):
     @staticmethod
     def create_window(instance):                                     #Wants to simulate a "Factory", can call this method without an instance, but creates an instance
         window = tk.Toplevel(root)                           
-        instance_manager = InstancesManager(parent=window, instance=instance, app=tk.mainloop)   #creating the frame (parent is the new window created in the previous line of code) ...
+        instance_manager = InstancesManager(parent=window, instance=instance)   #creating the frame (parent is the new window created in the previous line of code) ...
         instance_manager.pack(fill="both", expand=True)
 
 
     def modify_instance(self):
         #all the labels end with ":"
         name = self.labels_entries["Name:"].get()    #if we change "Name" in the window, we intend this to be the new name for the instance
-        comb = self.labels_entries["Hotkey:"].get()
+        comb = self.labels_entries["Comb:"].get()
         pos = self.labels_entries["POS:"].get()
 
         database123_interaction.rename_DATABASE(self.instance.name, name)
@@ -324,7 +318,7 @@ class InstancesManager(InstancesAdder):
     def infos_populate(self):
         super().infos_populate()
         self.labels_entries["Name:"].insert(0, self.instance.name)
-        #TODO: add "insertions" for Combination, POS and other parameters
+        self.labels_entries["Comb:"].insert(0, self.instance.combination)
 
 
 def get_passed_ms():

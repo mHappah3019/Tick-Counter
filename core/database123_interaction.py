@@ -11,7 +11,7 @@ import pandas as pd
 TICK_INSTANCES = gen.find_abs_path("tick-instances.csv")
 DAILIES = gen.find_abs_path("dailies.csv")
 WEEKLIES = gen.find_abs_path("weeklies.csv")
-MONTHLIES = DAILIES=gen.find_abs_path("monthlies.csv")
+MONTHLIES = gen.find_abs_path("monthlies.csv")
 
 
 def save_daily_counts(date):
@@ -110,17 +110,13 @@ def add_to_header(instance_name, file):
     df.to_csv(file, index=False)
 
 
+#takes the instance name, and adds it as header to any "database" csv file
+#in fact for all 3 "database" files every header corresponds to one instance
 def add_to_headers(instance_name):
     add_to_header(instance_name, DAILIES)
     add_to_header(instance_name, WEEKLIES)
     add_to_header(instance_name, MONTHLIES)
 
-
-""" df = pd.read_csv("dailies.csv", dtype=str)
-cacca = [i for i in list(range(0,15))]
-df["instance_cacca"] = cacca
-
-print(df) """
 
 def rename_type(old_name, new_name, file):
     df = pd.read_csv(file, dtype=object)
