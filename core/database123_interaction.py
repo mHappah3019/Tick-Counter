@@ -83,6 +83,13 @@ def save_monthly_counts(date):
                                  #all these counts are just MONTHLY counts
 
 
+def delete_counts(instance_name):
+    delete_type_count(instance_name, "dailies.csv")     
+    delete_type_count(instance_name, "weeklies.csv")
+    delete_type_count(instance_name, "monthlies.csv")
+    core.database_interaction.delete_from_GUI(instance_name, TICK_INSTANCES)
+
+
 def delete_type_count(instance_name, file): #TODO: test this shit
     instances = pd.read_csv(file, index_col=0, nrows=0).columns.tolist() #"Date" header is present too, so the list is not properly a list of only instances names
     f=pd.read_csv(file, dtype=str)

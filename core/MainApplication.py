@@ -253,7 +253,7 @@ class InstancesAdder(ScrollableFrame):
             csv_file1.writerows(matrix)
 
 
-        add_to_headers(name)
+        database123_interaction.add_to_headers(name)
         refresh() #closes MainApplication, hence it closes InstancesAdder too
 
     def infos_populate(self):
@@ -318,7 +318,7 @@ class InstancesManager(InstancesAdder):
         pass
 
     def delete_instance(self):
-        delete_counts(self.instance.name) #this function then calls all the "deletion" functions (1 for dailies, 1 for weeklies, 1 for monthlies and 1 for tick-instances1) 
+        database123_interaction.delete_counts(self.instance.name) #this function then calls all the "deletion" functions (1 for dailies, 1 for weeklies, 1 for monthlies and 1 for tick-instances1) 
         refresh()                         #we shall reload the application to get the GUI for all the instances we have KEPT
 
 
