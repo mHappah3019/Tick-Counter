@@ -8,8 +8,8 @@ import sys
 import pandas as pd
 
 
-TICK_INSTANCES=gen.find_abs_path("tick-instances.csv")
-DAILIES=gen.find_abs_path("dailies.csv")
+TICK_INSTANCES = gen.find_abs_path("tick-instances.csv")
+DAILIES = gen.find_abs_path("dailies.csv")
 WEEKLIES = gen.find_abs_path("weeklies.csv")
 MONTHLIES = DAILIES=gen.find_abs_path("monthlies.csv")
 
@@ -92,7 +92,7 @@ def delete_counts(instance_name):
 
 def delete_type_count(instance_name, file): #TODO: test this shit
     instances = pd.read_csv(file, index_col=0, nrows=0).columns.tolist() #"Date" header is present too, so the list is not properly a list of only instances names
-    f=pd.read_csv(file, dtype=str)
+    f=pd.read_csv(file, dtype=object)
     
     keep_instancecs = instances.remove(instance_name)
 
@@ -104,7 +104,7 @@ def delete_type_count(instance_name, file): #TODO: test this shit
 
 #https://stackoverflow.com/questions/46113078/pandas-add-value-at-specific-iloc-into-new-dataframe-column
 def add_to_header(instance_name, file):
-    df = pd.read_csv(file)
+    df = pd.read_csv(file, dtype=object)
     rowIndex = df.index[0]
     df.loc[rowIndex, instance_name] = None
     df.to_csv(file, index=False)
@@ -123,7 +123,7 @@ df["instance_cacca"] = cacca
 print(df) """
 
 def rename_type(old_name, new_name, file):
-    df = pd.read_csv(file)
+    df = pd.read_csv(file, dtype=object)
     df.rename(columns = {f'{old_name}':f'{new_name}'}, inplace = True)
     df.to_csv(file, index=False)
 

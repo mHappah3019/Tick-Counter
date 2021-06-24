@@ -75,7 +75,6 @@ class ScrollableFrame(tk.Frame):
                 instance = TickFrame(self.frame, row["Name"], row["Daily"], row["Comb"], relief=tk.SUNKEN, borderwidth=2, bg="blue", bd=2)
                 instance.grid(row=i, column=0, sticky="nsew")
 
-        #TORESTORE: link_combinations() #watch function definition additional comments
         link_combinations()
 
     def onFrameConfigure(self, event):

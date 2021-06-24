@@ -15,8 +15,8 @@ import sys
 import os
 
 
-TICK_INSTANCES=gen.find_abs_path("tick-instances.csv")
-DAILIES=gen.find_abs_path("dailies.csv")
+TICK_INSTANCES = gen.find_abs_path("tick-instances.csv")
+DAILIES = gen.find_abs_path("dailies.csv")
 WEEKLIES = gen.find_abs_path("weeklies.csv")
 MONTHLIES = DAILIES=gen.find_abs_path("monthlies.csv")
 
@@ -34,7 +34,7 @@ def load_last_date(file):
 
 
 def delete_from_GUI(instance_name, file):
-    df = pd.read_csv(file)
+    df = pd.read_csv(file, dtype=object)
 
     idx = get_row_index(instance_name, df)
     df.drop(df.index[idx], inplace=True)
@@ -89,7 +89,7 @@ def check_count_reset():
 
 #https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.at.html
 def rename_GUI(old_name, new_name): 
-    df = pd.read_csv(TICK_INSTANCES)
+    df = pd.read_csv(TICK_INSTANCES, dtype=object)
     idx = get_row_index(old_name, df)
 
     df.at[idx, "Name"] = new_name
