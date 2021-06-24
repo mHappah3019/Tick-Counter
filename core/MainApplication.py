@@ -230,8 +230,6 @@ class InstancesAdder(ScrollableFrame):
 
 
     def add_instance(self):
-
-        #
         with open(TICK_INSTANCES, "r") as file:
             csv_file = csv.reader(file)
             matrix = list(csv_file) #stores data locally in the form of a matrix where every row represents one single instance and the columns represent different parameters
@@ -242,8 +240,6 @@ class InstancesAdder(ScrollableFrame):
             comb = self.labels_entries["Hotkey:"].get()
             pos = self.labels_entries["POS:"].get()
 
-            #TODO: handle repeated (over different instances) combinations
-
             fields = [name, comb, 0, 0, 0]
 
             matrix.insert(-1, fields) #I'm happy that I don't have to handle the case where the file ends with one (or multiple) namespaces since matrix just "reads", and shows, rows with actual content
@@ -251,7 +247,6 @@ class InstancesAdder(ScrollableFrame):
         with open(TICK_INSTANCES, "w", newline="") as file1:
             csv_file1 = csv.writer(file1)
             csv_file1.writerows(matrix)
-
 
         database123_interaction.add_to_headers(name)
         refresh() #closes MainApplication, hence it closes InstancesAdder too
@@ -299,7 +294,7 @@ class InstancesManager(InstancesAdder):
 
 
     def define_submit(self):
-        self.btn_submit = tk.Button(master=self.frm_buttons, text="Submit", command=self.modify_instance) #add_instance will refresh the application
+        self.btn_submit = tk.Button(master=self.frm_buttons, text="Submit", command=self.modify_instance) #modify_instance will refresh the application
         self.btn_submit.pack(side=tk.RIGHT, padx=10, ipadx=10)
 
 
@@ -310,9 +305,14 @@ class InstancesManager(InstancesAdder):
         instance_manager.pack(fill="both", expand=True)
 
 
-    def modify_instance(self): #TODO: implement
-        
-        #TODO: add calls to "renaming" functions
+    def modify_instance(self):
+        #all the labels end with ":"
+        name = self.labels_entries["Name:"].get()    #if we change "Name" in the window, we intend this to be the new name for the instance
+        comb = self.labels_entries["Hotkey:"].get()
+        pos = self.labels_entries["POS:"].get()
+
+        database123_interaction.rename_DATABASE(self.instance.name, name)
+        database_interaction.rename_GUI(self.instance.name, name)
         
         refresh()
         pass
