@@ -4,7 +4,7 @@ import os
 sys.path.append("C:/Users/mkcam/Desktop/Tick Counter/Tick-Counter")
 print(sys.path)
 
-import core.database123_interaction as db_int
+import database123_interaction as db_int
 import utils.datetime_utils as dt_utils
 import utils.general_utils as gen
 

@@ -1,4 +1,4 @@
-import core.database_interaction
+import database_interaction
 import utils.general_utils as gen
 
 from datetime import datetime
@@ -83,23 +83,33 @@ def save_monthly_counts(date):
                                  #all these counts are just MONTHLY counts
 
 
+
 def delete_counts(instance_name):
     delete_type_count(instance_name, "dailies.csv")     
     delete_type_count(instance_name, "weeklies.csv")
     delete_type_count(instance_name, "monthlies.csv")
-    core.database_interaction.delete_from_GUI(instance_name, TICK_INSTANCES)
+    database_interaction.delete_from_GUI(instance_name, TICK_INSTANCES)
 
 
-def delete_type_count(instance_name, file): #TODO: test this shit
+#function that deletes column corresponding to the instance_name for the corresponding file
+#(can use for dailies.csv, weeklies.csv and monthlies.csv)
+def delete_type_count(instance_name, file): #TODO: fix and test this shit
     instances = pd.read_csv(file, index_col=0, nrows=0).columns.tolist() #"Date" header is present too, so the list is not properly a list of only instances names
-    f=pd.read_csv(file, dtype=object)
+    f=pd.read_csv(file)
     
-    keep_instancecs = instances.remove(instance_name)
+    keep_instances = instances.remove(instance_name)
+    print("LIST:"+ file)
+    print(instances)
+    print(keep_instances)
 
     #basically a filter: we get a dataframe composed of only the data corresponding to the "headers" in keep_instances
-    new_f = f[keep_instancecs]
+    #new_f = f[keep_instances]
 
-    new_f.to_csv(file, index=False)
+    #new_f.to_csv(file, index=False)
+
+delete_type_count("Instance2", MONTHLIES)
+print("\n\n\n\n\n")
+delete_type_count("Instance1", DAILIES)
 
 
 #https://stackoverflow.com/questions/46113078/pandas-add-value-at-specific-iloc-into-new-dataframe-column

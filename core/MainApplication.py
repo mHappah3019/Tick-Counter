@@ -78,6 +78,7 @@ class ScrollableFrame(tk.Frame):
 
         link_combinations()
 
+
     def onFrameConfigure(self, event):
         '''Reset the scroll region to encompass the inner frame'''
         # we are in fact setting the scroll region to be the bounding box of everything that is in the canvas
@@ -245,6 +246,7 @@ class InstancesAdder(ScrollableFrame):
         database123_interaction.add_to_headers(name)
         refresh() #closes MainApplication, hence it closes InstancesAdder too
 
+
     def infos_populate(self):
         self.frm_form = tk.Frame(master=self.frame, relief=tk.SUNKEN, borderwidth=3)
 
@@ -311,6 +313,7 @@ class InstancesManager(InstancesAdder):
         
         refresh()
         pass
+
 
     def delete_instance(self):
         database123_interaction.delete_counts(self.instance.name) #this function then calls all the "deletion" functions (1 for dailies, 1 for weeklies, 1 for monthlies and 1 for tick-instances) 
