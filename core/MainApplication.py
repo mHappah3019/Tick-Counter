@@ -11,6 +11,7 @@ from datetime import datetime
 import database_interaction
 import database123_interaction
 import utils.general_utils as gen
+import utils.datetime_utils
 
 
 
@@ -276,13 +277,14 @@ class InstancesAdder(ScrollableFrame):
 
 class InstancesManager(InstancesAdder):
     def __init__(self, parent, instance, *args, **kwargs):
-        self.instance = instance #TODO: Understand: why tf this works?????  https://stackoverflow.com/questions/8998608/why-superclass-attributes-are-not-available-in-the-current-class-namespace
+
+        #this instruction goes before the parent init cause self.info_populates is called inside the parent init,
+        #and in my implementation it already requires having a self.instance attribute
+        self.instance = instance 
 
         InstancesAdder.__init__(self, parent)
 
-        #self.instance = instance #TODO: Understand: why tf this does NOT work????? 
-
-        self.btn_delete = tk.Button(master=self.frm_buttons, text="Delete", command=self.delete_instance)
+        self.btn_delete = tk.Button(master=self.frm_buttons, text="Delete", command=self.delete_instance) #delete_instance will refresh the application
         self.btn_delete.pack(side=tk.LEFT, padx=10, ipadx=10)
 
 
@@ -311,30 +313,14 @@ class InstancesManager(InstancesAdder):
         pass
 
     def delete_instance(self):
-        database123_interaction.delete_counts(self.instance.name) #this function then calls all the "deletion" functions (1 for dailies, 1 for weeklies, 1 for monthlies and 1 for tick-instances1) 
+        database123_interaction.delete_counts(self.instance.name) #this function then calls all the "deletion" functions (1 for dailies, 1 for weeklies, 1 for monthlies and 1 for tick-instances) 
         refresh()                         #we shall reload the application to get the GUI for all the instances we have KEPT
 
 
     def infos_populate(self):
-        super().infos_populate()
-        self.labels_entries["Name:"].insert(0, self.instance.name)
-        self.labels_entries["Comb:"].insert(0, self.instance.combination)
-
-
-def get_passed_ms():
-    now = datetime.now()
-    hours = int(now.hour)
-    #print(hours)
-    minutes = hours*60 + int(now.minute)
-    #print(minutes)
-    seconds = minutes*60 + int(now.second)
-    #print(seconds)
-    return seconds*1000 #millisecondi
-
-
-def get_remaining_ms():
-    ms_in_aday = 86400000
-    return (ms_in_aday - get_passed_ms())
+        super().infos_populate() 
+        self.labels_entries["Name:"].insert(0, self.instance.name)        #show the current instance info: name, combination (for now)
+        self.labels_entries["Comb:"].insert(0, self.instance.combination) #
 
 
 def vp_start_gui():
@@ -345,7 +331,7 @@ def vp_start_gui():
     mainapp = MainApplication(root)
     mainapp.pack(side="top", fill="both", expand=True)
 
-    root.after(get_remaining_ms(), refresh)
+    root.after(utils.datetime_utils.get_remaining_ms(), refresh)
 
     with keyboard.GlobalHotKeys(
         hotkeys_dictionary
