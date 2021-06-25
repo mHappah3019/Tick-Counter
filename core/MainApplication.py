@@ -316,7 +316,8 @@ class InstancesManager(InstancesAdder):
 
 
     def delete_instance(self):
-        database123_interaction.delete_counts(self.instance.name) #this function then calls all the "deletion" functions (1 for dailies, 1 for weeklies, 1 for monthlies and 1 for tick-instances) 
+        database123_interaction.delete_counts_database(self.instance.name) #this function then calls all the "deletion" functions (1 for dailies, 1 for weeklies, 1 for monthlies and 1 for tick-instances) 
+        database_interaction.delete_from_GUI(self.instance.name)
         refresh()                         #we shall reload the application to get the GUI for all the instances we have KEPT
 
 

@@ -10,6 +10,7 @@ def skip_last(iterator):  #TODO: understand this
 
 def find_abs_path(file):
     cwd = os.path.abspath(os.path.dirname(__file__))
+    print(cwd)
     given_path = f"../../Tick-Counter/data/{file}"
     csv_path = os.path.abspath(os.path.join(cwd, given_path))
     return csv_path

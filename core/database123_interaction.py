@@ -84,11 +84,10 @@ def save_monthly_counts(date):
 
 
 
-def delete_counts(instance_name):
+def delete_counts_database(instance_name):
     delete_type_count(instance_name, DAILIES)     
     delete_type_count(instance_name, WEEKLIES)
     delete_type_count(instance_name, MONTHLIES)
-    database_interaction.delete_from_GUI(instance_name)
 
 
 #function that deletes column corresponding to the instance_name for the corresponding file
