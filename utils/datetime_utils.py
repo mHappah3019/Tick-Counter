@@ -56,5 +56,5 @@ def get_passed_ms():
 
 
 def get_remaining_ms():
-    ms_in_aday = 86,400,000
+    ms_in_aday = 86400000
     return ms_in_aday - get_passed_ms()

@@ -68,7 +68,7 @@ class ScrollableFrame(tk.Frame):
     def instances_populate(self):
         #We are specifying that the frame (for the Tick instances in case of MainApplication) has only one visible column
         self.frame.columnconfigure(0, weight=1, minsize=200) 
-        with open(TICK_INSTANCES, "r") as file:
+        with open(TICK_INSTANCES, "r", encoding="UTF-8") as file:
             csv_file = csv.DictReader(file)
 
             for i, row in gen.skip_last(enumerate(csv_file)):
@@ -225,7 +225,7 @@ class InstancesAdder(ScrollableFrame):
 
 
     def add_instance(self):
-        with open(TICK_INSTANCES, "r") as file:
+        with open(TICK_INSTANCES, "r", encoding="UTF-8") as file:
             csv_file = csv.reader(file)
             matrix = list(csv_file) #stores data locally in the form of a matrix where every row represents one single instance and the columns represent different parameters
                                     #NB. numbers are converted into string values
@@ -239,7 +239,7 @@ class InstancesAdder(ScrollableFrame):
 
             matrix.insert(-1, fields) #I'm happy that I don't have to handle the case where the file ends with one (or multiple) namespaces since matrix just "reads", and shows, rows with actual content
 
-        with open(TICK_INSTANCES, "w", newline="") as file1:
+        with open(TICK_INSTANCES, "w", newline="", encoding="UTF-8") as file1:
             csv_file1 = csv.writer(file1)
             csv_file1.writerows(matrix)
 

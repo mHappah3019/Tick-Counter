@@ -33,18 +33,21 @@ def load_last_date(file):
         return last_date
 
 
-def delete_from_GUI(instance_name, file):
-    df = pd.read_csv(file, dtype=object)
+def delete_from_GUI(instance_name):
+    df = pd.read_csv(TICK_INSTANCES, dtype=object)
 
     idx = get_row_index(instance_name, df)
     df.drop(df.index[idx], inplace=True)
 
-    df.to_csv(file, index=False)
+    df.to_csv(TICK_INSTANCES, index=False)
+
 
 
 def get_row_index(instance_name, df):
-    return df.index[df["Name"] == instance_name].tolist()[0] #TODO: implementare gestione IndexError
+    return df.index[df["Name"] == instance_name].tolist()[0]
 
+if __name__=="__main__":
+    delete_from_GUI("xxx")
 
 def count_reset(info): 
     with open(TICK_INSTANCES, "r") as file:
