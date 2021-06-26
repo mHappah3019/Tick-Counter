@@ -26,7 +26,7 @@ def find_data_abs_path(file):
     return full_path
 
 if __name__ == "__main__":
-    print(find_abs_path("dailies.csv"))
+    #print(find_abs_path("dailies.csv"))
     #p = Path(cwd = os.path.abspath(os.path.dirname(__file__)))
     #print(Path.cwd() / "Tick-Counter" / "data")
     print(find_data_abs_path("dailies.csv"))
