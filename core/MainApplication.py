@@ -18,7 +18,7 @@ import utils.datetime_utils
 
 
 
-TICK_INSTANCES = gen.find_abs_path("tick-instances.csv")
+TICK_INSTANCES = gen.find_data_abs_path("tick-instances.csv")
 
 
 
@@ -375,4 +375,3 @@ def link_combinations():
 
 if __name__ == "__main__":
     vp_start_gui()
-
