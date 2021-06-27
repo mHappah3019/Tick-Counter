@@ -31,6 +31,8 @@ def find_data_abs_path(file):
 
 def bind_hover_message(frame, hover_messages_key, hover_message=None):
     hover_messages_value = hm.hover_messages.get(hover_messages_key)
+    if hover_message:
+        hover_messages_value += f"\n{hover_message}"
     tip = Hovertip(frame, hover_messages_value, hover_delay=500)
     
 

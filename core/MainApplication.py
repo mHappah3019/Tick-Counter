@@ -128,8 +128,7 @@ class TickFrame(tk.Frame):
             name_tip = gen.bind_hover_message(self.name_lbl, "name_lbl")
             decrease_tip = gen.bind_hover_message(self.decrease_btn, "decrease_btn")
             count_tip = gen.bind_hover_message(self.count_lbl, "count_lbl")
-            increase_tip = gen.bind_hover_message(self.increase_btn, "increase_btn")
-            increase_tip_extra = Hovertip(self.increase_btn,f"Hotkey:Ctrl+Alt+{self.combination}", hover_delay=500) #TODO: fix
+            increase_tip = gen.bind_hover_message(self.increase_btn, "increase_btn", f"Hotkey: Ctrl+Alt+{self.combination}")
             info_tip = gen.bind_hover_message(self.info_btn, "info_btn")
 
             objects.append(self) #"populate" (ScrollableFrame) creates tick instances, hence they are added to an array that keeps track of all of them
@@ -168,6 +167,8 @@ class MainApplication(tk.Frame):
         #OOP approach: self.frame of the ScrollableFrame is being populated
         #self.frame holds the nx1 grid of instances
         self.instancesPanel.instances_populate()
+
+        #TODO: call function that adds hover messages
 
         self.instancesPanel.grid(row=0, column=0, sticky="nsew")
 
