@@ -4,7 +4,9 @@ import pandas as pd
 import csv
 import os
 
-os.chdir("C:/Users/mkcam/Desktop/Tick Counter/Tick-Counter")
+TICK_INSTANCES = "tick-instances.csv"
+
+#os.chdir("C:/Users/mkcam/Desktop/Tick Counter/Tick-Counter")
 
 current_date = datetime.today()  #for now current_date can be thought as a global variable too
 
@@ -18,10 +20,10 @@ def skip_last(iterator):  #TODO: understand thiss
 def save_daily_counts(date):
     fields = [date]  #"date" comes from tick-instances1.csv
 
-    with open("tick-instances1.csv", "r") as f: #ATTENZIONE al nome del file
+    with open(TICK_INSTANCES, "r") as f: #ATTENZIONE al nome del file
         csv_reader = csv.reader(f)
         headers = next(csv_reader)      #skipping headers row
-        for row in skip_last(csv_reader):    #for every instance we want to store the daily count; plus we are skipping the last row of tick-instances1
+        for row in skip_last(csv_reader):    #for every instance we want to store the daily count; plus we are skipping the last row of tick-instances
             fields.append(row[2]) #appending every instance's daily count, to be then appended to one single row, correspoding to "last_saved_date"
     
     with open("dailies.csv", "r") as file:
@@ -44,7 +46,7 @@ def save_weekly_counts(date):
 
     fields = [start_of_week + "-" + end_of_week] #formatting <start-of-week>-<end-of-week>
 
-    with open("tick-instances1.csv", "r") as f: #ATTENZIONE al nome del file
+    with open(TICK_INSTANCES, "r") as f: #ATTENZIONE al nome del file
         csv_reader = csv.reader(f)
         headers = next(csv_reader)      #skipping headers row
         for row in skip_last(csv_reader):    #for every instance we want to store the weekly count; plus skipping last row
@@ -68,7 +70,7 @@ def save_monthly_counts(date):
 
     fields = [month_name + " " + year] 
 
-    with open("tick-instances1.csv", "r") as f: #ATTENZIONE al nome del file
+    with open(TICK_INSTANCES, "r") as f: #ATTENZIONE al nome del file
         csv_reader = csv.reader(f)
         headers = next(csv_reader)      #skipping headers row
         for row in skip_last(csv_reader):    #for every instance we want to store the monthly count; plus skipping last row
@@ -85,7 +87,7 @@ def save_monthly_counts(date):
 
 
 # function that checks if 2 dates fall in the same week or not
-#one is a datetime object, the other is a string formatted in a specific format
+# one is a datetime object, the other is a string formatted in a specific format
 # returns True if the 2 dates fall in the same week
 def is_sameweek_dates(date1_object, date2_string):               #"date<>_objects" stands for datetime object coming from the datetime module
     date2_object = datetime.strptime(date2_string, "%d/%m/%Y")
@@ -121,7 +123,7 @@ def is_same_date(date1_object, date2_string):
 
 def check_count_reset():
     current_date = datetime.today()
-    last_saved_date = load_last_date("tick-instances1.csv") #taking this date from tick-instances1.csv
+    last_saved_date = load_last_date(TICK_INSTANCES) #taking this date from tick-instances1.csv
 
     if ( not is_same_date(current_date, last_saved_date) ):       #if current_date and last_saved_date are not actually the same date, then we shall set to zero the "Daily" count (in tick-instances.csv) of every instance
         save_daily_counts(last_saved_date)  # before resetting the daily counts, we shall save them in dailies.csv
@@ -137,7 +139,7 @@ def check_count_reset():
 
 
 def count_reset(info): 
-    with open("tick-instances1.csv", "r") as file:
+    with open(TICK_INSTANCES, "r") as file:
         csv_file = csv.reader(file)
         matrix = list(csv_file) #stores data locally in the form of a matrix where every row represents one single instance and the columns represent different parameters
                                 #NB. numbers are converted into string values
@@ -155,7 +157,7 @@ def count_reset(info):
                 matrix[i+1][option] = 0 #RESETTING...
         matrix[-1][0] = current_date.strftime("%d/%m/%Y") #modifichiamo la data in tick-instances1.csv
 
-    with open("tick-instances1.csv", "w", newline="") as file1:
+    with open(TICK_INSTANCES, "w", newline="") as file1:
         csv_file1 = csv.writer(file1)
         csv_file1.writerows(matrix)
  
@@ -206,7 +208,7 @@ def delete_counts(instance_name):
     delete_type_count(instance_name, "dailies.csv")     
     delete_type_count(instance_name, "weeklies.csv")
     delete_type_count(instance_name, "monthlies.csv")
-    delete_from_GUI(instance_name, "tick-instances1.csv")
+    delete_from_GUI(instance_name, TICK_INSTANCES)
 
 
 def delete_type_count(instance_name, file): #TODO: test this shit
@@ -238,3 +240,43 @@ def get_row_index(instance_name, df):
 #df = pd.read_csv("tick-instances1.csv")
 #print(get_row_index("xxx", df))
 #delete_from_GUI("ciccia33", "tick-instances1.csv")
+
+
+#this function, first, reads the "old" version of all the data
+#then, it takes all the data and brings it in the form of a matrix;
+#it updates the data inside the matrix
+#then overwrites the file
+def save_upon_closing(objects):
+    with open(TICK_INSTANCES, "r") as file: 
+                csv_file = csv.reader(file)
+                matrix = list(csv_file) #stores data locally in the form of a matrix where every row represents one single instance and the columns represent different parameters
+                                        #NB. numbers are converted into string values
+
+                for i, instance in (enumerate(objects)):
+                    print(f"tickframe {instance.name} updating")
+                    daily_value = int(matrix[i+1][2]) + instance.session_count #we are converting to int the first value cause it is originally a string type
+                    matrix[i+1][2] = daily_value #actually updating the daily value
+                    
+                    weekly_value = int(matrix[i+1][3]) + instance.session_count #we are converting to int the first value cause it is originally a string type
+                    matrix[i+1][3] = weekly_value #actually updating the weekly value
+                
+                    monthly_value = int(matrix[i+1][4]) + instance.session_count #we are converting to int the first value cause it is originally a string type
+                    matrix[i+1][4] = monthly_value #actually updating the monthly value
+                
+
+    with open(TICK_INSTANCES, "w", newline="") as file1:
+                csv_file1 = csv.writer(file1)
+                csv_file1.writerows(matrix)
+
+
+def add_to_header(instance_name, file):
+    df = pd.read_csv(file, dtype=str)
+    rowIndex = df.index[0]
+    df.loc[rowIndex, instance_name] = None
+    df.to_csv(file, index=False)
+
+
+def add_to_headers(instance_name):
+    add_to_header(instance_name, "dailies.csv")
+    add_to_header(instance_name, "weeklies.csv")
+    add_to_header(instance_name, "monthlies.csv")

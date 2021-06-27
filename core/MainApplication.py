@@ -1,18 +1,37 @@
-from csv_wip import current_date, get_remaining_ms, save_daily_counts, is_same_date, check_count_reset, load_last_date, get_remaining_ms, skip_last, delete_counts
-from datetime import datetime
-from functools import partial
+import sys
+import os
+
 import tkinter as tk
 import csv
-import os
-import sys
+
+from pynput import keyboard
+from functools import partial
+from datetime import datetime
+
+import database_interaction
+import database123_interaction
+import utils.general_utils as gen
+import utils.datetime_utils
+
+
+
+
+
+
+TICK_INSTANCES = gen.find_data_abs_path("tick-instances.csv")
+
+
 
 
 #ATTENZIONEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
 #https://stackoverflow.com/questions/431684/equivalent-of-shell-cd-command-to-change-the-working-directory
-os.chdir("C:/Users/mkcam/Desktop/Tick Counter/Tick-Counter")
+#os.chdir("C:/Users/mkcam/Desktop/Tick Counter/Tick-Counter")
 
+#"objects" is used to access to every TickFrame object when needed (i.e. see instances_populate)
+objects = []              
 
-objects = [] #TODO: define it's use in a comment
+#"hotkeys_dictionary" is used by keyboard.GlobalHotkeys (pynput Class)
+hotkeys_dictionary = {}
 
 
 class ScrollableFrame(tk.Frame):
@@ -49,14 +68,15 @@ class ScrollableFrame(tk.Frame):
     def instances_populate(self):
         #We are specifying that the frame (for the Tick instances in case of MainApplication) has only one visible column
         self.frame.columnconfigure(0, weight=1, minsize=200) 
-        with open("tick-instances1.csv", "r") as file:
+        with open(TICK_INSTANCES, "r", encoding="UTF-8") as file:
             csv_file = csv.DictReader(file)
-            for i, row in skip_last(enumerate(csv_file)):
+
+            for i, row in gen.skip_last(enumerate(csv_file)):
                 self.frame.rowconfigure(i, weight=1) # setting only the rows where Tick instances are appended to be visible
                 instance = TickFrame(self.frame, row["Name"], row["Daily"], row["Comb"], relief=tk.SUNKEN, borderwidth=2, bg="blue", bd=2)
                 instance.grid(row=i, column=0, sticky="nsew")
 
-        link_combinations() #watch function definition additional comments
+        link_combinations()
 
 
     def onFrameConfigure(self, event):
@@ -81,7 +101,6 @@ class TickFrame(tk.Frame):
             self.name = name #definisco anche un attributo "nome" per provare ad accedere più facilmente agli oggetti
                              #in un secondo momento
             
-            #TODO:  see if defining the binding here (in init) is better than defining all of them together (as implemented in link_combinations)
             self.combination = combination #will help us in link_combinations function
 
             self.name_lbl = tk.Label(master=self, text=name, width=25, height=2)
@@ -89,7 +108,7 @@ class TickFrame(tk.Frame):
             self.count_lbl = tk.Label(master=self, text=str(number)) #number represents the daily counter
             self.increase_btn = tk.Button(master=self, text="+", command=self.increment) #when this button is clicked we shall increment session_count for this particular instance
             
-            #this way I can call create_with_arg with arguments (1 in this case)
+            #this way I can call "create_window" (through create_with_arg) with arguments (1 in this case)
             create_with_arg = partial(InstancesManager.create_window, self)
             self.info_btn = tk.Button(master=self, text="...", command=create_with_arg)
 
@@ -105,7 +124,6 @@ class TickFrame(tk.Frame):
 
 
             objects.append(self) #"populate" (ScrollableFrame) creates tick instances, hence they are added to an array that keeps track of all of them
-            #print(f"tickframe {self.name} instantiated")
 
 
         def increment(self, event=None):
@@ -115,7 +133,7 @@ class TickFrame(tk.Frame):
 
         def decrement(self):
             self.session_count -= 1
-            self.count_lbl['text'] = str(int(self.count_lbl['text']) - 1) #shows in the label the new value; the old value is simply incremented by one
+            self.count_lbl['text'] = str(int(self.count_lbl['text']) - 1) #shows in the label the new value; the old value is simply decremented by one
 
 
 
@@ -124,9 +142,10 @@ class MainApplication(tk.Frame):
     def __init__(self, parent, *args, **kwargs):
         tk.Frame.__init__(self, parent, *args, **kwargs)
 
-        check_count_reset() #...if we should reset, either the "Daily", "Weekly", "Monthly" counters or all of em and...
-                            #plus, it triggers all the functions to save the stats in dailies.csv, weeklies.csv, monthlies.csv
-                            #should be run before populating the application with all the data (when instantiating ScrollableFrame)
+        #...if we should reset, either the "Daily", "Weekly", "Monthly" counters or all of em and...
+        #plus, it triggers all the functions to save the stats in dailies.csv, weeklies.csv, monthlies.csv
+        #should be run before populating the application with all the data (when instantiating ScrollableFrame)
+        database_interaction.check_count_reset()
 
         self.parent = parent #"parent" shall be "root"
         #needed for "hiding" all the empty columns
@@ -135,6 +154,7 @@ class MainApplication(tk.Frame):
         #virtually holds the nx1 grid of instances
         #the actual frame is set inside the canvas, that is inside instancesPanel
         self.instancesPanel = ScrollableFrame(parent=self)
+
         #OOP approach: self.frame of the ScrollableFrame is being populated
         #self.frame holds the nx1 grid of instances
         self.instancesPanel.instances_populate()
@@ -152,35 +172,17 @@ class MainApplication(tk.Frame):
         self.extraPanel.rowconfigure(0, weight=1, minsize=20) #setting up extraPanel
 
         #implementation of the ADD button
+        #"InstancesAdder.create_window" creates an "InstancesAdder window"
         ADD_btn = tk.Button(self.extraPanel, text="ADD", command=InstancesAdder.create_window)
         ADD_btn.grid(row=0, column=0, sticky="nsew")
 
 
-    #this function, first, reads the "old" version of all the data
-    #then, it takes all the data and brings it in the form of a matrix;
-    #it updates the data inside the matrix
-    #then overwrites the file
-    def __exit__(self, bool_refresh=None):
-        with open("tick-instances1.csv", "r") as file:
-            csv_file = csv.reader(file)
-            matrix = list(csv_file) #stores data locally in the form of a matrix where every row represents one single instance and the columns represent different parameters
-                                    #NB. numbers are converted into string values
-
-            for i, instance in (enumerate(objects)):
-                print(f"tickframe {instance.name} updating")
-                daily_value = int(matrix[i+1][2]) + instance.session_count #we are converting to int the first value cause it is originally a string type
-                matrix[i+1][2] = daily_value #actually updating the daily value
-                
-                weekly_value = int(matrix[i+1][3]) + instance.session_count #we are converting to int the first value cause it is originally a string type
-                matrix[i+1][3] = weekly_value #actually updating the weekly value
-            
-                monthly_value = int(matrix[i+1][4]) + instance.session_count #we are converting to int the first value cause it is originally a string type
-                matrix[i+1][4] = monthly_value #actually updating the monthly value
-            
-
-        with open("tick-instances1.csv", "w", newline="") as file1:
-            csv_file1 = csv.writer(file1)
-            csv_file1.writerows(matrix)
+    def __exit__(self): 
+        #this function, first, reads the "old" version of all the data
+        #then, it takes all the data and brings it in the form of a matrix;
+        #it updates the data inside the matrix
+        #then overwrites the file
+        database_interaction.save_upon_closing(objects)
 
         print("Applicazione chiusa con successo")
 
@@ -188,15 +190,14 @@ class MainApplication(tk.Frame):
 
 
 class InstancesAdder(ScrollableFrame):
-    def __init__(self, parent, app=None, *args, **kwargs):
+    def __init__(self, parent, *args, **kwargs):
         ScrollableFrame.__init__(self, parent)  #parent shall be "root"
 
         self.parent = parent #"parent" shall be "root"
-        self.app = app #TODO: understand the use of this apparently fucking useless attribute
 
         self.labels = [  #pay attention to all the ":"s
             "Name:",
-            "Hotkey:",
+            "Comb:",
             "POS:"
         ]
 
@@ -207,43 +208,44 @@ class InstancesAdder(ScrollableFrame):
 
         # Create the "Submit" button and pack it to the
         #   left side of `frm_buttons`
+        #   can have add_instance or modify_instance commands depending on inheritance
+        self.define_submit()
+
+
+    def define_submit(self):
         self.btn_submit = tk.Button(master=self.frm_buttons, text="Submit", command=self.add_instance) #add_instance will refresh the application
         self.btn_submit.pack(side=tk.RIGHT, padx=10, ipadx=10)
 
-        # Create the "Clear" button and pack it to the
-        #   right side of `frm_buttons`
-        # TODO: determine if I really need this Clear button
-        self.btn_clear = tk.Button(master=self.frm_buttons, text="Clear")
-        self.btn_clear.pack(side=tk.RIGHT, ipadx=10)
-
 
     @staticmethod
-    def create_window():                                     #Wants to simulate a "Factory", can call this method without an instance, but creates an instance
+    def create_window():                                 #Wants to simulate a "Factory", can call this method without an instance, but creates an instance
         window = tk.Toplevel(root)                           
-        instance_adder = InstancesAdder(parent=window)   #creating the frame (parent is the new window created in the previous line of code) ... #TODO: probably defining "window" as "parent" is darn useless, cause to refresh the application we use "mainloop"
+        instance_adder = InstancesAdder(parent=window)   #creating the frame (parent is the new window created in the previous line of code)
         instance_adder.pack(fill="both", expand=True)      #and directly packing it inside its parent (new window)
 
 
     def add_instance(self):
-        with open("tick-instances1.csv", "r") as file:
+        with open(TICK_INSTANCES, "r", encoding="UTF-8") as file:
             csv_file = csv.reader(file)
             matrix = list(csv_file) #stores data locally in the form of a matrix where every row represents one single instance and the columns represent different parameters
                                     #NB. numbers are converted into string values
 
 
             name = self.labels_entries["Name:"].get()    #all the labels end with ":"
-            comb = self.labels_entries["Hotkey:"].get()
+            comb = self.labels_entries["Comb:"].get()
             pos = self.labels_entries["POS:"].get()
 
             fields = [name, comb, 0, 0, 0]
 
             matrix.insert(-1, fields) #I'm happy that I don't have to handle the case where the file ends with one (or multiple) namespaces since matrix just "reads", and shows, rows with actual content
 
-        with open("tick-instances1.csv", "w", newline="") as file1:
+        with open(TICK_INSTANCES, "w", newline="", encoding="UTF-8") as file1:
             csv_file1 = csv.writer(file1)
             csv_file1.writerows(matrix)
 
+        database123_interaction.add_to_headers(name)
         refresh() #closes MainApplication, hence it closes InstancesAdder too
+
 
     def infos_populate(self):
         self.frm_form = tk.Frame(master=self.frame, relief=tk.SUNKEN, borderwidth=3)
@@ -276,49 +278,53 @@ class InstancesAdder(ScrollableFrame):
 
 
 class InstancesManager(InstancesAdder):
-    def __init__(self, parent, instance, app, *args, **kwargs):
-        self.instance = instance #TODO: Understand: why tf this works?????  https://stackoverflow.com/questions/8998608/why-superclass-attributes-are-not-available-in-the-current-class-namespace
+    def __init__(self, parent, instance, *args, **kwargs):
+
+        #this instruction goes before the parent init cause self.info_populates is called inside the parent init,
+        #and in my implementation it already requires having a self.instance attribute
+        self.instance = instance 
 
         InstancesAdder.__init__(self, parent)
 
-        self.instance = instance #TODO: Understand: why tf this does NOT work????? 
-
-        self.btn_delete = tk.Button(master=self.frm_buttons, text="Delete", command=self.delete_instance)
+        self.btn_delete = tk.Button(master=self.frm_buttons, text="Delete", command=self.delete_instance) #delete_instance will refresh the application
         self.btn_delete.pack(side=tk.LEFT, padx=10, ipadx=10)
+
+
+    def define_submit(self):
+        self.btn_submit = tk.Button(master=self.frm_buttons, text="Submit", command=self.modify_instance) #modify_instance will refresh the application
+        self.btn_submit.pack(side=tk.RIGHT, padx=10, ipadx=10)
 
 
     @staticmethod
     def create_window(instance):                                     #Wants to simulate a "Factory", can call this method without an instance, but creates an instance
         window = tk.Toplevel(root)                           
-        instance_manager = InstancesManager(parent=window, instance=instance, app=tk.mainloop)   #creating the frame (parent is the new window created in the previous line of code) ...
+        instance_manager = InstancesManager(parent=window, instance=instance)   #creating the frame (parent is the new window created in the previous line of code) ...
         instance_manager.pack(fill="both", expand=True)
 
 
+    def modify_instance(self):
+        #all the labels end with ":"
+        name = self.labels_entries["Name:"].get()    #if we change "Name" in the window, we intend this to be the new name for the instance
+        comb = self.labels_entries["Comb:"].get()
+        pos = self.labels_entries["POS:"].get()
+
+        database123_interaction.rename_DATABASE(self.instance.name, name)
+        database_interaction.rename_GUI(self.instance.name, name)
+        
+        refresh()
+        pass
+
+
     def delete_instance(self):
-        delete_counts(self.instance.name) #this function then calls all the "deletion" functions (1 for dailies, 1 for weeklies, 1 for monthlies and 1 for tick-instances1) 
+        database123_interaction.delete_counts_database(self.instance.name) #this function then calls all the "deletion" functions (1 for dailies, 1 for weeklies, 1 for monthlies and 1 for tick-instances) 
+        database_interaction.delete_from_GUI(self.instance.name)
         refresh()                         #we shall reload the application to get the GUI for all the instances we have KEPT
 
 
     def infos_populate(self):
-        super().infos_populate()
-        self.labels_entries["Name:"].insert(0, self.instance.name)
-        #TODO: add "insertions" for Combination, POS and other parameters
-
-
-def get_passed_ms():
-    now = datetime.now()
-    hours = int(now.hour)
-    #print(hours)
-    minutes = hours*60 + int(now.minute)
-    #print(minutes)
-    seconds = minutes*60 + int(now.second)
-    #print(seconds)
-    return seconds*1000 #millisecondi
-
-
-def get_remaining_ms():
-    ms_in_aday = 86400000
-    return (ms_in_aday - get_passed_ms())
+        super().infos_populate() 
+        self.labels_entries["Name:"].insert(0, self.instance.name)        #show the current instance info: name, combination (for now)
+        self.labels_entries["Comb:"].insert(0, self.instance.combination) #
 
 
 def vp_start_gui():
@@ -329,10 +335,18 @@ def vp_start_gui():
     mainapp = MainApplication(root)
     mainapp.pack(side="top", fill="both", expand=True)
 
-    root.after(get_remaining_ms(), refresh)
+    root.after(utils.datetime_utils.get_remaining_ms(), refresh)
 
-    root.mainloop()
-    mainapp.__exit__()
+    with keyboard.GlobalHotKeys(
+        hotkeys_dictionary
+    ) as h: 
+
+        print(hotkeys_dictionary)
+        root.mainloop()
+        h.stop()
+        h.join()
+        mainapp.__exit__()
+
 
 
 def refresh():  #https://stackoverflow.com/questions/44199332/removing-and-recreating-a-tkinter-window-with-a-restart-button
@@ -348,16 +362,15 @@ def order_matrix(): #TODO: implement
     pass
 
 
-#TODO: implement a new binding method cause "bind" from Tkinter doesn't work when app is out of focus
-
-#for every object (in objects) we have defined a specific instance (of class TickFrame)
-#and every instance holds a "combination" attribute that we can use to then bind the increment of the count for every instance to the specific combination
-#we could have used a dictionary but this way we are making use of OOP: taking combination directly from instance
 def link_combinations():                                
     for object in objects:
         key = object.combination
         #print(key)
-        root.bind(f"<Control-{key}>", object.increment)
+        if key :
+            hotkeys_dictionary[f"<ctrl>+<alt>+{key}"] = object.increment
+
+
+
 
 
 if __name__ == "__main__":
