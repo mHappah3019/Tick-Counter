@@ -135,7 +135,7 @@ def rename_DATABASE(old_name, new_name):
 #rename_type("sosa", "sosa2", "dailies.csv")
 
 
-def check_data_consistency():
+def check_data_consistency():   #TODO: Test and add to MainApplication.py
     df=pd.read_csv(TICK_INSTANCES, dtype=object)
     from_tick_instances = df['Name'].tolist()
     #print(from_tick_instances)

@@ -1,5 +1,8 @@
 import os
 from pathlib import Path
+from idlelib.tooltip import Hovertip
+
+import utils.hover_messages as hm
 
 
 def skip_last(iterator):  #TODO: understand this
@@ -25,6 +28,11 @@ def find_data_abs_path(file):
     #fullpath = Path(full_path)
     return full_path
 
+
+def bind_hover_message(frame, hover_messages_key, hover_message=None):
+    hover_messages_value = hm.hover_messages.get(hover_messages_key)
+    tip = Hovertip(frame, hover_messages_value, hover_delay=500)
+    
 
 
 if __name__ == "__main__":

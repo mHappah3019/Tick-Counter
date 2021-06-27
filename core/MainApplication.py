@@ -14,6 +14,8 @@ import database123_interaction
 import utils.general_utils as gen
 import utils.datetime_utils
 
+import utils.hover_messages as hm
+
 
 
 
@@ -123,15 +125,12 @@ class TickFrame(tk.Frame):
             self.increase_btn.grid(row=0, column=3)
             self.info_btn.grid(row=0, column=4)
 
-
-            #TODO: definire funzione
-            name_tip = Hovertip(self.name_lbl,'This is \na multiline tooltip.', hover_delay=500)
-            decrease_tip = Hovertip(self.decrease_btn,'This is \na multiline tooltip.', hover_delay=500)
-            count_tip = Hovertip(self.count_lbl,'This is \na multiline tooltip.', hover_delay=1000)
-            increase_tip = Hovertip(self.increase_btn,'This is \na multiline tooltip.', hover_delay=1000)
-            info_tip = Hovertip(self.info_btn,'This is \na multiline tooltip.', hover_delay=1000)
-            
-
+            name_tip = gen.bind_hover_message(self.name_lbl, "name_lbl")
+            decrease_tip = gen.bind_hover_message(self.decrease_btn, "decrease_btn")
+            count_tip = gen.bind_hover_message(self.count_lbl, "count_lbl")
+            increase_tip = gen.bind_hover_message(self.increase_btn, "increase_btn")
+            increase_tip_extra = Hovertip(self.increase_btn,f"Hotkey:Ctrl+Alt+{self.combination}", hover_delay=500) #TODO: fix
+            info_tip = gen.bind_hover_message(self.info_btn, "info_btn")
 
             objects.append(self) #"populate" (ScrollableFrame) creates tick instances, hence they are added to an array that keeps track of all of them
 
@@ -144,6 +143,7 @@ class TickFrame(tk.Frame):
         def decrement(self):
             self.session_count -= 1
             self.count_lbl['text'] = str(int(self.count_lbl['text']) - 1) #shows in the label the new value; the old value is simply decremented by one
+
 
 
 
