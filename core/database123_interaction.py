@@ -104,11 +104,6 @@ def delete_type_count(instance_name, file):
 
     new_f.to_csv(file, index=False)
 
-if __name__ == "__main__":
-    delete_type_count("Instance2", MONTHLIES)
-    print("\n\n\n\n\n")
-    delete_type_count("Instance1", DAILIES)
-
 
 #https://stackoverflow.com/questions/46113078/pandas-add-value-at-specific-iloc-into-new-dataframe-column
 def add_to_header(instance_name, file):
@@ -138,3 +133,33 @@ def rename_DATABASE(old_name, new_name):
     rename_type(old_name, new_name, MONTHLIES)
 
 #rename_type("sosa", "sosa2", "dailies.csv")
+
+
+def check_data_consistency():
+    df=pd.read_csv(TICK_INSTANCES, dtype=object)
+    from_tick_instances = df['Name'].tolist()
+    #print(from_tick_instances)
+    from_tick_instances.pop()
+    print(from_tick_instances)
+    
+    df1=pd.read_csv(DAILIES, dtype=object)
+    df2=pd.read_csv(WEEKLIES, dtype=object)
+    df3=pd.read_csv(MONTHLIES, dtype=object)
+
+    from_dailies=list(df1.columns.values) #"Date" header is present too, so the list is not properly a list of only instances names
+    from_weeklies=list(df2.columns.values) #"Week" header is present too, so the list is not properly a list of only instances names
+    from_monthlies=list(df3.columns.values) #"Month" header is present too, so the list is not properly a list of only instances names
+
+    from_dailies.remove("Date")
+    from_weeklies.remove("Week")
+    from_monthlies.remove("Month")
+
+    if (from_dailies == from_weeklies == from_monthlies == from_tick_instances):
+        return True
+
+
+if __name__ == "__main__":
+    #delete_type_count("Instance2", MONTHLIES)
+    print("\n\n\n\n\n")
+    #delete_type_count("Instance1", DAILIES)
+    print(check_data_consistency())

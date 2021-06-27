@@ -7,6 +7,7 @@ import csv
 from pynput import keyboard
 from functools import partial
 from datetime import datetime
+from idlelib.tooltip import Hovertip
 
 import database_interaction
 import database123_interaction
@@ -121,6 +122,15 @@ class TickFrame(tk.Frame):
             self.count_lbl.grid(row=0, column=2)
             self.increase_btn.grid(row=0, column=3)
             self.info_btn.grid(row=0, column=4)
+
+
+            #TODO: definire funzione
+            name_tip = Hovertip(self.name_lbl,'This is \na multiline tooltip.', hover_delay=500)
+            decrease_tip = Hovertip(self.decrease_btn,'This is \na multiline tooltip.', hover_delay=500)
+            count_tip = Hovertip(self.count_lbl,'This is \na multiline tooltip.', hover_delay=1000)
+            increase_tip = Hovertip(self.increase_btn,'This is \na multiline tooltip.', hover_delay=1000)
+            info_tip = Hovertip(self.info_btn,'This is \na multiline tooltip.', hover_delay=1000)
+            
 
 
             objects.append(self) #"populate" (ScrollableFrame) creates tick instances, hence they are added to an array that keeps track of all of them
@@ -368,9 +378,6 @@ def link_combinations():
         #print(key)
         if key :
             hotkeys_dictionary[f"<ctrl>+<alt>+{key}"] = object.increment
-
-
-
 
 
 if __name__ == "__main__":
