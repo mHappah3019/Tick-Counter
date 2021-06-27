@@ -50,14 +50,14 @@ class ScrollableFrame(tk.Frame):
             #We are creating the frame that shall be later embedded in the canvas as a per-se window
             self.frame = tk.Frame(self.canvas, bd=2, bg="yellow")
             
-            #We want the object frame whose class we are defining to be the parent of scrollbar (parent of scrollbar is ScrollableFrame object)
+            #We want the object frame whose class we are defining to be the parent of scrollbar (parent of Scrollbar/vsb is ScrollableFrame object)
             self.vsb = tk.Scrollbar(master=self, orient=tk.VERTICAL, command=self.canvas.yview) #ig we are telling python to scroll the canvas in the "y" direction
             #We are connecting the scrollbar to the canvas:
             #in particular, with this instruction we are telling the scrollbar
             #to keep its "relative position" in regards to the canvas
             self.canvas.configure(yscrollcommand=self.vsb.set)
 
-            self.vsb.pack(side="right", fill="y") #inserting the scrollbar in the right side  of the ScrollableFrame
+            self.vsb.pack(side="right", fill="y") #inserting the scrollbar in the right side of the ScrollableFrame
             self.canvas.pack(side="left", fill="both", expand=True) #inserting the canvas in the left side of the ScrollableFrame
 
             #creating the window where the self.frame (the frame where TickFrame instances will actually be set) is "virtually" set to be
@@ -127,7 +127,7 @@ class TickFrame(tk.Frame):
 
             name_tip = gen.bind_hover_message(self.name_lbl, "name_lbl")
             decrease_tip = gen.bind_hover_message(self.decrease_btn, "decrease_btn")
-            count_tip = gen.bind_hover_message(self.count_lbl, "count_lbl")
+            #count_tip = gen.bind_hover_message(self.count_lbl, "count_lbl")
             increase_tip = gen.bind_hover_message(self.increase_btn, "increase_btn", f"Hotkey: Ctrl+Alt+{self.combination}")
             info_tip = gen.bind_hover_message(self.info_btn, "info_btn")
 
@@ -154,6 +154,10 @@ class MainApplication(tk.Frame):
         #...if we should reset, either the "Daily", "Weekly", "Monthly" counters or all of em and...
         #plus, it triggers all the functions to save the stats in dailies.csv, weeklies.csv, monthlies.csv
         #should be run before populating the application with all the data (when instantiating ScrollableFrame)
+        if not database123_interaction.check_data_consistency():
+            sys.exit()
+
+        
         database_interaction.check_count_reset()
 
         self.parent = parent #"parent" shall be "root"
@@ -167,8 +171,6 @@ class MainApplication(tk.Frame):
         #OOP approach: self.frame of the ScrollableFrame is being populated
         #self.frame holds the nx1 grid of instances
         self.instancesPanel.instances_populate()
-
-        #TODO: call function that adds hover messages
 
         self.instancesPanel.grid(row=0, column=0, sticky="nsew")
 
