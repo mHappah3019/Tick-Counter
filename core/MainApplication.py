@@ -125,7 +125,7 @@ class TickFrame(tk.Frame):
             self.increase_btn.grid(row=0, column=3)
             self.info_btn.grid(row=0, column=4)
 
-            name_tip = gen.bind_hover_message(self.name_lbl, "name_lbl")
+            name_tip = gen.bind_hover_message(self.name_lbl, "name_lbl", f"Hotkey: Ctrl+Alt+{self.combination}")
             decrease_tip = gen.bind_hover_message(self.decrease_btn, "decrease_btn")
             #count_tip = gen.bind_hover_message(self.count_lbl, "count_lbl")
             increase_tip = gen.bind_hover_message(self.increase_btn, "increase_btn", f"Hotkey: Ctrl+Alt+{self.combination}")
@@ -188,6 +188,7 @@ class MainApplication(tk.Frame):
         #"InstancesAdder.create_window" creates an "InstancesAdder window"
         ADD_btn = tk.Button(self.extraPanel, text="ADD", command=InstancesAdder.create_window)
         ADD_btn.grid(row=0, column=0, sticky="nsew")
+        ADD_tip = gen.bind_hover_message(ADD_btn, "ADD_btn")
 
 
     def __exit__(self): 
@@ -211,7 +212,7 @@ class InstancesAdder(ScrollableFrame):
         self.labels = [  #pay attention to all the ":"s
             "Name:",
             "Comb:",
-            "POS:"
+#           "POS:"
         ]
 
         self.infos_populate() #calling it now for simplicity purposes
@@ -224,6 +225,9 @@ class InstancesAdder(ScrollableFrame):
         #   can have add_instance or modify_instance commands depending on inheritance
         self.define_submit()
 
+        gen.bind_hover_message(self.labels_entries["Name:"], "name_entry")
+        gen.bind_hover_message(self.labels_entries["Comb:"], "comb_entry")
+        gen.bind_hover_message(self.btn_submit, "Submit_btn" )
 
     def define_submit(self):
         self.btn_submit = tk.Button(master=self.frm_buttons, text="Submit", command=self.add_instance) #add_instance will refresh the application
@@ -269,6 +273,7 @@ class InstancesAdder(ScrollableFrame):
         self.frm_form.columnconfigure(0, weight=1) # make only "Label" and "Entry" columns visible...
         self.frm_form.columnconfigure(1, weight=2) # ...since we are using a grid
 
+        #TODO: valutare se conviene portarlo all'interno dell'init
         self.labels_entries = {} #redefining the dictionary as empty before populating the frame, since we'll encounter a bug anytime we add a new tickframe instance
 
         for idx, text in enumerate(self.labels):
@@ -302,6 +307,7 @@ class InstancesManager(InstancesAdder):
         self.btn_delete = tk.Button(master=self.frm_buttons, text="Delete", command=self.delete_instance) #delete_instance will refresh the application
         self.btn_delete.pack(side=tk.LEFT, padx=10, ipadx=10)
 
+        delete_tip = gen.bind_hover_message(self.btn_delete, "Delete_btn")
 
     def define_submit(self):
         self.btn_submit = tk.Button(master=self.frm_buttons, text="Submit", command=self.modify_instance) #modify_instance will refresh the application
