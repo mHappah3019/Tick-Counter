@@ -156,8 +156,6 @@ class MainApplication(tk.Frame):
         #should be run before populating the application with all the data (when instantiating ScrollableFrame)
         if not database123_interaction.check_data_consistency():
             sys.exit()
-
-        
         database_interaction.check_count_reset()
 
         self.parent = parent #"parent" shall be "root"
@@ -290,7 +288,7 @@ class InstancesAdder(ScrollableFrame):
             # populates dictionary as:
             # keys correspond to text, directly taken from labels
             # values are represented by entries object (references)
-            self.labels_entries[text] = entry
+            self.labels_entries[text] = entry  #TODO: comment giving info on its actual use
         
 
 
@@ -327,16 +325,16 @@ class InstancesManager(InstancesAdder):
         comb = self.labels_entries["Comb:"].get()
         pos = self.labels_entries["POS:"].get()
 
-        database123_interaction.rename_DATABASE(self.instance.name, name)
-        database_interaction.rename_GUI(self.instance.name, name)
+        database123_interaction.rename_DATABASE(self.instance.name, name) #interacts with dailies, weeklies and monthlies (.csv)
+        database_interaction.rename_GUI(self.instance.name, name)         #interacts with tick-instances.csv
         
-        refresh()
+        refresh()                         #we shall reload the application to get the GUI for all the instances we have modified
         pass
 
 
     def delete_instance(self):
-        database123_interaction.delete_counts_database(self.instance.name) #this function then calls all the "deletion" functions (1 for dailies, 1 for weeklies, 1 for monthlies and 1 for tick-instances) 
-        database_interaction.delete_from_GUI(self.instance.name)
+        database123_interaction.delete_counts_database(self.instance.name) #this function then calls all the "deletion" functions (1 for dailies, 1 for weeklies, 1 for monthlies) 
+        database_interaction.delete_from_GUI(self.instance.name)           #this function deletes instance from tick-instances.csv
         refresh()                         #we shall reload the application to get the GUI for all the instances we have KEPT
 
 
@@ -381,8 +379,11 @@ def order_matrix(): #TODO: implement
     pass
 
 
-def link_combinations():                                
-    for object in objects:
+def link_combinations():         
+#iterating over all the instances we have set for our application:
+#"fetch" the combination to insert inside hotkeys_dictionary
+#needed later in vp_start_gui()                       
+    for object in objects:    
         key = object.combination
         #print(key)
         if key :
