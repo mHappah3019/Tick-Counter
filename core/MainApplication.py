@@ -289,7 +289,7 @@ class InstancesAdder(ScrollableFrame):
             # populates dictionary as:
             # keys correspond to text, directly taken from labels
             # values are represented by entries object (references)
-            self.labels_entries[text] = entry  #TODO: comment giving info on its actual use
+            self.labels_entries[text] = entry  #it later lets us bind hover messages to all the different entry frames
         
 
 
