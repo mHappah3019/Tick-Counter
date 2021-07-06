@@ -1,8 +1,8 @@
 import sys
 import os
 
-sys.path.append("C:/Users/mkcam/Desktop/Tick Counter/Tick-Counter")
-print(sys.path)
+sys.path.append("C:/Users/mkcam/Desktop/Tick Counter/Tick-Counter") #TODO: fix this
+#print(sys.path)
 
 import database123_interaction as db_int
 import utils.datetime_utils as dt_utils
@@ -21,7 +21,8 @@ WEEKLIES = gen.find_data_abs_path("weeklies.csv")
 MONTHLIES = gen.find_data_abs_path("monthlies.csv")
 
 
-
+#tick-instances.csv keeps the logs for the last date the application was run on
+#the date is in the last row, first column
 def load_last_date(file):
     with open(TICK_INSTANCES, "r") as file:
         csv_reader = csv.reader(file)
@@ -33,6 +34,7 @@ def load_last_date(file):
         return last_date
 
 
+#deletes corresponding row for the "instance_name" object
 def delete_from_GUI(instance_name):
     df = pd.read_csv(TICK_INSTANCES, dtype=object)
 
@@ -42,9 +44,10 @@ def delete_from_GUI(instance_name):
     df.to_csv(TICK_INSTANCES, index=False)
 
 
-
+#this functions works only for finding the index of the th-row in tick-instances.csv (return index of corresponding "Name" row)
 def get_row_index(instance_name, df):
     return df.index[df["Name"] == instance_name].tolist()[0]
+
 
 if __name__=="__main__":
     delete_from_GUI("xxx")
@@ -90,12 +93,12 @@ def check_count_reset():
         count_reset("month") #actually resetting the values
 
 
-#https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.at.html
+
 def rename_GUI(old_name, new_name): 
     df = pd.read_csv(TICK_INSTANCES, dtype=object)
     idx = get_row_index(old_name, df)
 
-    df.at[idx, "Name"] = new_name
+    df.at[idx, "Name"] = new_name   #the selected element to be renamed is the one given by the intersection of "idx" index/row and "Name" column
 
     df.to_csv(TICK_INSTANCES, index=False)
 

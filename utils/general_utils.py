@@ -18,13 +18,16 @@ def find_data_abs_path(file):
     return full_path
 
 
+#function that binds hover_message to any frame;
+#these messages can be retrieved from either hover_messages dictionary (defined in hover_messages.py)
+#or defined as string (hover_message parameter)
 def bind_hover_message(frame, hover_messages_key, hover_message=None):
     hover_messages_value = hm.hover_messages.get(hover_messages_key)
-    if hover_message:
+    if hover_message:  
         if hover_messages_value:
             hover_messages_value += f"\n{hover_message}"
         else:
-            hover_messages_value = hover_message
+            hover_messages_value = hover_message                 #if hover_messages_value == False, we are actually just taking in the hover_message string as the real hover_message 
     tip = Hovertip(frame, hover_messages_value, hover_delay=500)
     
 

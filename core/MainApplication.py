@@ -151,11 +151,13 @@ class MainApplication(tk.Frame):
     def __init__(self, parent, *args, **kwargs):
         tk.Frame.__init__(self, parent, *args, **kwargs)
 
+        #check_data_consistency assures that all the files are in the right format, hence they were not modified by the user
+        if not database123_interaction.check_data_consistency():
+            sys.exit()
+
         #...if we should reset, either the "Daily", "Weekly", "Monthly" counters or all of em and...
         #plus, it triggers all the functions to save the stats in dailies.csv, weeklies.csv, monthlies.csv
         #should be run before populating the application with all the data (when instantiating ScrollableFrame)
-        if not database123_interaction.check_data_consistency():
-            sys.exit()
         database_interaction.check_count_reset()
 
         self.parent = parent #"parent" shall be "root"
@@ -212,6 +214,8 @@ class InstancesAdder(ScrollableFrame):
             "Comb:",
 #           "POS:"
         ]
+
+        self.labels_entries = {} #redefining the dictionary as empty before populating the frame, since we'll encounter a bug anytime we add a new tickframe instance
 
         self.infos_populate() #calling it now for simplicity purposes
 
@@ -271,9 +275,6 @@ class InstancesAdder(ScrollableFrame):
         self.frm_form.columnconfigure(0, weight=1) # make only "Label" and "Entry" columns visible...
         self.frm_form.columnconfigure(1, weight=2) # ...since we are using a grid
 
-        #TODO: valutare se conviene portarlo all'interno dell'init
-        self.labels_entries = {} #redefining the dictionary as empty before populating the frame, since we'll encounter a bug anytime we add a new tickframe instance
-
         for idx, text in enumerate(self.labels):
             self.frm_form.rowconfigure(idx, weight=1) #make the row at index "idx" visible (all the other rows are kept hidden)
             # Create a Label widget with the text from the labels list
@@ -329,7 +330,6 @@ class InstancesManager(InstancesAdder):
         database_interaction.rename_GUI(self.instance.name, name)         #interacts with tick-instances.csv
         
         refresh()                         #we shall reload the application to get the GUI for all the instances we have modified
-        pass
 
 
     def delete_instance(self):
@@ -352,13 +352,14 @@ def vp_start_gui():
     mainapp = MainApplication(root)
     mainapp.pack(side="top", fill="both", expand=True)
 
+    #to make refresh trigger at 00:00 if the application is still on
     root.after(utils.datetime_utils.get_remaining_ms(), refresh)
 
     with keyboard.GlobalHotKeys(
         hotkeys_dictionary
     ) as h: 
 
-        print(hotkeys_dictionary)
+        #print(hotkeys_dictionary)
         root.mainloop()
         h.stop()
         h.join()
@@ -366,8 +367,8 @@ def vp_start_gui():
 
 
 
-def refresh():  #https://stackoverflow.com/questions/44199332/removing-and-recreating-a-tkinter-window-with-a-restart-button
-    del objects[:]
+def refresh():
+    del objects[:]   #deletes all elements from objects list
     root.destroy()
     root.after(3000)
     vp_start_gui()

@@ -108,8 +108,10 @@ def delete_type_count(instance_name, file):
 #https://stackoverflow.com/questions/46113078/pandas-add-value-at-specific-iloc-into-new-dataframe-column
 def add_to_header(instance_name, file):
     df = pd.read_csv(file, dtype=object)
-    rowIndex = df.index[0]
-    df.loc[rowIndex, instance_name] = None
+
+    rowIndex = df.index[0]                   #represents Header row
+    df.loc[rowIndex, instance_name] = None   #actually adds as header "instance_name", then, fills the column with None value
+
     df.to_csv(file, index=False)
 
 
@@ -123,7 +125,7 @@ def add_to_headers(instance_name):
 
 def rename_type(old_name, new_name, file):
     df = pd.read_csv(file, dtype=object)
-    df.rename(columns = {f'{old_name}':f'{new_name}'}, inplace = True)
+    df.rename(columns = {f'{old_name}':f'{new_name}'}, inplace = True) #renames columns/header names
     df.to_csv(file, index=False)
 
 
@@ -135,12 +137,13 @@ def rename_DATABASE(old_name, new_name):
 #rename_type("sosa", "sosa2", "dailies.csv")
 
 
-def check_data_consistency():   #TODO: Test and add to MainApplication.py
+#function that compares all the instances names of tick-instances.csv with all the instances names of dailies, weeklies, monthlies (.csv)
+def check_data_consistency():
     df=pd.read_csv(TICK_INSTANCES, dtype=object)
     from_tick_instances = df['Name'].tolist()
     #print(from_tick_instances)
-    from_tick_instances.pop()
-    print(from_tick_instances)
+    from_tick_instances.pop()     #popping last element because it represents the adte
+    #print(from_tick_instances)
     
     df1=pd.read_csv(DAILIES, dtype=object)
     df2=pd.read_csv(WEEKLIES, dtype=object)
