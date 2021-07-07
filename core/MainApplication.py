@@ -3,6 +3,7 @@ import os
 
 sys.path.append("C:/Users/mkcam/Desktop/Tick Counter/Tick-Counter/core")
 
+import pandas as pd
 import tkinter as tk
 import csv
 

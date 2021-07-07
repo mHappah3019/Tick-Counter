@@ -1,6 +1,9 @@
 import os
+import sys
 from pathlib import Path
 from idlelib.tooltip import Hovertip
+
+sys.path.append("C:/Users/mkcam/Desktop/Tick Counter/Tick-Counter")
 
 import utils.hover_messages as hm
 
@@ -14,7 +17,10 @@ def skip_last(iterator):  #TODO: understand this
 
 def find_data_abs_path(file):
     relative_path = f"./Tick-Counter/data/{file}"
-    full_path = Path.cwd() / relative_path
+    print("\n\n\n")
+    full_path = Path.cwd() / relative_path           #TODO: fix cwd, running from vscode gives Tick Counter as cwd, running from cli.exe gives Tick-Counter
+    print(Path.cwd())
+    print("\n\n\n")
     return full_path
 
 

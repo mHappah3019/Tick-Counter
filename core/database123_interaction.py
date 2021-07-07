@@ -1,3 +1,7 @@
+import sys
+
+sys.path.append("C:/Users/mkcam/Desktop/Tick Counter/Tick-Counter")
+
 import database_interaction
 import utils.general_utils as gen
 
