@@ -16,7 +16,8 @@ def skip_last(iterator):  #TODO: understand this
 
 
 def find_data_abs_path(file):
-    relative_path = f"./Tick-Counter/data/{file}"
+    #relative_path = f"./Tick-Counter/data/{file}"
+    relative_path = f"./data/{file}"
     print("\n\n\n")
     full_path = Path.cwd() / relative_path           #TODO: fix cwd, running from vscode gives Tick Counter as cwd, running from cli.exe gives Tick-Counter
     print(Path.cwd())
