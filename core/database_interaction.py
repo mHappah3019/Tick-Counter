@@ -1,7 +1,7 @@
 import sys
 import os
 
-sys.path.append("C:/Users/mkcam/Desktop/Tick Counter/Tick-Counter")
+sys.path.append("C:/Users/mkcam/Desktop/Tick Counter/Tick-Counter")  #TODO: fix this shit
 print(sys.path)
 
 import database123_interaction as db_int

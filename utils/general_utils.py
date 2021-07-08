@@ -3,7 +3,7 @@ import sys
 from pathlib import Path
 from idlelib.tooltip import Hovertip
 
-sys.path.append("C:/Users/mkcam/Desktop/Tick Counter/Tick-Counter")
+sys.path.append("C:/Users/mkcam/Desktop/Tick Counter/Tick-Counter")   #TODO: fix this shit
 
 import utils.hover_messages as hm
 

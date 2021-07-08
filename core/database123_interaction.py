@@ -1,6 +1,6 @@
 import sys
 
-sys.path.append("C:/Users/mkcam/Desktop/Tick Counter/Tick-Counter")
+sys.path.append("C:/Users/mkcam/Desktop/Tick Counter/Tick-Counter")    #TODO: fix this shit
 
 import database_interaction
 import utils.general_utils as gen
@@ -139,7 +139,7 @@ def rename_DATABASE(old_name, new_name):
 #rename_type("sosa", "sosa2", "dailies.csv")
 
 
-def check_data_consistency():   #TODO: Test and add to MainApplication.py
+def check_data_consistency(): 
     df=pd.read_csv(TICK_INSTANCES, dtype=object)
     from_tick_instances = df['Name'].tolist()
     #print(from_tick_instances)

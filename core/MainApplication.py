@@ -1,7 +1,7 @@
 import sys
 import os
 
-sys.path.append("C:/Users/mkcam/Desktop/Tick Counter/Tick-Counter/core")
+sys.path.append("C:/Users/mkcam/Desktop/Tick Counter/Tick-Counter/core")  #TODO: fix this shit
 
 import pandas as pd
 import tkinter as tk
