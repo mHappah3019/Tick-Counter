@@ -7,6 +7,7 @@ import pandas as pd
 import tkinter as tk
 import csv
 
+from importlib import resources
 from pynput import keyboard
 from functools import partial
 from datetime import datetime
@@ -74,7 +75,7 @@ class ScrollableFrame(tk.Frame):
     def instances_populate(self):
         #We are specifying that the frame (for the Tick instances in case of MainApplication) has only one visible column
         self.frame.columnconfigure(0, weight=1, minsize=200) 
-        with open(TICK_INSTANCES, "r", encoding="UTF-8") as file:
+        with resources.open_text("data", "tick-instances.csv") as file:
             csv_file = csv.DictReader(file)
 
             for i, row in gen.skip_last(enumerate(csv_file)):
